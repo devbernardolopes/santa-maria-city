@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" uid="uid://bsq8my0ehu8pn" path="res://scripts/world/world.gd" id="1_world"]
+[ext_resource type="Script" uid="uid://bn1i3eh0js1tf" path="res://scripts/world/map_loader.gd" id="2_map"]
+[ext_resource type="Script" uid="uid://b78jeffoiffbn" path="res://scripts/world/debug_camera.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://l1t1fxwtwqt1" path="res://scripts/ui/hud.gd" id="4_hud"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_world")
+
+[node name="Map" type="Node2D" parent="."]
+script = ExtResource("2_map")
+
+[node name="Decals" type="Node2D" parent="."]
+
+[node name="TerrainState" type="Node2D" parent="."]
+
+[node name="Objects" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Canopy" type="Node2D" parent="."]
+
+[node name="DebugCamera" type="Camera2D" parent="."]
+enabled = true
+script = ExtResource("3_camera")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+script = ExtResource("4_hud")
+
+[node name="Label" type="Label" parent="Hud"]
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_vertical = 0
+mouse_filter = 2
+text = "Loading map…"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
