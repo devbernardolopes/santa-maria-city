@@ -1,5 +1,6 @@
+class_name DebugCamera
 extends Camera2D
-## Debug camera: panned with the move actions, wheel/action zoom, and left-drag.
+## Debug camera: frames the map data, pans with actions, and zooms/drags.
 
 const PAN_SPEED_MPS: float = 60.0
 const ZOOM_STEP: float = 1.15
@@ -16,7 +17,6 @@ func _ready() -> void:
 	if _map == null:
 		push_warning("DebugCamera: Map node not found; map framing is disabled.")
 		return
-	_map.map_loaded.connect(_on_map_loaded)
 	if _map.is_loaded:
 		_frame_map()
 
@@ -48,20 +48,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		position -= mouse_motion.relative / zoom
 
 
-func _on_map_loaded(_counts: Dictionary) -> void:
+func on_map_loaded() -> void:
 	_frame_map()
 
 
 func _frame_map() -> void:
-	if _map == null or _map.map_size_m == Vector2.ZERO:
+	if _map == null or _map.map_bounds_px.size == Vector2.ZERO:
 		return
 	var viewport_size: Vector2 = get_viewport_rect().size
-	var map_pixels: Vector2 = Units.to_px(_map.map_size_m)
+	var map_pixels: Vector2 = _map.map_bounds_px.size
 	if map_pixels.x <= 0.0 or map_pixels.y <= 0.0:
 		return
 	var fit_zoom: float = minf(viewport_size.x / map_pixels.x, viewport_size.y / map_pixels.y) * FRAME_MARGIN
 	zoom = Vector2.ONE * clampf(fit_zoom, MIN_ZOOM, MAX_ZOOM)
-	position = Vector2.ZERO
+	position = _map.map_bounds_px.get_center()
 
 
 func _zoom_by(factor: float) -> void:

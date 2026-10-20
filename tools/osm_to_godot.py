@@ -4,16 +4,16 @@ Converts an OSM GeoJSON export (Overpass Turbo / osmium export) into a single
 JSON file that Godot 4 can load easily.
 
 Usage:
-    python osm_to_godot.py export.geojson map.json
+    python osm_to_godot.py export.geojson map.json [--origin-utm X Y]
 
-Output coordinates are in METERS, relative to the center of the data, with Y
-flipped (Godot: +Y is down, so north is -Y). Scaling to pixels is done in Godot.
+Output coordinates are in METERS, relative to a fixed UTM origin, with Y flipped
+(Godot: +Y is down, so north is -Y). Scaling to pixels is done in Godot.
 
-Dependencies:  shapely, pyproj
-    sudo pacman -S python-shapely python-pyproj
+Dependencies:  shapely, pyproj, numpy
+    sudo pacman -S python-shapely python-pyproj python-numpy
 """
+import argparse
 import json
-import sys
 
 from pyproj import Transformer
 from shapely.affinity import affine_transform
@@ -23,6 +23,9 @@ import shapely
 
 # SIRGAS 2000 / UTM zone 22S (good for Santa Maria)
 TARGET_CRS = "EPSG:31982"
+
+# Pinned world origin in UTM. Never change this: authored positions depend on it.
+DEFAULT_ORIGIN_UTM: tuple[float, float] = (228400.0, 6712900.0)
 
 # Road width in meters by highway class (used if there is no usable `width` tag)
 ROAD_WIDTHS = {
@@ -35,10 +38,12 @@ SKIP_HIGHWAY = {"proposed", "construction", "razed", "abandoned", "platform"}
 
 # Tags kept in the output (everything else is dropped to keep the file small)
 KEEP_TAGS = {
-    "name", "alt_name", "highway", "building", "building:levels", "height",
-    "oneway", "lanes", "maxspeed", "surface", "bridge", "tunnel", "layer",
-    "junction", "landuse", "natural", "leisure", "waterway", "amenity",
-    "shop", "railway", "addr:street", "addr:housenumber", "addr:postcode",
+    "name", "alt_name", "highway", "building", "building:levels",
+    "building:material", "height", "oneway", "lanes", "maxspeed", "surface",
+    "access", "width", "bridge", "tunnel", "layer", "junction", "landuse",
+    "natural", "leisure", "waterway", "amenity", "shop", "railway",
+    "roof:material", "roof:colour", "addr:street", "addr:housenumber",
+    "addr:postcode",
 }
 
 
@@ -70,7 +75,30 @@ def parse_width(value):
         return None
 
 
-def main(src, dst):
+def output_bounds(out):
+    """Bounding box [min_x, min_y, max_x, max_y] of every written coordinate."""
+    min_x = min_y = float("inf")
+    max_x = max_y = float("-inf")
+    for key in ("landuse", "waterways", "roads", "buildings"):
+        for entry in out[key]:
+            for polygon_rings in entry.get("polys", []):
+                for ring in polygon_rings:
+                    for x, y in ring:
+                        min_x = min(min_x, x)
+                        min_y = min(min_y, y)
+                        max_x = max(max_x, x)
+                        max_y = max(max_y, y)
+            for x, y in entry.get("line", []):
+                min_x = min(min_x, x)
+                min_y = min(min_y, y)
+                max_x = max(max_x, x)
+                max_y = max(max_y, y)
+    if min_x == float("inf"):
+        return [0.0, 0.0, 0.0, 0.0]
+    return [round(min_x, 2), round(min_y, 2), round(max_x, 2), round(max_y, 2)]
+
+
+def main(src: str, dst: str, origin_utm: tuple[float, float]) -> None:
     with open(src, encoding="utf-8") as f:
         data = json.load(f)
 
@@ -86,16 +114,18 @@ def main(src, dst):
             lambda c: np.column_stack(to_utm(c[:, 0], c[:, 1])),
         )
         items.append((osm_id, props, geom))
+    if not items:
+        raise SystemExit("Input file contains no features.")
 
-    # 2) Origin = center of the bounding box of everything
+    # 2) Keep the imported extent for meta.size_m (the old semantics)
     minx = min(g.bounds[0] for _, _, g in items)
     miny = min(g.bounds[1] for _, _, g in items)
     maxx = max(g.bounds[2] for _, _, g in items)
     maxy = max(g.bounds[3] for _, _, g in items)
-    cx, cy = (minx + maxx) / 2, (miny + maxy) / 2
 
-    # x' = x - cx ; y' = -(y - cy)   (flip Y)
-    matrix = [1, 0, 0, -1, -cx, cy]
+    # 3) Subtract the pinned origin and flip Y.
+    origin_x, origin_y = origin_utm
+    matrix = [1, 0, 0, -1, -origin_x, origin_y]
 
     out = {"landuse": [], "waterways": [], "roads": [], "buildings": []}
 
@@ -167,8 +197,9 @@ def main(src, dst):
 
     out["meta"] = {
         "crs": TARGET_CRS,
-        "origin_utm": [round(cx, 2), round(cy, 2)],
+        "origin_utm": [origin_x, origin_y],
         "size_m": [round(maxx - minx, 1), round(maxy - miny, 1)],
+        "bounds_m": output_bounds(out),
         "attribution": "© OpenStreetMap contributors (ODbL)",
         "counts": {k: len(v) for k, v in out.items() if isinstance(v, list)},
     }
@@ -180,7 +211,22 @@ def main(src, dst):
     print(out["meta"])
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input", help="OSM GeoJSON export")
+    parser.add_argument("output", help="output map.json")
+    parser.add_argument(
+        "--origin-utm",
+        nargs=2,
+        type=float,
+        metavar=("X", "Y"),
+        default=DEFAULT_ORIGIN_UTM,
+        help="pinned origin in EPSG:31982 meters",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        sys.exit("Usage: python osm_to_godot.py input.geojson output.json")
-    main(sys.argv[1], sys.argv[2])
+    args = parse_args()
+    origin = args.origin_utm
+    main(str(args.input), str(args.output), (float(origin[0]), float(origin[1])))

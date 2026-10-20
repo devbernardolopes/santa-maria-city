@@ -52,15 +52,19 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 
 ### Units and coordinates
 
-- Map data is in **meters**, origin at the center of the imported area, +X east, +Y south (Y is already flipped for Godot's coordinate system).
+- Map data is in **meters**, relative to a pinned UTM origin (`meta.origin_utm`, projection EPSG:31982), +X east, +Y south (Y is already flipped for Godot's coordinate system). The origin never moves when the imported area changes, so authored positions stay valid across re-imports.
+- `meta.size_m` is the imported extent; `meta.bounds_m` is `[min_x, min_y, max_x, max_y]` of every written coordinate. Frame using `bounds_m`; derive bounds from polygons only for old data that has no `bounds_m`.
 - The single source of truth for scale is `Units.PX_PER_METER` in `scripts/units.gd` (`class_name Units`). Never hard-code a scale anywhere else. Convert with `Units.m_to_px()` / `Units.px_to_m()`.
 - Gameplay values (speeds, ranges, sizes) are expressed in meters and m/s and converted to pixels at the edge.
 
 ### Map data pipeline
 
 - OSM `.geojson` export → `tools/osm_to_godot.py` (Python, shapely + pyproj, projection EPSG:31982) → `res://data/map.json`. The file is generated: regenerate it instead of editing it.
-- `map.json` schema: top level keys `landuse`, `waterways`, `roads`, `buildings`, `meta`. Every feature has `id` (string, e.g. `"way/123"` or `"relation/456"`), `name` (string, may be empty), `tags` (Dictionary of kept OSM tags), `kind` (string), and `polys`: an Array of polygons, each polygon an Array of rings (`[outer, hole1, ...]`), each ring an Array of `[x, y]` points in meters (rings are not closed). Roads additionally have `width` (m), `oneway` (bool, the `line` already points in the travel direction), `layer` (int), `bridge`, `tunnel` (bool), and `line` (the centerline, Array of `[x, y]`). Waterways additionally have `line`. Buildings additionally have `levels`. `meta` has `crs`, `origin_utm`, `size_m`, `attribution`, `counts`.
+- The converter's pinned origin is `DEFAULT_ORIGIN_UTM = (228400.0, 6712900.0)` and is written to `meta.origin_utm`. `--origin-utm X Y` exists for a deliberate re-origin only; changing it invalidates every authored position and overlay.
+- `map.json` schema: top level keys `landuse`, `waterways`, `roads`, `buildings`, `meta`. Every feature has `id` (string, e.g. `"way/123"` or `"relation/456"`), `name` (string, may be empty), `tags` (Dictionary of kept OSM tags), `kind` (string), and `polys`: an Array of polygons, each polygon an Array of rings (`[outer, hole1, ...]`), each ring an Array of `[x, y]` points in meters (rings are not closed). Roads additionally have `width` (m), `oneway` (bool, the `line` already points in the travel direction), `layer` (int), `bridge`, `tunnel` (bool), and `line` (the centerline, Array of `[x, y]`). Waterways additionally have `line`. Buildings additionally have `levels`. `meta` has `crs`, `origin_utm`, `size_m`, `bounds_m`, `attribution`, `counts`.
 - Developer-authored data (interiors, entrances, spawn points, building properties) lives in `res://data/overlays/` **keyed by OSM ID**, never by array index or node path, so the map can be re-imported without losing work.
+- Map styling is data-driven through `MapStyle` / `TerrainStyle` (`id`, `kind`, `surface`, color/texture/scale). Resolution order is: exact style-id override → kind + surface → kind → category default. Surface keys are normalized to lowercase and stripped before `;` and `:` (for example `concrete:lanes` becomes `concrete`). No colors or textures are hard-coded in loader logic.
+- `res://data/overlays/style_overrides.json` maps OSM ID to style ID, for example `{"version": 1, "overrides": {"way/123": "residential_asphalt"}}`. Unknown OSM IDs and unknown style IDs fall back safely and produce one aggregated warning per rebuild, not one per feature.
 - Attribution "© OpenStreetMap contributors (ODbL)" must be shown in the credits before any release.
 
 ### Rendering layers (draw order, bottom to top)
@@ -68,7 +72,9 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 `Landuse` → `Waterways` → `Roads` → `Buildings` (footprints draw as roofs) → `Decals` → `TerrainState` (reserved for future dynamic overlays) → `Objects` (y-sorted: entities, vehicles, items, vegetation) → `Canopy` (tree tops, roof fade-outs).
 
 - Base ground/road/building polygons are **static art**: never modify them at runtime. Anything dynamic (burn marks, wetness, regrowth, puddles) goes in an overlay layer above.
-- Terrain appearance is data-driven through the `MapStyle` resource (kind → color/texture/scale). No colors or textures hard-coded in loader logic.
+- Terrain appearance is data-driven through `MapStyle` / `TerrainStyle` (style id + kind + surface → color/texture/scale). No colors or textures hard-coded in loader logic.
+- `scripts/world/map_loader.gd` is the **only `@tool` script**. It previews the generated layers in the editor, has a “Rebuild map” inspector button, and auto-frames the 2D editor view once when the map bounds are completely off-screen. Generated layer/polygon nodes deliberately have no `owner`, so they are never saved into a scene. Other scripts (including `world.gd`) stay non-tool and connect `map_loaded` in `_ready()`.
+- `scripts/world/map_picker.gd` is a non-tool debug node. The `debug_pick` action picks the top-most polygon under the mouse (or the screen center for the pad), draws a closed white `Line2D` outline, copies the OSM ID to the clipboard, and sends the feature report (category, kind, surface, style, up to eight tags) to the HUD.
 
 ### Data versus nodes
 
@@ -87,7 +93,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 
 ### Input actions
 
-Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
+Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start) · `debug_pick` (right mouse button / pad right-stick press). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
 
 ### Performance
 
@@ -113,6 +119,8 @@ Before shipping a build: remove any `_mcp_game_helper` dev autoload and its edit
 - `input_map` calls must be **sequential** (parallel bursts wedge the backend lock); `project_manage settings_set` accepts invalid keys without complaint (verify setting names against engine docs).
 - Godot 4 API differs from Godot 3 memory (e.g. `ScrollContainer.horizontal_scroll_mode`). When unsure about a property or method, check the Godot 4.7 docs instead of guessing.
 - Editor-log ghosts: the log buffer re-emits stale diagnostics on scans — confirm errors against current file contents (grep) before treating them as live.
+- Never reference `EditorInterface` directly from a script that is shipped in a game: editor classes are stripped from export templates and the script then fails to load. Access it only under `Engine.is_editor_hint()` through `Engine.get_singleton(&"EditorInterface")`.
+- Regenerate the map with `uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py data/export.geojson data/map.json` when the system Python lacks the geo dependencies.
 
 ## Commit Convention
 
