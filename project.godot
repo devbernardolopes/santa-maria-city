@@ -28,6 +28,14 @@ window/stretch/aspect="expand"
 
 enabled=PackedStringArray("res://addons/godit/plugin.cfg", "res://addons/godot_ai/plugin.cfg")
 
+[file_customization]
+
+folder_colors={
+"res://resources/": "orange",
+"res://scenes/": "red",
+"res://scripts/": "green"
+}
+
 [input]
 
 move_up={
