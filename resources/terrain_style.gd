@@ -1,3 +1,4 @@
+@tool
 class_name TerrainStyle
 extends Resource
 ## Appearance of one map feature kind. A missing texture falls back to a flat color.

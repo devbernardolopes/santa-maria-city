@@ -1,3 +1,4 @@
+@tool
 class_name MapStyle
 extends Resource
 ## Data-driven appearance for every map layer, with surface variants and fallbacks.
@@ -54,6 +55,9 @@ const ROAD_SURFACE_COLORS: Dictionary = {
 		default_building = value
 		invalidate_index()
 
+@export_tool_button("Reset to defaults")
+var reset_to_defaults_button: Callable = fill_defaults
+
 var _kind_index: Dictionary = {}
 var _id_index: Dictionary = {}
 var _index_dirty: bool = true
@@ -89,6 +93,19 @@ func get_style_by_id(category: StringName, style_id: StringName) -> TerrainStyle
 	if style_value is TerrainStyle:
 		return style_value
 	return null
+
+
+func is_empty() -> bool:
+	return (
+		landuse.is_empty()
+		and waterways.is_empty()
+		and roads.is_empty()
+		and buildings.is_empty()
+		and default_landuse == null
+		and default_waterway == null
+		and default_road == null
+		and default_building == null
+	)
 
 
 func invalidate_index() -> void:
@@ -202,16 +219,24 @@ static func normalize_surface(raw: String) -> String:
 
 static func create_default() -> MapStyle:
 	var style := MapStyle.new()
-	style.landuse.assign([
+	style.fill_defaults()
+	return style
+
+
+## Replaces every category and default style with the built-in palette.
+func fill_defaults() -> void:
+	waterways.assign([])
+	buildings.assign([])
+	landuse.assign([
 		_make_style(&"residential", &"residential", &"", Color("e3dccd")),
 		_make_style(&"grass", &"grass", &"", Color("b8d98a")),
 		_make_style(&"wood", &"wood", &"", Color("7fb069")),
 		_make_style(&"pitch", &"pitch", &"", Color("9ccc7a")),
 		_make_style(&"playground", &"playground", &"", Color("d9c8a0")),
 	])
-	style.default_landuse = _make_style(&"default_landuse", &"", &"", Color("d8e0c8"))
-	style.default_waterway = _make_style(&"default_waterway", &"", &"", Color("7fb3d5"))
-	style.roads.assign([
+	default_landuse = _make_style(&"default_landuse", &"", &"", Color("d8e0c8"))
+	default_waterway = _make_style(&"default_waterway", &"", &"", Color("7fb3d5"))
+	roads.assign([
 		_make_style(&"tertiary", &"tertiary", &"", Color("f2d98d")),
 		_make_style(&"residential", &"residential", &"", Color("ffffff")),
 		_make_style(&"service", &"service", &"", Color("f0f0f0")),
@@ -223,10 +248,11 @@ static func create_default() -> MapStyle:
 			var surface: StringName = StringName(str(surface_value))
 			var color: Color = ROAD_SURFACE_COLORS[surface_value]
 			var variant_id: StringName = StringName("%s_%s" % [String(road_kind), String(surface)])
-			style.roads.append(_make_style(variant_id, road_kind, surface, color))
-	style.default_road = _make_style(&"default_road", &"", &"", Color("eeeeee"))
-	style.default_building = _make_style(&"default_building", &"", &"", Color("b5a69a"))
-	return style
+			roads.append(_make_style(variant_id, road_kind, surface, color))
+	default_road = _make_style(&"default_road", &"", &"", Color("eeeeee"))
+	default_building = _make_style(&"default_building", &"", &"", Color("b5a69a"))
+	invalidate_index()
+	emit_changed()
 
 
 static func _make_style(id: StringName, kind: StringName, surface: StringName, color: Color) -> TerrainStyle:

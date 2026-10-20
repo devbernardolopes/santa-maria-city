@@ -50,6 +50,11 @@ func rebuild() -> void:
 	map_size_m = Vector2.ZERO
 	meta = {}
 	_active_style = style if style != null else MapStyle.create_default()
+	if style != null and style.is_empty():
+		var style_path: String = style.resource_path
+		if style_path.is_empty():
+			style_path = "<unsaved MapStyle>"
+		push_warning("MapLoader: %s has no style entries; using fallback colors. Click 'Reset to defaults' in the MapStyle inspector." % style_path)
 	_overrides = _read_overrides()
 	if not _load_map():
 		return
