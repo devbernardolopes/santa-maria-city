@@ -42,7 +42,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 	- videos = all video files
 - shaders = 2D shaders files
 - resources = Godot resource files `.tres` and their associated scripts, if any (map styles, entity data, item data, and so on)
-- autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`; do not rename without updating uids and references)
+- autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`, `game_clock.gd` ↔ `GameClock`, `game_weather.gd` ↔ `GameWeather`; do not rename without updating uids and references)
 - data = game data files read at runtime
 	- `map.json` = GENERATED map data (never hand-edit)
 	- overlays = developer-authored data layered on the map, keyed by OSM ID
@@ -84,8 +84,16 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - Interactive world objects (doors, windows, vehicles, containers, vegetation) use composition: an `Interactable` component exposing `interact(actor)`; behavior-specific components are added as needed.
 - Items: `ItemData` (static definition, Resource) versus an item instance (runtime state: stack count, durability, owner/location). A dropped item is a node carrying an instance.
 - Buildings block entities (static collision). They are entered only through entrances (door objects) that switch to an interior scene.
-- "What terrain is at this point?" is answered by one function (`TerrainQuery.kind_at(position)`), so the implementation can later move from polygon tests to a raster grid without touching callers.
+- "What terrain is at this point?" is answered by `TerrainQuery` (`TerrainQuery.active.sample(position_m)` → a `TerrainSample` with category, kind, surface, style id, and OSM id; `TerrainSample.default_sample()` when nothing matches; coordinates in **meters**). The index is a 32 m uniform grid built once per map load, at runtime only (`active` is `null` before `map_loaded`), outer rings only (holes ignored, exactly like drawing and collisions), priority buildings → roads → waterways → landuse with later features winning — the same top-most polygon `MapPicker` shows. `TerrainRules` maps a sample's surface, then kind, to a walking-speed factor that `Entity` re-samples at most every 0.25 s or per 1 m moved. Callers go through one method, so the implementation can later move from polygon tests to a raster grid without touching them.
 - Procedural placement (e.g. vegetation scatter) must be deterministic: seed from the OSM ID. Persist only the differences from the generated state, keyed by OSM ID plus index.
+
+### World state
+
+- `GameClock` (autoload) is the single source of truth for in-game time: `total_seconds` (float seconds since 1970-01-01 00:00) is the only time state; year/month/day/hour/minute, weekday, sunrise/sunset, and the `Period` are all derived through `GameCalendar` (proleptic Gregorian, weekday 0 = Monday; the sunrise/sunset model is for Santa Maria, UTC−3, no DST). The six `Period`s (NIGHT, DAWN, MORNING, AFTERNOON, DUSK, EVENING) are relative to today's sunrise/sunset (±1 h twilight windows) and always partition the whole day.
+- `GameWeather` (autoload) is a pure function of `weather_seed` and clock time: `GameWeather.compute(seed, total_seconds)` holds no accumulated state, so clock jumps and future save/load reproduce identical weather. It recomputes on `GameClock.minute_changed` and emits `weather_changed` only when the condition changes or the temperature moves at least 0.5 °C.
+- Day/night is the `DayNight` `CanvasModulate` in `world.tscn`: `smoothstep`-blended night → twilight → day around sunrise/sunset, plus an overcast blend weighted by daylight from `cloud_cover`/`rain_intensity`. It tints the world only; the HUD is a `CanvasLayer` and stays untinted. This is the only weather visual for now — no rain particles, no wetness.
+- Systems react to clock and weather **signals** (`minute_changed`, `hour_changed`, `day_changed`, `period_changed`, `time_scale_changed`, `paused_changed`, `weather_changed`) instead of polling every frame. `GameClock` and `GameWeather` each expose `get_state()` / `load_state()` as the future save hooks: validation happens up front, and unknown or invalid input warns and changes nothing. No file I/O exists yet.
+- The HUD's debug time panel (pause, time scale, +1 h) exists **only in debug builds** (`OS.is_debug_build()`) and its buttons are mouse/touch only (`FOCUS_NONE`) — the one deliberate exception to full gamepad support.
 
 ### Entities
 

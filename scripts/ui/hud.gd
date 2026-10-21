@@ -1,6 +1,6 @@
 class_name Hud
 extends CanvasLayer
-## Shows map feature counts, attribution, the player position, and pick reports.
+## Shows map counts, attribution, the clock and weather line, the player state, and pick reports.
 
 const FALLBACK_ATTRIBUTION: String = "© OpenStreetMap contributors (ODbL)"
 const FONT_REFERENCE_HEIGHT: float = 42.0
@@ -10,10 +10,23 @@ const INFO_FONT_SCALE: float = 0.8
 const INFO_TAG_LIMIT: int = 8
 const INFO_VALUE_MAX_LENGTH: int = 48
 const PLAYER_UPDATE_INTERVAL_S: float = 0.25
+const DEBUG_BUTTON_MIN_HEIGHT: float = 44.0
+const DEBUG_BUTTON_HEIGHT_SCALE: float = 2.0
+const TIME_SCALE_OPTIONS: Array[float] = [1.0, 60.0, 600.0, 3600.0]
+const CONDITION_NAMES: Dictionary = {
+	WeatherSample.Condition.CLEAR: "Clear",
+	WeatherSample.Condition.CLOUDY: "Cloudy",
+	WeatherSample.Condition.RAIN: "Rain",
+}
 
 @onready var _label: Label = $TextStack/Label
+@onready var _clock_label: Label = $TextStack/ClockLabel
 @onready var _player_label: Label = $TextStack/PlayerLabel
 @onready var _info_label: Label = $TextStack/InfoLabel
+@onready var _time_debug: HBoxContainer = $TextStack/TimeDebug
+@onready var _pause_button: Button = $TextStack/TimeDebug/PauseButton
+@onready var _scale_button: Button = $TextStack/TimeDebug/ScaleButton
+@onready var _hour_button: Button = $TextStack/TimeDebug/HourButton
 
 var _map: MapLoader = null
 var _player: Entity = null
@@ -21,12 +34,22 @@ var _player_update_timer: float = 0.0
 
 
 func _ready() -> void:
-	for label: Label in [_label, _player_label, _info_label]:
+	for label: Label in [_label, _clock_label, _player_label, _info_label]:
 		label.add_theme_color_override("font_color", Color("1e1e1e"))
 		label.add_theme_color_override("font_outline_color", Color(1.0, 1.0, 1.0, 0.85))
 	_map = get_parent().get_node_or_null("Map") as MapLoader
 	if _map != null and _map.is_loaded:
 		_update_text(_counts_from_map())
+	_time_debug.visible = OS.is_debug_build()
+	_pause_button.pressed.connect(_on_pause_pressed)
+	_scale_button.pressed.connect(_on_scale_pressed)
+	_hour_button.pressed.connect(_on_hour_pressed)
+	GameClock.minute_changed.connect(_update_clock_text)
+	GameClock.time_scale_changed.connect(_on_time_scale_changed)
+	GameClock.paused_changed.connect(_on_paused_changed)
+	GameWeather.weather_changed.connect(_on_weather_changed)
+	_update_clock_text()
+	_update_debug_buttons()
 	get_viewport().size_changed.connect(_update_font_size)
 	_update_font_size()
 	await get_tree().process_frame
@@ -95,11 +118,95 @@ func _update_player_text() -> void:
 		Units.px_to_m(_player.global_position.x),
 		Units.px_to_m(_player.global_position.y)
 	)
-	_player_label.text = "%s · x %.1f m · y %.1f m" % [
-		_player.data.full_name,
-		position_m.x,
-		position_m.y,
+	var data: EntityData = _player.data
+	var parts: PackedStringArray = [
+		"%s, %d" % [
+			data.full_name,
+			data.get_age_years(GameClock.get_year(), GameClock.get_month(), GameClock.get_day()),
+		],
+		"x %.1f m · y %.1f m" % [position_m.x, position_m.y],
 	]
+	var terrain_text: String = _terrain_text(_player.current_terrain)
+	if not terrain_text.is_empty():
+		parts.append(terrain_text)
+	_player_label.text = " · ".join(parts)
+
+
+## "road · residential · asphalt", "landuse · grass", or "ground"; empty parts omitted.
+func _terrain_text(sample: TerrainSample) -> String:
+	if sample == null:
+		return ""
+	var parts: PackedStringArray = [_category_label(sample.category)]
+	if not sample.kind.is_empty() and sample.kind != sample.category:
+		parts.append(String(sample.kind))
+	if not sample.surface.is_empty():
+		parts.append(String(sample.surface))
+	return " · ".join(parts)
+
+
+func _category_label(category: StringName) -> String:
+	match category:
+		&"roads":
+			return "road"
+		&"buildings":
+			return "building"
+		&"waterways":
+			return "waterway"
+		_:
+			return String(category)
+
+
+func _update_clock_text() -> void:
+	var parts: PackedStringArray = [GameClock.format_date(), GameClock.format_time()]
+	var sample: WeatherSample = GameWeather.current
+	if sample != null:
+		parts.append("%.1f °C" % sample.temperature_c)
+		parts.append(_condition_name(sample.condition))
+	if GameClock.paused:
+		parts.append("paused")
+	else:
+		parts.append("×%.0f" % GameClock.time_scale)
+	_clock_label.text = " · ".join(parts)
+
+
+func _condition_name(condition: WeatherSample.Condition) -> String:
+	return str(CONDITION_NAMES.get(condition, "Clear"))
+
+
+func _on_time_scale_changed(_value: float) -> void:
+	_update_clock_text()
+	_update_debug_buttons()
+
+
+func _on_paused_changed(_value: bool) -> void:
+	_update_clock_text()
+	_update_debug_buttons()
+
+
+func _on_weather_changed(_sample: WeatherSample) -> void:
+	_update_clock_text()
+
+
+func _update_debug_buttons() -> void:
+	_pause_button.text = "Resume" if GameClock.paused else "Pause"
+	_scale_button.text = "×%.0f" % GameClock.time_scale
+
+
+func _on_pause_pressed() -> void:
+	GameClock.set_paused(not GameClock.paused)
+
+
+func _on_scale_pressed() -> void:
+	var next_scale: float = TIME_SCALE_OPTIONS[0]
+	for option: float in TIME_SCALE_OPTIONS:
+		if option > GameClock.time_scale + 0.001:
+			next_scale = option
+			break
+	GameClock.set_time_scale(next_scale)
+
+
+func _on_hour_pressed() -> void:
+	GameClock.advance_hours(1.0)
 
 
 func _counts_from_map() -> Dictionary:
@@ -140,3 +247,9 @@ func _update_font_size() -> void:
 	_player_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
 	_info_label.add_theme_font_size_override("font_size", info_font_size)
 	_info_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
+	_clock_label.add_theme_font_size_override("font_size", info_font_size)
+	_clock_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
+	var button_height: float = maxf(DEBUG_BUTTON_MIN_HEIGHT, font_size * DEBUG_BUTTON_HEIGHT_SCALE)
+	for button: Button in [_pause_button, _scale_button, _hour_button]:
+		button.add_theme_font_size_override("font_size", info_font_size)
+		button.custom_minimum_size = Vector2(0.0, button_height)

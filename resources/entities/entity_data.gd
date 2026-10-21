@@ -60,6 +60,15 @@ func get_modifier(ability: Ability) -> int:
 	return floori((float(get_ability(ability)) - 10.0) / 2.0)
 
 
+## Whole years lived on the given date. A Feb 29 birthday counts on Mar 1 in non-leap years.
+func get_age_years(year: int, month: int, day: int) -> int:
+	var birthday_reached: bool = month > birth_month or (month == birth_month and day >= birth_day)
+	var age: int = year - birth_year
+	if not birthday_reached:
+		age -= 1
+	return maxi(0, age)
+
+
 static func create_random(rng: RandomNumberGenerator) -> EntityData:
 	var data := EntityData.new()
 	data.sex = EntityData.Sex.MALE if rng.randi_range(0, 1) == 0 else EntityData.Sex.FEMALE

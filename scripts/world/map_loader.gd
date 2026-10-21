@@ -26,6 +26,8 @@ var map_size_m: Vector2 = Vector2.ZERO
 var map_bounds_px: Rect2 = Rect2()
 var meta: Dictionary = {}
 var is_loaded: bool = false
+## Runtime terrain index for the current map; null in the editor and before the map loads.
+var terrain: TerrainQuery = null
 
 var _active_style: MapStyle = null
 var _polygons_by_osm_id: Dictionary = {}
@@ -46,6 +48,11 @@ func _ready() -> void:
 	rebuild.call_deferred()
 
 
+func _exit_tree() -> void:
+	terrain = null
+	TerrainQuery.active = null
+
+
 func rebuild() -> void:
 	if not is_inside_tree():
 		return
@@ -54,6 +61,10 @@ func rebuild() -> void:
 	map_bounds_px = Rect2()
 	map_size_m = Vector2.ZERO
 	meta = {}
+	terrain = null
+	TerrainQuery.active = null
+	if not Engine.is_editor_hint():
+		terrain = TerrainQuery.new()
 	_active_style = style if style != null else MapStyle.create_default()
 	if style != null and style.is_empty():
 		var style_path: String = style.resource_path
@@ -62,6 +73,7 @@ func rebuild() -> void:
 		push_warning("MapLoader: %s has no style entries; using fallback colors. Click 'Reset to defaults' in the MapStyle inspector." % style_path)
 	_overrides = _read_overrides()
 	if not _load_map():
+		terrain = null
 		return
 	is_loaded = true
 	if not Engine.is_editor_hint():
@@ -174,6 +186,9 @@ func _load_map() -> bool:
 	if map_bounds_px.size == Vector2.ZERO and _has_computed_bounds:
 		map_bounds_px = _computed_bounds_px
 	_warn_unknown_overrides()
+	if terrain != null:
+		terrain.finalize(_meta_bounds_m())
+		TerrainQuery.active = terrain
 	return true
 
 
@@ -224,6 +239,24 @@ func _parse_bounds(value: Variant) -> bool:
 		return false
 	map_bounds_px = Rect2(Units.to_px(min_m), Units.to_px(max_m - min_m))
 	return true
+
+
+## meta.bounds_m as meters; Rect2() when missing or invalid (the caller falls back).
+func _meta_bounds_m() -> Rect2:
+	var bounds_value: Variant = meta.get("bounds_m")
+	if not (bounds_value is Array):
+		return Rect2()
+	var bounds: Array = bounds_value
+	if bounds.size() != 4:
+		return Rect2()
+	for component: Variant in bounds:
+		if not _is_number(component):
+			return Rect2()
+	var min_m := Vector2(float(bounds[0]), float(bounds[1]))
+	var max_m := Vector2(float(bounds[2]), float(bounds[3]))
+	if max_m.x <= min_m.x or max_m.y <= min_m.y:
+		return Rect2()
+	return Rect2(min_m, max_m - min_m)
 
 
 func _is_number(value: Variant) -> bool:
@@ -280,6 +313,15 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 			layer.add_child(polygon)
 			_index_polygon(osm_id, polygon)
 			_expand_computed_bounds(points)
+			if terrain != null:
+				terrain.add_polygon(
+					_points_to_m(points),
+					category,
+					StringName(kind),
+					StringName(surface),
+					StringName(style_id),
+					osm_id
+				)
 
 
 func _resolve_style(category: StringName, osm_id: String, kind: String, raw_surface: String) -> TerrainStyle:
@@ -303,6 +345,13 @@ func _ring_to_px(ring: Array) -> PackedVector2Array:
 		if point.size() < 2:
 			continue
 		points.append(Units.to_px(Vector2(float(point[0]), float(point[1]))))
+	return points
+
+
+func _points_to_m(points_px: PackedVector2Array) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for point: Vector2 in points_px:
+		points.append(Vector2(Units.px_to_m(point.x), Units.px_to_m(point.y)))
 	return points
 
 

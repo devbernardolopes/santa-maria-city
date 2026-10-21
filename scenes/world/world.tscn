@@ -9,9 +9,13 @@
 [ext_resource type="Script" path="res://scripts/world/follow_camera.gd" id="6_follow"]
 [ext_resource type="Script" path="res://scripts/world/debug_spawner.gd" id="7_spawner"]
 [ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="8_touch"]
+[ext_resource type="Script" path="res://scripts/world/day_night.gd" id="9_daynight"]
 
 [node name="World" type="Node2D" unique_id=1946698986]
 script = ExtResource("1_world")
+
+[node name="DayNight" type="CanvasModulate" parent="."]
+script = ExtResource("9_daynight")
 
 [node name="Map" type="Node2D" parent="." unique_id=1696366913]
 script = ExtResource("2_map")
@@ -62,6 +66,10 @@ theme_override_font_sizes/font_size = 16
 text = "Loading map…"
 autowrap_mode = 3
 
+[node name="ClockLabel" type="Label" parent="Hud/TextStack"]
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
 [node name="PlayerLabel" type="Label" parent="Hud/TextStack"]
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
@@ -69,5 +77,21 @@ autowrap_mode = 3
 [node name="InfoLabel" type="Label" parent="Hud/TextStack"]
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
+
+[node name="TimeDebug" type="HBoxContainer" parent="Hud/TextStack"]
+visible = false
+theme_override_constants/separation = 6
+
+[node name="PauseButton" type="Button" parent="Hud/TextStack/TimeDebug"]
+focus_mode = 0
+text = "Pause"
+
+[node name="ScaleButton" type="Button" parent="Hud/TextStack/TimeDebug"]
+focus_mode = 0
+text = "×60"
+
+[node name="HourButton" type="Button" parent="Hud/TextStack/TimeDebug"]
+focus_mode = 0
+text = "+1 h"
 
 [node name="TouchControls" parent="Hud" instance=ExtResource("8_touch")]
