@@ -73,6 +73,14 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 	_update_terrain(delta)
+	var move_mode: EntityController.MovementMode = controller.movement_mode
+	if move_mode == EntityController.MovementMode.RELATIVE:
+		_resolve_relative(delta)
+	else:
+		_resolve_omni(delta)
+
+
+func _resolve_omni(delta: float) -> void:
 	var move_vector: Vector2 = controller.get_move_vector().limit_length(1.0)
 	if move_vector != Vector2.ZERO:
 		facing = move_vector.normalized()
@@ -84,6 +92,34 @@ func _physics_process(delta: float) -> void:
 			)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
+	move_and_slide()
+
+
+func _resolve_relative(delta: float) -> void:
+	var intent: Vector2 = controller.get_move_intent().limit_length(1.0)
+	var turn_input: float = intent.x
+	var throttle_input: float = intent.y
+	if absf(turn_input) > 0.001:
+		var turn_rate: float = controller.turn_rate_rad_s
+		if turn_rate < 0.0:
+			turn_rate = 0.0
+		facing = facing.rotated(turn_input * turn_rate * delta)
+	if _visual != null and (absf(turn_input) > 0.001 or absf(throttle_input) > 0.001):
+		_visual.rotation = lerp_angle(
+			_visual.rotation,
+			facing.angle(),
+			minf(1.0, delta * TURN_RATE)
+		)
+	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
+	var move_speed_factor: float = 1.0
+	if throttle_input < 0.0:
+		var reverse_factor: float = controller.reverse_speed_factor
+		if reverse_factor < 0.0:
+			reverse_factor = 0.0
+		move_speed_factor = reverse_factor
+	var throttle_magnitude: float = absf(throttle_input)
+	var move_vector: Vector2 = facing * throttle_input
+	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
 	move_and_slide()
 
 

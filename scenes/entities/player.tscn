@@ -14,6 +14,9 @@ body_color = Color(0.2, 0.55, 0.92, 1)
 
 [node name="PlayerController" type="Node" parent="." index="2" unique_id=953886403]
 script = ExtResource("2_controller")
+movement_mode = 0
+turn_rate_rad_s = 3.141593
+reverse_speed_factor = 0.5
 
 [node name="PlayerInteraction" type="Area2D" parent="." index="3" unique_id=2050525086]
 script = ExtResource("3_interaction")
