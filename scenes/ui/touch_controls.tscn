@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/touch_controls.gd" id="1_controls"]
 [ext_resource type="PackedScene" path="res://scenes/ui/virtual_joystick.tscn" id="2_joystick"]
 [ext_resource type="Script" path="res://scripts/ui/touch_run_button.gd" id="3_run"]
+[ext_resource type="Script" path="res://scripts/ui/touch_interact_button.gd" id="4_interact"]
 
 [node name="TouchControls" type="Control"]
 anchors_preset = 15
@@ -18,3 +19,8 @@ script = ExtResource("1_controls")
 [node name="RunButton" type="Control" parent="."]
 mouse_filter = 2
 script = ExtResource("3_run")
+
+[node name="InteractButton" type="Control" parent="."]
+visible = false
+mouse_filter = 2
+script = ExtResource("4_interact")

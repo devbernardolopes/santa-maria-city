@@ -12,15 +12,17 @@ const SPAWNS_VERSION: int = 1
 @onready var _follow_camera: FollowCamera = $FollowCamera
 @onready var _debug_camera: DebugCamera = $DebugCamera
 @onready var _debug_spawner: DebugSpawner = $DebugSpawner
-@onready var _hud: Hud = $Hud
 @onready var _picker: MapPicker = $MapPicker
-
-var _player: Entity = null
+@onready var _touch_controls: TouchControls = $Hud/TouchControls
+@onready var _entrance_spawner: EntranceSpawner = $EntranceSpawner
+@onready var _interior_manager: InteriorManager = $InteriorManager
+var _spawn_point_m: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	_map.map_loaded.connect(_on_map_loaded)
-	_picker.picked.connect(_hud.show_pick)
+	var hud0: Hud = get_node_or_null("Hud") as Hud
+	_picker.picked.connect(hud0.show_pick) if hud0 != null else null
 	if _map.is_loaded:
 		var counts: Dictionary = {}
 		var counts_value: Variant = _map.meta.get("counts")
@@ -43,17 +45,28 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_map_loaded(counts: Dictionary) -> void:
 	_debug_camera.on_map_loaded()
-	_hud.on_map_loaded(counts)
+	var hud: Hud = get_node_or_null("Hud") as Hud
+	if hud != null:
+		hud.on_map_loaded(counts)
 	_picker.clear_pick()
 	_spawn_player()
-	_debug_spawner.spawn_npcs(debug_seed + 1)
+	if _entrance_spawner != null:
+		_entrance_spawner.spawn_entrances(_spawn_point_m)
+	if _debug_spawner != null:
+		_debug_spawner.spawn_npcs(debug_seed + 1)
 
 
 func _spawn_player() -> void:
-	if _player != null and is_instance_valid(_player):
-		_follow_camera.target = null
-		_hud.set_player(null)
-		_player.free()
+	var hud_r: Hud = get_node_or_null("Hud") as Hud
+	if hud_r != null:
+		hud_r.set_player(null)
+		hud_r.set_interaction_prompt("")
+	var tc_r: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
+	if tc_r != null:
+		tc_r.set_interact_available(false)
+	var player_ref: Entity = _player
+	if player_ref != null and is_instance_valid(player_ref):
+		player_ref.free()
 	_player = null
 	var rng := RandomNumberGenerator.new()
 	rng.seed = debug_seed
@@ -63,13 +76,22 @@ func _spawn_player() -> void:
 		push_error("World: could not instantiate the player scene.")
 		return
 	player.data = data
-	player.position = Units.to_px(_player_spawn_point_m())
+	_spawn_point_m = _player_spawn_point_m()
+	player.position = Units.to_px(_spawn_point_m)
 	_objects.add_child(player)
 	_player = player
 	_follow_camera.target = player
 	_follow_camera.snap_to_target()
 	_follow_camera.make_current()
-	_hud.set_player(player)
+	var hud_p: Hud = get_node_or_null("Hud") as Hud
+	if hud_p != null:
+		hud_p.set_player(player)
+	_wire_player_interaction(player)
+	if hud_p != null:
+		hud_p.set_interaction_prompt("")
+	var tc_p: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
+	if tc_p != null:
+		tc_p.set_interact_available(false)
 
 
 func _player_spawn_point_m() -> Vector2:
@@ -129,5 +151,33 @@ func _map_center_m() -> Vector2:
 	return Vector2(Units.px_to_m(center_px.x), Units.px_to_m(center_px.y))
 
 
+func _wire_player_interaction(player: Entity) -> void:
+	var hud: Hud = get_node_or_null("Hud") as Hud
+	if hud == null:
+		return
+	var interaction := player.get_node_or_null("PlayerInteraction") as PlayerInteraction
+	if interaction == null:
+		return
+	if interaction.target_changed.is_connected(_on_player_target_changed):
+		return
+	interaction.target_changed.connect(_on_player_target_changed)
+	if not interaction.message.is_connected(hud.show_message):
+		interaction.message.connect(hud.show_message)
+
+
+func _on_player_target_changed(target: Interactable) -> void:
+	var hud: Hud = get_node_or_null("Hud") as Hud
+	if hud == null:
+		return
+	var text: String = ""
+	if target != null and is_instance_valid(target):
+		text = target.get_prompt()
+	hud.set_interaction_prompt(text)
+	var tc: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
+	if tc != null:
+		tc.set_interact_available(not text.is_empty())
+
 func _is_number(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
+
+var _player: Entity = null

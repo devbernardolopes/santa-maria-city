@@ -38,6 +38,7 @@ var _unknown_style_ids: Dictionary = {}
 var _computed_bounds_px: Rect2 = Rect2()
 var _has_computed_bounds: bool = false
 var _road_lines_m: Array[PackedVector2Array] = []
+var _building_rings_m: Dictionary = {}
 var _building_collision: StaticBody2D = null
 var _water_collision: StaticBody2D = null
 var _collision_skip_count: int = 0
@@ -137,6 +138,23 @@ func get_road_lines_m() -> Array[PackedVector2Array]:
 	var lines: Array[PackedVector2Array] = []
 	lines.assign(_road_lines_m)
 	return lines
+
+
+## First outer ring of a building footprint in meters (runtime only); empty when unknown.
+func get_building_ring_m(osm_id: String) -> PackedVector2Array:
+	var ring_value: Variant = _building_rings_m.get(osm_id)
+	if ring_value is PackedVector2Array:
+		return ring_value
+	return PackedVector2Array()
+
+
+## Building OSM IDs with a cached ring, sorted for deterministic iteration.
+func get_building_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for key_value: Variant in _building_rings_m:
+		ids.append(str(key_value))
+	ids.sort()
+	return ids
 
 
 func _load_map() -> bool:
@@ -300,6 +318,11 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 			var points: PackedVector2Array = _ring_to_px(outer_ring_value)
 			if points.size() < 3:
 				continue
+			if category == &"buildings" and not osm_id.is_empty() and not Engine.is_editor_hint():
+				if not _building_rings_m.has(osm_id):
+					var ring_m: PackedVector2Array = _line_to_m(outer_ring_value)
+					if ring_m.size() >= 3:
+						_building_rings_m[osm_id] = ring_m
 			var polygon := Polygon2D.new()
 			polygon.polygon = points
 			_apply_style(polygon, terrain_style)
@@ -575,6 +598,7 @@ func _clear_generated() -> void:
 	_seen_osm_ids.clear()
 	_unknown_style_ids.clear()
 	_road_lines_m.clear()
+	_building_rings_m.clear()
 	_collision_skip_count = 0
 	if is_instance_valid(_building_collision):
 		_building_collision.free()

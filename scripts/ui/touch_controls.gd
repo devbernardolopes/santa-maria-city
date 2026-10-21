@@ -1,6 +1,6 @@
 class_name TouchControls
 extends Control
-## Shows and lays out the virtual joystick and run button.
+## Shows and lays out the virtual joystick, run button, and interact button.
 
 const SHORT_SIDE_RATIO: float = 0.22
 const MIN_SIDE_PX: float = 56.0
@@ -15,6 +15,7 @@ const MIN_MARGIN_PX: float = 12.0
 
 @onready var _joystick: TouchJoystick = $VirtualJoystick
 @onready var _run_button: TouchRunButton = $RunButton
+@onready var _interact_button: TouchInteractButton = $InteractButton
 
 
 func _ready() -> void:
@@ -44,8 +45,14 @@ func _update_visibility() -> void:
 		_release_all()
 
 
+## Shows the interact button only while a target exists (touch controls keep their own visibility).
+func set_interact_available(value: bool) -> void:
+	if _interact_button != null:
+		_interact_button.visible = value
+
+
 func _layout() -> void:
-	if _joystick == null or _run_button == null:
+	if _joystick == null or _run_button == null or _interact_button == null:
 		return
 	var viewport_size: Vector2 = get_viewport_rect().size
 	var side: float = maxf(MIN_SIDE_PX, minf(viewport_size.x, viewport_size.y) * SHORT_SIDE_RATIO)
@@ -60,8 +67,14 @@ func _layout() -> void:
 	_run_button.offset_top = -side - margin
 	_run_button.offset_right = -margin
 	_run_button.offset_bottom = -margin
+	_interact_button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_interact_button.offset_left = -side - margin
+	_interact_button.offset_top = -side * 2.0 - margin * 2.0
+	_interact_button.offset_right = -margin
+	_interact_button.offset_bottom = -side - margin * 2.0
 	_joystick.queue_redraw()
 	_run_button.queue_redraw()
+	_interact_button.queue_redraw()
 
 
 func _release_all() -> void:
@@ -69,3 +82,5 @@ func _release_all() -> void:
 		_joystick.release_all()
 	if _run_button != null:
 		_run_button.release_all()
+	if _interact_button != null:
+		_interact_button.release_all()

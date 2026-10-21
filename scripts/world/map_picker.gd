@@ -62,6 +62,7 @@ func _pick_at(world_point: Vector2) -> void:
 	var osm_id: String = str(info.get("id", ""))
 	if not osm_id.is_empty():
 		DisplayServer.clipboard_set(osm_id)
+	info["point_m"] = Vector2(Units.px_to_m(world_point.x), Units.px_to_m(world_point.y))
 	picked.emit(info)
 
 

@@ -13,6 +13,7 @@ const PLAYER_UPDATE_INTERVAL_S: float = 0.25
 const DEBUG_BUTTON_MIN_HEIGHT: float = 44.0
 const DEBUG_BUTTON_HEIGHT_SCALE: float = 2.0
 const TIME_SCALE_OPTIONS: Array[float] = [1.0, 60.0, 600.0, 3600.0]
+const PROMPT_BOTTOM_MARGIN: float = 96.0
 const CONDITION_NAMES: Dictionary = {
 	WeatherSample.Condition.CLEAR: "Clear",
 	WeatherSample.Condition.CLOUDY: "Cloudy",
@@ -27,6 +28,10 @@ const CONDITION_NAMES: Dictionary = {
 @onready var _pause_button: Button = $TextStack/TimeDebug/PauseButton
 @onready var _scale_button: Button = $TextStack/TimeDebug/ScaleButton
 @onready var _hour_button: Button = $TextStack/TimeDebug/HourButton
+@onready var _bottom_stack: VBoxContainer = $BottomStack
+@onready var _message_label: Label = $BottomStack/MessageLabel
+@onready var _prompt_label: Label = $BottomStack/PromptLabel
+@onready var _message_timer: Timer = $BottomStack/MessageTimer
 
 var _map: MapLoader = null
 var _player: Entity = null
@@ -34,7 +39,7 @@ var _player_update_timer: float = 0.0
 
 
 func _ready() -> void:
-	for label: Label in [_label, _clock_label, _player_label, _info_label]:
+	for label: Label in [_label, _clock_label, _player_label, _info_label, _message_label, _prompt_label]:
 		label.add_theme_color_override("font_color", Color("1e1e1e"))
 		label.add_theme_color_override("font_outline_color", Color(1.0, 1.0, 1.0, 0.85))
 	_map = get_parent().get_node_or_null("Map") as MapLoader
@@ -48,6 +53,10 @@ func _ready() -> void:
 	GameClock.time_scale_changed.connect(_on_time_scale_changed)
 	GameClock.paused_changed.connect(_on_paused_changed)
 	GameWeather.weather_changed.connect(_on_weather_changed)
+	_message_label.visible = false
+	_prompt_label.visible = false
+	if _message_timer != null:
+		_message_timer.timeout.connect(_on_message_timeout)
 	_update_clock_text()
 	_update_debug_buttons()
 	get_viewport().size_changed.connect(_update_font_size)
@@ -94,6 +103,10 @@ func show_pick(info: Dictionary) -> void:
 		"%s · %s · %s" % [osm_id, category, kind],
 		"surface: %s · style: %s" % [surface_text, style_id],
 	]
+	var point_value: Variant = info.get("point_m")
+	if point_value is Vector2:
+		var point_m: Vector2 = point_value
+		lines.append("at x %.1f m · y %.1f m" % [point_m.x, point_m.y])
 	var tags: Dictionary = {}
 	var tags_value: Variant = info.get("tags")
 	if tags_value is Dictionary:
@@ -108,6 +121,36 @@ func show_pick(info: Dictionary) -> void:
 		var value: String = _truncate(str(tags.get(key, "")))
 		lines.append("%s=%s" % [key, value])
 	_info_label.text = "\n".join(lines)
+
+
+## Show or hide the bottom-center interaction prompt.
+func set_interaction_prompt(text: String) -> void:
+	if _prompt_label == null:
+		return
+	if text.is_empty():
+		_prompt_label.visible = false
+		_prompt_label.text = ""
+		return
+	_prompt_label.text = text
+	_prompt_label.visible = true
+
+
+## Show a temporary message above the prompt; replaces any existing message.
+func show_message(text: String, seconds: float = 2.5) -> void:
+	if _message_label == null:
+		return
+	if text.is_empty():
+		_message_label.visible = false
+		_message_label.text = ""
+		if _message_timer != null:
+			_message_timer.stop()
+		return
+	_message_label.text = text
+	_message_label.visible = true
+	if _message_timer != null:
+		_message_timer.stop()
+		_message_timer.wait_time = maxf(0.1, seconds)
+		_message_timer.start()
 
 
 func _update_player_text() -> void:
@@ -237,6 +280,12 @@ func _truncate(value: String) -> String:
 	return value.left(INFO_VALUE_MAX_LENGTH - 1) + "…"
 
 
+func _on_message_timeout() -> void:
+	if _message_label != null:
+		_message_label.visible = false
+		_message_label.text = ""
+
+
 func _update_font_size() -> void:
 	var viewport_height: float = get_viewport().get_visible_rect().size.y
 	var font_size: int = int(clampf(viewport_height / FONT_REFERENCE_HEIGHT, float(MIN_FONT_SIZE), float(MAX_FONT_SIZE)))
@@ -249,6 +298,14 @@ func _update_font_size() -> void:
 	_info_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
 	_clock_label.add_theme_font_size_override("font_size", info_font_size)
 	_clock_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
+	if _message_label != null:
+		_message_label.add_theme_font_size_override("font_size", font_size)
+		_message_label.add_theme_constant_override("outline_size", maxi(2, int(font_size * 0.12)))
+	if _prompt_label != null:
+		_prompt_label.add_theme_font_size_override("font_size", font_size)
+		_prompt_label.add_theme_constant_override("outline_size", maxi(2, int(font_size * 0.12)))
+	if _bottom_stack != null:
+		_bottom_stack.offset_bottom = -PROMPT_BOTTOM_MARGIN
 	var button_height: float = maxf(DEBUG_BUTTON_MIN_HEIGHT, font_size * DEBUG_BUTTON_HEIGHT_SCALE)
 	for button: Button in [_pause_button, _scale_button, _hour_button]:
 		button.add_theme_font_size_override("font_size", info_font_size)

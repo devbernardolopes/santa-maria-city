@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bd0ybcsgdql65"]
+[gd_scene load_steps=6 format=3 uid="uid://bd0ybcsgdql65"]
 
 [ext_resource type="Script" uid="uid://bsq8my0ehu8pn" path="res://scripts/world/world.gd" id="1_world"]
 [ext_resource type="Script" uid="uid://bn1i3eh0js1tf" path="res://scripts/world/map_loader.gd" id="2_map"]
@@ -10,6 +10,9 @@
 [ext_resource type="Script" path="res://scripts/world/debug_spawner.gd" id="7_spawner"]
 [ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="8_touch"]
 [ext_resource type="Script" path="res://scripts/world/day_night.gd" id="9_daynight"]
+[ext_resource type="Script" path="res://scripts/world/entrance_spawner.gd" id="10_entrance_spawner"]
+[ext_resource type="Script" path="res://scripts/world/interior_manager.gd" id="11_interior_manager"]
+[ext_resource type="Script" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
 
 [node name="World" type="Node2D" unique_id=1946698986]
 script = ExtResource("1_world")
@@ -27,6 +30,8 @@ style = ExtResource("3_t5ptc")
 
 [node name="Objects" type="Node2D" parent="." unique_id=1436374420]
 y_sort_enabled = true
+
+[node name="Interiors" type="Node2D" parent="."]
 
 [node name="Canopy" type="Node2D" parent="." unique_id=186150278]
 
@@ -47,6 +52,16 @@ script = ExtResource("6_follow")
 
 [node name="DebugSpawner" type="Node" parent="."]
 script = ExtResource("7_spawner")
+
+[node name="EntranceSpawner" type="Node" parent="."]
+script = ExtResource("10_entrance_spawner")
+
+[node name="InteriorManager" type="Node" parent="."]
+script = ExtResource("11_interior_manager")
+
+[node name="ScreenFader" type="CanvasLayer" parent="."]
+layer = 100
+script = ExtResource("12_screen_fader")
 
 [node name="Hud" type="CanvasLayer" parent="." unique_id=2054326508]
 script = ExtResource("4_hud")
@@ -93,5 +108,34 @@ text = "×60"
 [node name="HourButton" type="Button" parent="Hud/TextStack/TimeDebug"]
 focus_mode = 0
 text = "+1 h"
+
+[node name="BottomStack" type="VBoxContainer" parent="Hud"]
+anchors_preset = 15
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = -160.0
+offset_right = -16.0
+offset_bottom = -96.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 6
+alignment = 2
+
+[node name="MessageLabel" type="Label" parent="Hud/BottomStack"]
+visible = false
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="PromptLabel" type="Label" parent="Hud/BottomStack"]
+visible = false
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MessageTimer" type="Timer" parent="Hud/BottomStack"]
+one_shot = true
 
 [node name="TouchControls" parent="Hud" instance=ExtResource("8_touch")]

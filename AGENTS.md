@@ -26,6 +26,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - addons = third-party addons and plugins
 - scenes = scene files (per-area subfolders, e.g. `world/`, `entities/`, `objects/`, `interiors/`, `ui/`)
 - scripts = script files with the exception of the globals auto-loaded ones (per-area subfolders mirroring `scenes`)
+	- objects = reusable interactive objects and components
 - assets = different assets
 	- fonts = TrueType Font files
 	- images = all images
@@ -41,7 +42,15 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 		- bgm = background musics
 	- videos = all video files
 - shaders = 2D shaders files
+	- textures = tileable ground/roof/road textures and images to be used with shaders or other nodes that expect textures
+	- ui = application icon and all UI images (interface menus and in-game)
+- sounds = all sounds and musics
+	- sfx = sound effects
+	- bgm = background musics
+- videos = all video files
+- shaders = 2D shaders files
 - resources = Godot resource files `.tres` and their associated scripts, if any (map styles, entity data, item data, and so on)
+	- world = world-level authored data resources
 - autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`, `game_clock.gd` ↔ `GameClock`, `game_weather.gd` ↔ `GameWeather`; do not rename without updating uids and references)
 - data = game data files read at runtime
 	- `map.json` = GENERATED map data (never hand-edit)
@@ -112,6 +121,15 @@ Canonical actions, persisted in `project.godot`, one keyboard key + one pad butt
 ### Performance
 
 - Target 60 fps on the laptop and a stable frame rate on the low-end phone (see Testing). Keep node counts low: prefer one node per feature at most, and plan for chunked streaming of the map when the imported area grows. Do not build per-frame work that scales with the total number of map features.
+
+### Interaction and interiors
+
+- `Interactable` is an `Area2D` on `PhysicsLayers.INTERACTABLES` with `monitoring = false`. `PlayerInteraction` is an `Area2D` child of the player on layer 0 with mask `PhysicsLayers.INTERACTABLES`, `monitorable = false`; it polls `Input.is_action_just_pressed("interact")` each physics frame while overlaps exist, picks the closest target in front with a small preference, ignores input while the entity is `locked`, and emits `message` when the target rejects.
+- `Entity` has `locked: bool` with `set_locked(value)` — while locked velocity is zero and the controller is not read.
+- Entrances are data in `res://data/overlays/entrances.json` keyed by building OSM ID (`{"version":1,"entrances":[]}`), `position` approximated and snapped to the building footprint edge at load time by `BuildingGeometry`. `EntranceData.is_open(weekday,hour)` uses Monday = 0: entries `{"days":[...],"from":float,"to":float}`; `to < from` wraps past midnight, the listed day is the interval start (and yesterday's wrapped intervals are checked). Unavailable doors show `Closed · opens HH:MM` with the next opening time. Availability updates on `GameClock.minute_changed`.
+- Interiors live on the same canvas, far away at `InteriorManager.INTERIOR_ORIGIN_M = Vector2(-10000.0, 0.0)`. The exterior keeps simulating. One interior loads at a time; the same `Entity` is repositioned. Entering: lock → fade out (ScreenFader) → instantiate `res://scenes/interiors/<interior_id>.tscn` if present and has an `Interior` root, else a `PlaceholderInterior` sized from the building footprint (clamped 5×4..14×10 m) with label = entrance label or building ID → place at the interior origin, move the player to `EntryPoint`, set `FollowCamera` limits from `interior.get_bounds_m()` and snap, disable `DayNight.enabled` (restored on exit). Exiting reverses it: free the interior, restore limits, place the player 1 m in front of the door outside, snap the camera.
+- Authored interiors extend `Interior` with required `EntryPoint` (`Marker2D`) and `Objects` (`Node2D`, y_sort) children, optional `bounds_m` (meters, local to the interior origin) used for camera limits; `InteriorExit` inside asks the ancestor interior to exit.
+- Debug builds with an empty `entrances.json` auto-spawn up to 4 doors on buildings nearest to the player spawn (snapped road-facing, placeholder interiors).
 
 ## Testing
 

@@ -16,6 +16,8 @@ var controller: EntityController = null
 var facing: Vector2 = Vector2.DOWN
 ## Terrain under this entity; refreshed at most every TERRAIN_SAMPLE_INTERVAL_S.
 var current_terrain: TerrainSample = null
+## Frozen during screen transitions: velocity zero and the controller is not read.
+var locked: bool = false
 
 var _terrain_timer: float = 0.0
 var _terrain_speed_factor: float = 1.0
@@ -55,7 +57,17 @@ func set_controller(next_controller: EntityController) -> void:
 		add_child(controller)
 
 
+func set_locked(value: bool) -> void:
+	locked = value
+	if locked:
+		velocity = Vector2.ZERO
+
+
 func _physics_process(delta: float) -> void:
+	if locked:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
 	if controller == null or data == null:
 		velocity = Vector2.ZERO
 		move_and_slide()

@@ -5,6 +5,7 @@ extends Camera2D
 const ZOOM_STEP: float = 1.15
 const MIN_ZOOM: float = 0.5
 const MAX_ZOOM: float = 8.0
+const DEFAULT_LIMIT_PX: int = 10000000
 
 @export var target: Node2D = null
 @export var default_zoom: Vector2 = Vector2.ONE * 3.0
@@ -20,6 +21,23 @@ func snap_to_target() -> void:
 		return
 	global_position = target.global_position
 	reset_smoothing()
+
+
+## Restricts the camera to a rectangle given in global meters.
+func set_limits_m(rect_m: Rect2) -> void:
+	var top_left: Vector2 = Units.to_px(rect_m.position)
+	var bottom_right: Vector2 = Units.to_px(rect_m.position + rect_m.size)
+	limit_left = int(top_left.x)
+	limit_top = int(top_left.y)
+	limit_right = int(bottom_right.x)
+	limit_bottom = int(bottom_right.y)
+
+
+func clear_limits() -> void:
+	limit_left = -DEFAULT_LIMIT_PX
+	limit_top = -DEFAULT_LIMIT_PX
+	limit_right = DEFAULT_LIMIT_PX
+	limit_bottom = DEFAULT_LIMIT_PX
 
 
 func _process(_delta: float) -> void:
