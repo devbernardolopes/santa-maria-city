@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/entities/entity.tscn" id="1_entity"]
+[ext_resource type="Script" path="res://scripts/entities/player_controller.gd" id="2_controller"]
+
+[node name="Player" instance=ExtResource("1_entity")]
+
+[node name="PlayerController" type="Node" parent="."]
+script = ExtResource("2_controller")
+
+[node name="Visual" parent="." index="1"]
+body_color = Color(0.2, 0.55, 0.92, 1)
