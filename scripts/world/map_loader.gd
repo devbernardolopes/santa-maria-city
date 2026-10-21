@@ -9,6 +9,7 @@ const MAP_PATH: String = "res://data/map.json"
 const OVERRIDES_PATH: String = "res://data/overlays/style_overrides.json"
 const OVERRIDES_VERSION: int = 1
 const EDITOR_FRAME_MARGIN: float = 0.9
+const BLOCKING_LANDUSE_KINDS: Array[StringName] = [&"water"]
 
 @export var style: MapStyle = null:
 	set(value):
@@ -34,6 +35,10 @@ var _seen_osm_ids: Dictionary = {}
 var _unknown_style_ids: Dictionary = {}
 var _computed_bounds_px: Rect2 = Rect2()
 var _has_computed_bounds: bool = false
+var _road_lines_m: Array[PackedVector2Array] = []
+var _building_collision: StaticBody2D = null
+var _water_collision: StaticBody2D = null
+var _collision_skip_count: int = 0
 static var _editor_auto_frame_attempted: bool = false
 
 
@@ -97,6 +102,31 @@ func pick(world_point_px: Vector2) -> Dictionary:
 	return {}
 
 
+func nearest_road_point_m(from_m: Vector2) -> Vector2:
+	var nearest: Vector2 = from_m
+	var best_distance: float = INF
+	for line: PackedVector2Array in _road_lines_m:
+		if line.size() < 2:
+			continue
+		for index: int in range(line.size() - 1):
+			var candidate: Vector2 = Geometry2D.get_closest_point_to_segment(
+				from_m,
+				line[index],
+				line[index + 1]
+			)
+			var distance: float = from_m.distance_squared_to(candidate)
+			if distance < best_distance:
+				best_distance = distance
+				nearest = candidate
+	return nearest
+
+
+func get_road_lines_m() -> Array[PackedVector2Array]:
+	var lines: Array[PackedVector2Array] = []
+	lines.assign(_road_lines_m)
+	return lines
+
+
 func _load_map() -> bool:
 	var file: FileAccess = FileAccess.open(MAP_PATH, FileAccess.READ)
 	if file == null:
@@ -138,6 +168,9 @@ func _load_map() -> bool:
 	_build_layer(data["waterways"], "Waterways", &"waterways")
 	_build_layer(data["roads"], "Roads", &"roads")
 	_build_layer(data["buildings"], "Buildings", &"buildings")
+	_road_lines_m = _collect_road_lines(data["roads"])
+	if not Engine.is_editor_hint():
+		_build_collisions(data)
 	if map_bounds_px.size == Vector2.ZERO and _has_computed_bounds:
 		map_bounds_px = _computed_bounds_px
 	_warn_unknown_overrides()
@@ -389,6 +422,99 @@ func _warn_unknown_overrides() -> void:
 	push_warning("MapLoader: %s: %s" % [OVERRIDES_PATH, " | ".join(messages)])
 
 
+func _collect_road_lines(features: Array) -> Array[PackedVector2Array]:
+	var lines: Array[PackedVector2Array] = []
+	for feature_value: Variant in features:
+		if not (feature_value is Dictionary):
+			continue
+		var feature_data: Dictionary = feature_value
+		var line_value: Variant = feature_data.get("line")
+		if not (line_value is Array):
+			continue
+		var line: PackedVector2Array = _line_to_m(line_value)
+		if line.size() >= 2:
+			lines.append(line)
+	return lines
+
+
+func _line_to_m(line: Array) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for point_value: Variant in line:
+		if not (point_value is Array):
+			continue
+		var point: Array = point_value
+		if point.size() < 2:
+			continue
+		if not _is_number(point[0]) or not _is_number(point[1]):
+			continue
+		points.append(Vector2(float(point[0]), float(point[1])))
+	return points
+
+
+func _build_collisions(data: Dictionary) -> void:
+	_building_collision = _create_collision_body("BuildingCollision")
+	_water_collision = _create_collision_body("WaterCollision")
+	_build_collision_shapes(data["buildings"], _building_collision, &"")
+	_build_collision_shapes(data["landuse"], _water_collision, &"water")
+	if _collision_skip_count > 0:
+		push_warning("MapLoader: skipped %d invalid collision polygon(s)." % _collision_skip_count)
+
+
+func _create_collision_body(body_name: String) -> StaticBody2D:
+	var body := StaticBody2D.new()
+	body.name = body_name
+	body.collision_layer = PhysicsLayers.WORLD
+	body.collision_mask = 0
+	add_child(body)
+	return body
+
+
+func _build_collision_shapes(features: Array, body: StaticBody2D, filter_kind: StringName) -> void:
+	for feature_value: Variant in features:
+		if not (feature_value is Dictionary):
+			continue
+		var feature_data: Dictionary = feature_value
+		if not filter_kind.is_empty():
+			var kind := StringName(str(feature_data.get("kind", "")))
+			if kind != filter_kind or not BLOCKING_LANDUSE_KINDS.has(kind):
+				continue
+		var osm_id: String = str(feature_data.get("id", ""))
+		for points: PackedVector2Array in _outer_rings_px(feature_data):
+			_add_collision_polygon(body, points, osm_id)
+
+
+func _outer_rings_px(feature_data: Dictionary) -> Array[PackedVector2Array]:
+	var rings_px: Array[PackedVector2Array] = []
+	var polys_value: Variant = feature_data.get("polys")
+	if not (polys_value is Array):
+		return rings_px
+	var polys: Array = polys_value
+	for polygon_rings_value: Variant in polys:
+		if not (polygon_rings_value is Array):
+			continue
+		var rings: Array = polygon_rings_value
+		if rings.is_empty():
+			continue
+		var outer_ring_value: Variant = rings[0]
+		if not (outer_ring_value is Array):
+			continue
+		var points: PackedVector2Array = _ring_to_px(outer_ring_value)
+		if points.size() >= 3:
+			rings_px.append(points)
+	return rings_px
+
+
+func _add_collision_polygon(body: StaticBody2D, points_px: PackedVector2Array, osm_id: String) -> void:
+	if points_px.size() < 3 or Geometry2D.triangulate_polygon(points_px).is_empty():
+		_collision_skip_count += 1
+		return
+	var polygon := CollisionPolygon2D.new()
+	polygon.build_mode = CollisionPolygon2D.BUILD_SOLIDS
+	polygon.polygon = points_px
+	polygon.set_meta("osm_id", osm_id)
+	body.add_child(polygon)
+
+
 func _clear_generated() -> void:
 	for layer: Node2D in _layers:
 		if is_instance_valid(layer):
@@ -399,6 +525,14 @@ func _clear_generated() -> void:
 	_has_computed_bounds = false
 	_seen_osm_ids.clear()
 	_unknown_style_ids.clear()
+	_road_lines_m.clear()
+	_collision_skip_count = 0
+	if is_instance_valid(_building_collision):
+		_building_collision.free()
+	_building_collision = null
+	if is_instance_valid(_water_collision):
+		_water_collision.free()
+	_water_collision = null
 
 
 func _frame_editor_view_once() -> bool:

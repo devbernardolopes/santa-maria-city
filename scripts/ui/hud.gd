@@ -1,6 +1,6 @@
 class_name Hud
 extends CanvasLayer
-## Shows map feature counts, attribution, and the debug polygon picker report.
+## Shows map feature counts, attribution, the player position, and pick reports.
 
 const FALLBACK_ATTRIBUTION: String = "© OpenStreetMap contributors (ODbL)"
 const FONT_REFERENCE_HEIGHT: float = 42.0
@@ -9,15 +9,19 @@ const MAX_FONT_SIZE: int = 64
 const INFO_FONT_SCALE: float = 0.8
 const INFO_TAG_LIMIT: int = 8
 const INFO_VALUE_MAX_LENGTH: int = 48
+const PLAYER_UPDATE_INTERVAL_S: float = 0.25
 
-@onready var _label: Label = $Label
-@onready var _info_label: Label = $InfoLabel
+@onready var _label: Label = $TextStack/Label
+@onready var _player_label: Label = $TextStack/PlayerLabel
+@onready var _info_label: Label = $TextStack/InfoLabel
 
 var _map: MapLoader = null
+var _player: Entity = null
+var _player_update_timer: float = 0.0
 
 
 func _ready() -> void:
-	for label: Label in [_label, _info_label]:
+	for label: Label in [_label, _player_label, _info_label]:
 		label.add_theme_color_override("font_color", Color("1e1e1e"))
 		label.add_theme_color_override("font_outline_color", Color(1.0, 1.0, 1.0, 0.85))
 	_map = get_parent().get_node_or_null("Map") as MapLoader
@@ -28,6 +32,25 @@ func _ready() -> void:
 	await get_tree().process_frame
 	if _map == null or not _map.is_loaded:
 		_label.text = "Map failed to load.\n%s" % FALLBACK_ATTRIBUTION
+
+
+func _process(delta: float) -> void:
+	if _player == null:
+		return
+	if not is_instance_valid(_player):
+		_player = null
+		_player_label.text = ""
+		return
+	_player_update_timer -= delta
+	if _player_update_timer <= 0.0:
+		_player_update_timer = PLAYER_UPDATE_INTERVAL_S
+		_update_player_text()
+
+
+func set_player(player: Entity) -> void:
+	_player = player
+	_player_update_timer = 0.0
+	_update_player_text()
 
 
 func on_map_loaded(counts: Dictionary) -> void:
@@ -64,6 +87,21 @@ func show_pick(info: Dictionary) -> void:
 	_info_label.text = "\n".join(lines)
 
 
+func _update_player_text() -> void:
+	if _player == null or not is_instance_valid(_player) or _player.data == null:
+		_player_label.text = ""
+		return
+	var position_m := Vector2(
+		Units.px_to_m(_player.global_position.x),
+		Units.px_to_m(_player.global_position.y)
+	)
+	_player_label.text = "%s · x %.1f m · y %.1f m" % [
+		_player.data.full_name,
+		position_m.x,
+		position_m.y,
+	]
+
+
 func _counts_from_map() -> Dictionary:
 	if _map == null:
 		return {}
@@ -98,5 +136,7 @@ func _update_font_size() -> void:
 	_label.add_theme_font_size_override("font_size", font_size)
 	_label.add_theme_constant_override("outline_size", maxi(2, int(font_size * 0.12)))
 	var info_font_size: int = maxi(MIN_FONT_SIZE, int(round(font_size * INFO_FONT_SCALE)))
+	_player_label.add_theme_font_size_override("font_size", info_font_size)
+	_player_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))
 	_info_label.add_theme_font_size_override("font_size", info_font_size)
 	_info_label.add_theme_constant_override("outline_size", maxi(2, int(info_font_size * 0.12)))

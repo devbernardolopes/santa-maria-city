@@ -22,6 +22,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if not _is_current():
+		_dragging = false
+		return
 	var direction: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if direction != Vector2.ZERO:
 		position += direction * Units.m_to_px(PAN_SPEED_MPS) * delta / zoom.x
@@ -32,20 +35,27 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not _is_current():
+		_dragging = false
+		return
 	var mouse_button := event as InputEventMouseButton
 	if mouse_button != null:
 		if mouse_button.pressed and mouse_button.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_zoom_by(ZOOM_STEP)
+			get_viewport().set_input_as_handled()
 			return
 		if mouse_button.pressed and mouse_button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_zoom_by(1.0 / ZOOM_STEP)
+			get_viewport().set_input_as_handled()
 			return
 		if mouse_button.button_index == MOUSE_BUTTON_LEFT:
 			_dragging = mouse_button.pressed
+			get_viewport().set_input_as_handled()
 		return
 	var mouse_motion := event as InputEventMouseMotion
 	if mouse_motion != null and _dragging:
 		position -= mouse_motion.relative / zoom
+		get_viewport().set_input_as_handled()
 
 
 func on_map_loaded() -> void:
@@ -66,3 +76,7 @@ func _frame_map() -> void:
 
 func _zoom_by(factor: float) -> void:
 	zoom = (zoom * factor).clamp(Vector2.ONE * MIN_ZOOM, Vector2.ONE * MAX_ZOOM)
+
+
+func _is_current() -> bool:
+	return get_viewport().get_camera_2d() == self

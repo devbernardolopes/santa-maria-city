@@ -42,7 +42,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 	- videos = all video files
 - shaders = 2D shaders files
 - resources = Godot resource files `.tres` and their associated scripts, if any (map styles, entity data, item data, and so on)
-- autoloaders = all globals auto-loaded `.gd` scripts (file `world.gd` ↔ autoload `World`; do not rename without updating uids and references)
+- autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`; do not rename without updating uids and references)
 - data = game data files read at runtime
 	- `map.json` = GENERATED map data (never hand-edit)
 	- overlays = developer-authored data layered on the map, keyed by OSM ID
@@ -87,13 +87,19 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - "What terrain is at this point?" is answered by one function (`TerrainQuery.kind_at(position)`), so the implementation can later move from polygon tests to a raster grid without touching callers.
 - Procedural placement (e.g. vegetation scatter) must be deterministic: seed from the OSM ID. Persist only the differences from the generated state, keyed by OSM ID plus index.
 
+### Entities
+
+- `EntityData` is a `Resource` holding identity and D&D 5.5e ability scores; the `Entity` node is only presentation. The player and debug NPCs share the same `Entity` body and swap behavior through an `EntityController` (`PlayerController` or `WanderController`).
+- `EntityRegistry` is the `autoloaders/entity_registry.gd` autoload. It assigns IDs of the form `e_000001`, stores `EntityData` by ID, and stores relationship edges as directed ID pairs. Relationship resources never hold references to other resources.
+- Entities collide with `PhysicsLayers.WORLD` only for now. They do not block each other. Buildings and `water` landuse polygons block entities; waterways (streams) do not block. Collision bodies are generated at runtime only, never saved into the editor scene.
+
 ### Physics layers (named in project settings)
 
-1 `world` (buildings, water, static obstacles) · 2 `entities` · 3 `vehicles` · 4 `items` · 5 `interactables`.
+1 `world` (buildings, water, static obstacles) · 2 `entities` · 3 `vehicles` · 4 `items` · 5 `interactables`. The bit masks are `PhysicsLayers.WORLD = 1`, `ENTITIES = 2`, `VEHICLES = 4`, `ITEMS = 8`, `INTERACTABLES = 16`; collision layer/mask assignment uses those constants.
 
 ### Input actions
 
-Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start) · `debug_pick` (right mouse button / pad right-stick press). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
+Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start) · `debug_pick` (right mouse button / pad right-stick press) · `debug_camera` (F1 / pad back). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
 
 ### Performance
 

@@ -9,20 +9,18 @@ const OUTLINE_SCREEN_WIDTH: float = 3.0
 @onready var _outline: Line2D = $Outline
 
 var _map: MapLoader = null
-var _camera: Camera2D = null
 
 
 func _ready() -> void:
 	_map = get_parent().get_node_or_null("Map") as MapLoader
-	_camera = get_parent().get_node_or_null("DebugCamera") as Camera2D
-	if _camera == null:
-		_camera = get_viewport().get_camera_2d()
 	_outline.closed = true
 	_outline.visible = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("debug_pick"):
+		return
+	if get_viewport().get_camera_2d() == null:
 		return
 	var world_point: Vector2 = Vector2.ZERO
 	if event is InputEventMouseButton:
@@ -58,7 +56,8 @@ func _pick_at(world_point: Vector2) -> void:
 		clear_pick()
 		return
 	_outline.points = _to_local_points(world_points)
-	_outline.width = OUTLINE_SCREEN_WIDTH / maxf(_camera.zoom.x, 0.0001) if _camera != null else OUTLINE_SCREEN_WIDTH
+	var camera: Camera2D = get_viewport().get_camera_2d()
+	_outline.width = OUTLINE_SCREEN_WIDTH / maxf(camera.zoom.x, 0.0001) if camera != null else OUTLINE_SCREEN_WIDTH
 	_outline.visible = true
 	var osm_id: String = str(info.get("id", ""))
 	if not osm_id.is_empty():
@@ -74,8 +73,9 @@ func _to_local_points(world_points: PackedVector2Array) -> PackedVector2Array:
 
 
 func _screen_center_world() -> Vector2:
-	if _camera != null:
-		return _camera.get_screen_center_position()
+	var camera: Camera2D = get_viewport().get_camera_2d()
+	if camera != null:
+		return camera.get_screen_center_position()
 	var viewport: Viewport = get_viewport()
 	var center: Vector2 = viewport.get_visible_rect().size * 0.5
 	return viewport.get_canvas_transform().affine_inverse() * center
