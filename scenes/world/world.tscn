@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bsq8my0ehu8pn" path="res://scripts/world/world.gd" id="1_world"]
 [ext_resource type="Script" uid="uid://bn1i3eh0js1tf" path="res://scripts/world/map_loader.gd" id="2_map"]
 [ext_resource type="Script" uid="uid://b78jeffoiffbn" path="res://scripts/world/debug_camera.gd" id="3_camera"]
-[ext_resource type="Resource" uid="uid://cswbkmxfxru8b" path="res://resources/style_001.tres" id="3_t5ptc"]
+[ext_resource type="Resource" uid="uid://yk6r1f5gcvvx" path="res://resources/style_002.tres" id="3_t5ptc"]
 [ext_resource type="Script" uid="uid://l1t1fxwtwqt1" path="res://scripts/ui/hud.gd" id="4_hud"]
 [ext_resource type="Script" uid="uid://bpmjjc3el8ayn" path="res://scripts/world/map_picker.gd" id="5_picker"]
 

@@ -1,0 +1,325 @@
+[gd_resource type="Resource" script_class="MapStyle" format=3 uid="uid://yk6r1f5gcvvx"]
+
+[ext_resource type="Script" uid="uid://crsl4l1sgw012" path="res://resources/terrain_style.gd" id="1_mud50"]
+[ext_resource type="Texture2D" uid="uid://bpkqvr63qu32m" path="res://assets/images/textures/roof_tiles_arched.png" id="2_di6a0"]
+[ext_resource type="Texture2D" uid="uid://bhyec6spywrrp" path="res://assets/images/textures/asphalt_road.jpg" id="2_rduk6"]
+[ext_resource type="Script" uid="uid://cvgwo4nfal7e0" path="res://resources/map_style.gd" id="2_y6kca"]
+[ext_resource type="Texture2D" uid="uid://dmhyb613vnk37" path="res://assets/images/textures/grass-01.png" id="3_di6a0"]
+[ext_resource type="Texture2D" uid="uid://bcmnnoohglvu6" path="res://assets/images/textures/IMG_1887.png" id="4_ssj4p"]
+
+[sub_resource type="Resource" id="Resource_lxefa"]
+script = ExtResource("1_mud50")
+id = &"default_building"
+color = Color(0.92775965, 0.41108245, 0.18517146, 1)
+texture = ExtResource("2_di6a0")
+
+[sub_resource type="Resource" id="Resource_tvbdg"]
+script = ExtResource("1_mud50")
+id = &"default_landuse"
+color = Color(0.84705883, 0.8784314, 0.78431374, 1)
+
+[sub_resource type="Resource" id="Resource_fmxaa"]
+script = ExtResource("1_mud50")
+id = &"default_road"
+color = Color(0.93333334, 0.93333334, 0.93333334, 1)
+
+[sub_resource type="Resource" id="Resource_76hd2"]
+script = ExtResource("1_mud50")
+id = &"default_waterway"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_ym4de"]
+script = ExtResource("1_mud50")
+id = &"residential"
+kind = &"residential"
+color = Color(0.8901961, 0.8627451, 0.8039216, 1)
+
+[sub_resource type="Resource" id="Resource_legmu"]
+script = ExtResource("1_mud50")
+id = &"grass"
+kind = &"grass"
+color = Color(0.72156864, 0.8509804, 0.5411765, 1)
+texture = ExtResource("3_di6a0")
+
+[sub_resource type="Resource" id="Resource_6m05q"]
+script = ExtResource("1_mud50")
+id = &"wood"
+kind = &"wood"
+color = Color(0.49803922, 0.6901961, 0.4117647, 1)
+texture = ExtResource("4_ssj4p")
+
+[sub_resource type="Resource" id="Resource_isrgh"]
+script = ExtResource("1_mud50")
+id = &"pitch"
+kind = &"pitch"
+color = Color(0.6117647, 0.8, 0.47843137, 1)
+
+[sub_resource type="Resource" id="Resource_mdfsp"]
+script = ExtResource("1_mud50")
+id = &"playground"
+kind = &"playground"
+surface = &"asphalt"
+color = Color(0.8509804, 0.78431374, 0.627451, 1)
+
+[sub_resource type="Resource" id="Resource_u5li1"]
+script = ExtResource("1_mud50")
+id = &"tertiary"
+kind = &"tertiary"
+surface = &"paving_stones"
+color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+
+[sub_resource type="Resource" id="Resource_kto0e"]
+script = ExtResource("1_mud50")
+id = &"residential"
+kind = &"residential"
+surface = &"cobblestone"
+color = Color(0.8392157, 0.79607844, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_rs0by"]
+script = ExtResource("1_mud50")
+id = &"service"
+kind = &"service"
+surface = &"concrete"
+color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+
+[sub_resource type="Resource" id="Resource_56hir"]
+script = ExtResource("1_mud50")
+id = &"footway"
+kind = &"footway"
+surface = &"dirt"
+color = Color(0.8784314, 0.72156864, 0.6901961, 1)
+
+[sub_resource type="Resource" id="Resource_41qvm"]
+script = ExtResource("1_mud50")
+id = &"service_asphalt"
+kind = &"service"
+surface = &"asphalt"
+color = Color(0.7882353, 0.7882353, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_h6y42"]
+script = ExtResource("1_mud50")
+id = &"service_paving_stones"
+kind = &"service"
+surface = &"paving_stones"
+color = Color(0.835905, 0.45570266, 0.27477047, 1)
+texture = ExtResource("2_rduk6")
+
+[sub_resource type="Resource" id="Resource_1ooxv"]
+script = ExtResource("1_mud50")
+id = &"service_cobblestone"
+kind = &"service"
+surface = &"cobblestone"
+color = Color(0.8392157, 0.79607844, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_g0vej"]
+script = ExtResource("1_mud50")
+id = &"service_concrete"
+kind = &"service"
+surface = &"concrete"
+color = Color(0.8627451, 0.8627451, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_6evjd"]
+script = ExtResource("1_mud50")
+id = &"service_dirt"
+kind = &"service"
+surface = &"dirt"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_uof1o"]
+script = ExtResource("1_mud50")
+id = &"service_unpaved"
+kind = &"service"
+surface = &"unpaved"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_m44pd"]
+script = ExtResource("1_mud50")
+id = &"service_ground"
+kind = &"service"
+surface = &"ground"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_ccxhl"]
+script = ExtResource("1_mud50")
+id = &"service_gravel"
+kind = &"service"
+surface = &"gravel"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_ki0wh"]
+script = ExtResource("1_mud50")
+id = &"residential_asphalt"
+kind = &"residential"
+surface = &"asphalt"
+color = Color(0.7882353, 0.7882353, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_6sg4h"]
+script = ExtResource("1_mud50")
+id = &"residential_paving_stones"
+kind = &"residential"
+surface = &"paving_stones"
+color = Color(0.89411765, 0.8509804, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_sd8bd"]
+script = ExtResource("1_mud50")
+id = &"residential_cobblestone"
+kind = &"residential"
+surface = &"cobblestone"
+color = Color(0.8392157, 0.79607844, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_uupte"]
+script = ExtResource("1_mud50")
+id = &"residential_concrete"
+kind = &"residential"
+surface = &"concrete"
+color = Color(0.8627451, 0.8627451, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_akmfd"]
+script = ExtResource("1_mud50")
+id = &"residential_dirt"
+kind = &"residential"
+surface = &"dirt"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_3ags5"]
+script = ExtResource("1_mud50")
+id = &"residential_unpaved"
+kind = &"residential"
+surface = &"unpaved"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_qai0e"]
+script = ExtResource("1_mud50")
+id = &"residential_ground"
+kind = &"residential"
+surface = &"ground"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_pdjn4"]
+script = ExtResource("1_mud50")
+id = &"residential_gravel"
+kind = &"residential"
+surface = &"gravel"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_vwthw"]
+script = ExtResource("1_mud50")
+id = &"tertiary_asphalt"
+kind = &"tertiary"
+surface = &"asphalt"
+color = Color(0.7882353, 0.7882353, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_42gpr"]
+script = ExtResource("1_mud50")
+id = &"tertiary_paving_stones"
+kind = &"tertiary"
+surface = &"paving_stones"
+color = Color(0.89411765, 0.8509804, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_g4lcv"]
+script = ExtResource("1_mud50")
+id = &"tertiary_cobblestone"
+kind = &"tertiary"
+surface = &"cobblestone"
+color = Color(0.8392157, 0.79607844, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_x0sm7"]
+script = ExtResource("1_mud50")
+id = &"tertiary_concrete"
+kind = &"tertiary"
+surface = &"concrete"
+color = Color(0.8627451, 0.8627451, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_2w3x8"]
+script = ExtResource("1_mud50")
+id = &"tertiary_dirt"
+kind = &"tertiary"
+surface = &"dirt"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_qdwpt"]
+script = ExtResource("1_mud50")
+id = &"tertiary_unpaved"
+kind = &"tertiary"
+surface = &"unpaved"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_r7tjs"]
+script = ExtResource("1_mud50")
+id = &"tertiary_ground"
+kind = &"tertiary"
+surface = &"ground"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_jsll8"]
+script = ExtResource("1_mud50")
+id = &"tertiary_gravel"
+kind = &"tertiary"
+surface = &"gravel"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_7120w"]
+script = ExtResource("1_mud50")
+id = &"unclassified_asphalt"
+kind = &"unclassified"
+surface = &"asphalt"
+color = Color(0.7882353, 0.7882353, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_61dpc"]
+script = ExtResource("1_mud50")
+id = &"unclassified_paving_stones"
+kind = &"unclassified"
+surface = &"paving_stones"
+color = Color(0.89411765, 0.8509804, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_7rycd"]
+script = ExtResource("1_mud50")
+id = &"unclassified_cobblestone"
+kind = &"unclassified"
+surface = &"cobblestone"
+color = Color(0.8392157, 0.79607844, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_h4s66"]
+script = ExtResource("1_mud50")
+id = &"unclassified_concrete"
+kind = &"unclassified"
+surface = &"concrete"
+color = Color(0.8627451, 0.8627451, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_u2qxn"]
+script = ExtResource("1_mud50")
+id = &"unclassified_dirt"
+kind = &"unclassified"
+surface = &"dirt"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_t3nth"]
+script = ExtResource("1_mud50")
+id = &"unclassified_unpaved"
+kind = &"unclassified"
+surface = &"unpaved"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_08fl1"]
+script = ExtResource("1_mud50")
+id = &"unclassified_ground"
+kind = &"unclassified"
+surface = &"ground"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_61vo4"]
+script = ExtResource("1_mud50")
+id = &"unclassified_gravel"
+kind = &"unclassified"
+surface = &"gravel"
+color = Color(0.78431374, 0.6901961, 0.5411765, 1)
+
+[resource]
+script = ExtResource("2_y6kca")
+landuse = Array[ExtResource("1_mud50")]([SubResource("Resource_ym4de"), SubResource("Resource_legmu"), SubResource("Resource_6m05q"), SubResource("Resource_isrgh"), SubResource("Resource_mdfsp")])
+roads = Array[ExtResource("1_mud50")]([SubResource("Resource_u5li1"), SubResource("Resource_kto0e"), SubResource("Resource_rs0by"), SubResource("Resource_56hir"), SubResource("Resource_41qvm"), SubResource("Resource_h6y42"), SubResource("Resource_1ooxv"), SubResource("Resource_g0vej"), SubResource("Resource_6evjd"), SubResource("Resource_uof1o"), SubResource("Resource_m44pd"), SubResource("Resource_ccxhl"), SubResource("Resource_ki0wh"), SubResource("Resource_6sg4h"), SubResource("Resource_sd8bd"), SubResource("Resource_uupte"), SubResource("Resource_akmfd"), SubResource("Resource_3ags5"), SubResource("Resource_qai0e"), SubResource("Resource_pdjn4"), SubResource("Resource_vwthw"), SubResource("Resource_42gpr"), SubResource("Resource_g4lcv"), SubResource("Resource_x0sm7"), SubResource("Resource_2w3x8"), SubResource("Resource_qdwpt"), SubResource("Resource_r7tjs"), SubResource("Resource_jsll8"), SubResource("Resource_7120w"), SubResource("Resource_61dpc"), SubResource("Resource_7rycd"), SubResource("Resource_h4s66"), SubResource("Resource_u2qxn"), SubResource("Resource_t3nth"), SubResource("Resource_08fl1"), SubResource("Resource_61vo4")])
+default_landuse = SubResource("Resource_tvbdg")
+default_waterway = SubResource("Resource_76hd2")
+default_road = SubResource("Resource_fmxaa")
+default_building = SubResource("Resource_lxefa")
+metadata/_custom_type_script = "uid://cvgwo4nfal7e0"
