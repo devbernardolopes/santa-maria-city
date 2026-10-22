@@ -1,20 +1,26 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help check smoke lint format map
+MAP_SOURCE ?= data/export_0002.geojson
+
+.PHONY: help check smoke bench lint format map
 
 help:
 	@echo "make check      Syntax, import scan, and autoload-aware compile check"
 	@echo "make smoke      Headless map + vegetation smoke test (runs check first)"
+	@echo "make bench      Measure runtime map load time, counts, and memory"
 	@echo "make lint       Run gdlint via uv (does not modify files)"
 	@echo "make format     Rewrite GDScript with gdformat via uv"
-	@echo "make map        Regenerate data/map.json from data/export.geojson"
+	@echo "make map        Regenerate data/map.json from $(MAP_SOURCE)"
 
 check:
 	@tools/check.sh
 
 smoke: check
 	@tools/smoke.sh
+
+bench: check
+	@tools/bench.sh
 
 lint:
 	uv run --python 3.13 --with gdtoolkit gdlint autoloaders resources scripts tests
@@ -23,4 +29,4 @@ format:
 	uv run --python 3.13 --with gdtoolkit gdformat autoloaders resources scripts tests
 
 map:
-	uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py data/export.geojson data/map.json
+	uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py $(MAP_SOURCE) data/map.json

@@ -9,7 +9,6 @@ const MAP_PATH: String = "res://data/map.json"
 const OVERRIDES_PATH: String = "res://data/overlays/style_overrides.json"
 const OVERRIDES_VERSION: int = 1
 const EDITOR_FRAME_MARGIN: float = 0.9
-const BLOCKING_LANDUSE_KINDS: Array[StringName] = [&"water"]
 
 @export var style: MapStyle = null:
 	set(value):
@@ -19,8 +18,23 @@ const BLOCKING_LANDUSE_KINDS: Array[StringName] = [&"water"]
 		if is_inside_tree():
 			rebuild()
 
+## Draw the full map in the editor. Turn off for a fast, empty editor view.
+@export var editor_preview: bool = true:
+	set(value):
+		if editor_preview == value:
+			return
+		editor_preview = value
+		if Engine.is_editor_hint() and is_inside_tree():
+			rebuild()
+
+## 2D editor view used once on first open, in meters. Defaults to the original playtest area.
+@export var editor_initial_view_m: Rect2 = Rect2(1721.9, 2995.3, 1118.8, 2136.5)
+
 @export_tool_button("Rebuild map")
 var rebuild_button: Callable = rebuild
+
+@export_tool_button("Frame full map")
+var frame_full_map_button: Callable = frame_full_map_editor
 
 var map_size_m: Vector2 = Vector2.ZERO
 var map_bounds_px: Rect2 = Rect2()
@@ -28,6 +42,8 @@ var meta: Dictionary = {}
 var is_loaded: bool = false
 ## Runtime terrain index for the current map; null in the editor and before the map loads.
 var terrain: TerrainQuery = null
+## Last build timings and counts, for the headless benchmark and console diagnostics.
+var build_stats: Dictionary = {}
 
 var _active_style: MapStyle = null
 var _polygons_by_osm_id: Dictionary = {}
@@ -43,6 +59,8 @@ var _building_rings_m: Dictionary = {}
 var _building_collision: StaticBody2D = null
 var _water_collision: StaticBody2D = null
 var _collision_skip_count: int = 0
+var _polygon_count: int = 0
+var _collision_shape_count: int = 0
 static var _editor_auto_frame_attempted: bool = false
 
 
@@ -65,6 +83,9 @@ func rebuild() -> void:
 	meta = {}
 	terrain = null
 	TerrainQuery.active = null
+	build_stats = {}
+	if Engine.is_editor_hint() and not editor_preview:
+		return
 	if not Engine.is_editor_hint():
 		terrain = TerrainQuery.new()
 	_active_style = style if style != null else MapStyle.create_default()
@@ -170,6 +191,7 @@ func get_building_ids() -> Array[String]:
 
 
 func _load_map() -> bool:
+	var build_start_usec: int = Time.get_ticks_usec()
 	var file: FileAccess = FileAccess.open(MAP_PATH, FileAccess.READ)
 	if file == null:
 		push_error("MapLoader: could not open %s (error %s)." % [MAP_PATH, error_string(FileAccess.get_open_error())])
@@ -177,6 +199,7 @@ func _load_map() -> bool:
 	var json := JSON.new()
 	var parse_error: Error = json.parse(file.get_as_text())
 	file.close()
+	var parse_end_usec: int = Time.get_ticks_usec()
 	if parse_error != OK:
 		push_error(
 			"MapLoader: invalid JSON in %s at line %d: %s" % [
@@ -212,20 +235,72 @@ func _load_map() -> bool:
 	_has_computed_bounds = false
 	_seen_osm_ids.clear()
 	_unknown_style_ids.clear()
+	_polygon_count = 0
+	_collision_shape_count = 0
 	_build_layer(data["landuse"], "Landuse", &"landuse")
 	_build_layer(data["waterways"], "Waterways", &"waterways")
 	_build_layer(data["roads"], "Roads", &"roads")
 	_build_layer(data["buildings"], "Buildings", &"buildings")
+	var layers_end_usec: int = Time.get_ticks_usec()
 	_collect_road_features(data["roads"])
+	var collision_end_usec: int = layers_end_usec
 	if not Engine.is_editor_hint():
 		_build_collisions(data)
+		collision_end_usec = Time.get_ticks_usec()
 	if map_bounds_px.size == Vector2.ZERO and _has_computed_bounds:
 		map_bounds_px = _computed_bounds_px
 	_warn_unknown_overrides()
 	if terrain != null:
 		terrain.finalize(_meta_bounds_m())
 		TerrainQuery.active = terrain
+	var build_end_usec: int = Time.get_ticks_usec()
+	build_stats = {
+		"parse_ms": _usec_to_ms(parse_end_usec - build_start_usec),
+		"layers_ms": _usec_to_ms(layers_end_usec - parse_end_usec),
+		"collisions_ms": _usec_to_ms(collision_end_usec - layers_end_usec),
+		"terrain_ms": _usec_to_ms(build_end_usec - collision_end_usec),
+		"total_ms": _usec_to_ms(build_end_usec - build_start_usec),
+		"features": _feature_count(data),
+		"polygons": _polygon_count,
+		"collision_shapes": _collision_shape_count,
+		"terrain_entries": _polygon_count if terrain != null else 0,
+		"editor": Engine.is_editor_hint(),
+	}
+	_log_build_stats()
 	return true
+
+
+func _usec_to_ms(usec: int) -> int:
+	return int(round(float(usec) / 1000.0))
+
+
+func _feature_count(data: Dictionary) -> int:
+	var total: int = 0
+	for key: String in ["landuse", "waterways", "roads", "buildings"]:
+		var value: Variant = data.get(key)
+		if value is Array:
+			total += (value as Array).size()
+	return total
+
+
+func _log_build_stats() -> void:
+	if not OS.is_debug_build() and not Engine.is_editor_hint():
+		return
+	print(
+		(
+			"MapLoader: %d features, %d polygons, %d collision shapes in %d ms "
+			+ "(parse %d, layers %d, collisions %d, terrain %d)."
+		) % [
+			int(build_stats.get("features", 0)),
+			int(build_stats.get("polygons", 0)),
+			int(build_stats.get("collision_shapes", 0)),
+			int(build_stats.get("total_ms", 0)),
+			int(build_stats.get("parse_ms", 0)),
+			int(build_stats.get("layers_ms", 0)),
+			int(build_stats.get("collisions_ms", 0)),
+			int(build_stats.get("terrain_ms", 0)),
+		]
+	)
 
 
 func _read_meta(meta_data: Dictionary) -> bool:
@@ -300,6 +375,7 @@ func _is_number(value: Variant) -> bool:
 
 
 func _build_layer(features: Array, layer_name: String, category: StringName) -> void:
+	var runtime: bool = not Engine.is_editor_hint()
 	var layer := Node2D.new()
 	layer.name = layer_name
 	add_child(layer)
@@ -336,7 +412,7 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 			var points: PackedVector2Array = _ring_to_px(outer_ring_value)
 			if points.size() < 3:
 				continue
-			if category == &"buildings" and not osm_id.is_empty() and not Engine.is_editor_hint():
+			if runtime and category == &"buildings" and not osm_id.is_empty():
 				if not _building_rings_m.has(osm_id):
 					var ring_m: PackedVector2Array = _line_to_m(outer_ring_value)
 					if ring_m.size() >= 3:
@@ -349,10 +425,13 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 			polygon.set_meta("kind", kind)
 			polygon.set_meta("surface", surface)
 			polygon.set_meta("style_id", style_id)
-			polygon.set_meta("tags", tags)
-			polygon.set_meta("bounds_px", _bounds_of(points))
+			if runtime:
+				polygon.set_meta("tags", tags)
+				polygon.set_meta("bounds_px", _bounds_of(points))
 			layer.add_child(polygon)
-			_index_polygon(osm_id, polygon)
+			_polygon_count += 1
+			if runtime:
+				_index_polygon(osm_id, polygon)
 			_expand_computed_bounds(points)
 			if terrain != null:
 				terrain.add_polygon(
@@ -553,8 +632,8 @@ func _line_to_m(line: Array) -> PackedVector2Array:
 func _build_collisions(data: Dictionary) -> void:
 	_building_collision = _create_collision_body("BuildingCollision")
 	_water_collision = _create_collision_body("WaterCollision")
-	_build_collision_shapes(data["buildings"], _building_collision, &"")
-	_build_collision_shapes(data["landuse"], _water_collision, &"water")
+	_build_collision_shapes(data["buildings"], _building_collision, false)
+	_build_collision_shapes(data["landuse"], _water_collision, true)
 	if _collision_skip_count > 0:
 		push_warning("MapLoader: skipped %d invalid collision polygon(s)." % _collision_skip_count)
 
@@ -568,14 +647,14 @@ func _create_collision_body(body_name: String) -> StaticBody2D:
 	return body
 
 
-func _build_collision_shapes(features: Array, body: StaticBody2D, filter_kind: StringName) -> void:
+func _build_collision_shapes(features: Array, body: StaticBody2D, water_only: bool) -> void:
 	for feature_value: Variant in features:
 		if not (feature_value is Dictionary):
 			continue
 		var feature_data: Dictionary = feature_value
-		if not filter_kind.is_empty():
+		if water_only:
 			var kind := StringName(str(feature_data.get("kind", "")))
-			if kind != filter_kind or not BLOCKING_LANDUSE_KINDS.has(kind):
+			if not TerrainSample.is_water_landuse(&"landuse", kind):
 				continue
 		var osm_id: String = str(feature_data.get("id", ""))
 		for points: PackedVector2Array in _outer_rings_px(feature_data):
@@ -612,6 +691,7 @@ func _add_collision_polygon(body: StaticBody2D, points_px: PackedVector2Array, o
 	polygon.polygon = points_px
 	polygon.set_meta("osm_id", osm_id)
 	body.add_child(polygon)
+	_collision_shape_count += 1
 
 
 func _clear_generated() -> void:
@@ -628,12 +708,20 @@ func _clear_generated() -> void:
 	_road_features_m.clear()
 	_building_rings_m.clear()
 	_collision_skip_count = 0
+	_polygon_count = 0
+	_collision_shape_count = 0
 	if is_instance_valid(_building_collision):
 		_building_collision.free()
 	_building_collision = null
 	if is_instance_valid(_water_collision):
 		_water_collision.free()
 	_water_collision = null
+
+
+func frame_full_map_editor() -> void:
+	if not Engine.is_editor_hint() or not is_loaded:
+		return
+	_fit_editor_view(map_bounds_px)
 
 
 func _frame_editor_view_once() -> bool:
@@ -651,13 +739,38 @@ func _frame_editor_view_once() -> bool:
 	var view_rect: Rect2 = viewport.get_visible_rect()
 	if view_rect.size.x <= 0.0 or view_rect.size.y <= 0.0:
 		return false
+	var target_bounds: Rect2 = map_bounds_px
+	if editor_initial_view_m.size.x > 0.0 and editor_initial_view_m.size.y > 0.0:
+		target_bounds = Rect2(
+			Units.to_px(editor_initial_view_m.position),
+			Units.to_px(editor_initial_view_m.size)
+		)
 	var visible_world: Rect2 = viewport.global_canvas_transform.affine_inverse() * view_rect
-	if visible_world.intersects(map_bounds_px):
+	if visible_world.intersects(target_bounds):
 		return true
-	var fit_zoom_x: float = view_rect.size.x / map_bounds_px.size.x
-	var fit_zoom_y: float = view_rect.size.y / map_bounds_px.size.y
+	_fit_editor_view(target_bounds)
+	return true
+
+
+func _fit_editor_view(bounds_px: Rect2) -> bool:
+	if not Engine.is_editor_hint():
+		return false
+	if bounds_px.size.x <= 0.0 or bounds_px.size.y <= 0.0:
+		return false
+	var editor_interface: Object = Engine.get_singleton(&"EditorInterface") as Object
+	if editor_interface == null:
+		return false
+	var viewport_value: Variant = editor_interface.call(&"get_editor_viewport_2d")
+	var viewport := viewport_value as SubViewport
+	if viewport == null:
+		return false
+	var view_rect: Rect2 = viewport.get_visible_rect()
+	if view_rect.size.x <= 0.0 or view_rect.size.y <= 0.0:
+		return false
+	var fit_zoom_x: float = view_rect.size.x / bounds_px.size.x
+	var fit_zoom_y: float = view_rect.size.y / bounds_px.size.y
 	var fit_zoom: float = minf(fit_zoom_x, fit_zoom_y) * EDITOR_FRAME_MARGIN
 	fit_zoom = clampf(fit_zoom, 0.0001, 64.0)
-	var origin: Vector2 = view_rect.size * 0.5 - map_bounds_px.get_center() * fit_zoom
+	var origin: Vector2 = view_rect.size * 0.5 - bounds_px.get_center() * fit_zoom
 	viewport.global_canvas_transform = Transform2D(0.0, Vector2(fit_zoom, fit_zoom), 0.0, origin)
 	return true

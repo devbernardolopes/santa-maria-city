@@ -12,6 +12,7 @@ var _rules: VegetationRules = null
 var _seed: int = 0
 var _placement_bounds_m: Rect2 = Rect2()
 var _street_by_chunk: Dictionary = {}
+var _street_tree_count: int = 0
 
 
 func _init(rules: VegetationRules, seed_value: int, bounds_m: Rect2) -> void:
@@ -23,6 +24,7 @@ func _init(rules: VegetationRules, seed_value: int, bounds_m: Rect2) -> void:
 ## Builds the per-chunk street-tree buckets once per map load.
 func prepare_street_trees(roads: Array[Dictionary]) -> void:
 	_street_by_chunk.clear()
+	_street_tree_count = 0
 	if _rules == null or TerrainQuery.active == null:
 		return
 	for road: Dictionary in roads:
@@ -179,6 +181,12 @@ func _add_street_tree(
 		"key": key,
 	})
 	_street_by_chunk[chunk] = bucket
+	_street_tree_count += 1
+
+
+## Number of street trees bucketed by prepare_street_trees(); for diagnostics.
+func get_street_tree_count() -> int:
+	return _street_tree_count
 
 
 func _terrain_position_ok(
@@ -299,7 +307,7 @@ func _is_blocked_category(category: StringName) -> bool:
 func _is_blocked_sample(sample: TerrainSample) -> bool:
 	if _is_blocked_category(sample.category):
 		return true
-	return sample.category == &"landuse" and sample.kind == &"water"
+	return TerrainSample.is_water_landuse(sample.category, sample.kind)
 
 
 func _is_number(value: Variant) -> bool:

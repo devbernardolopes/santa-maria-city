@@ -60,7 +60,7 @@ script = ExtResource("10_entrance_spawner")
 [node name="InteriorManager" type="Node" parent="." unique_id=337000427]
 script = ExtResource("11_interior_manager")
 
-[node name="VegetationManager" type="Node" parent="."]
+[node name="VegetationManager" type="Node" parent="." unique_id=1791694108]
 script = ExtResource("13_vegetation")
 
 [node name="ScreenFader" type="CanvasLayer" parent="." unique_id=250914884]

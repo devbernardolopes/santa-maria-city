@@ -72,11 +72,14 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 
 ### Map data pipeline
 
-- OSM `.geojson` export → `tools/osm_to_godot.py` (Python, shapely + pyproj, projection EPSG:31982) → `res://data/map.json`. The file is generated: regenerate it instead of editing it.
+- The current source export is `data/export_0002.geojson` (about 55 MB, gitignored and kept local). `make map` converts it with `tools/osm_to_godot.py` (Python, shapely + pyproj, projection EPSG:31982) into `res://data/map.json` (about 18 MB, tracked as runtime data). Pass `MAP_SOURCE=path/to/other.geojson` to regenerate from a different export. Raw `.geojson` exports are not committed.
+- The imported city is about 19.5 × 19.1 km with roughly 68k features (56k buildings). The pinned origin keeps every authored coordinate, OSM-ID-keyed overlay, and entrance valid when the export grows; the original playtest area is contained in the full-city bounds.
 - The converter's pinned origin is `DEFAULT_ORIGIN_UTM = (228400.0, 6712900.0)` and is written to `meta.origin_utm`. `--origin-utm X Y` exists for a deliberate re-origin only; changing it invalidates every authored position and overlay.
 - `map.json` schema: top level keys `landuse`, `waterways`, `roads`, `buildings`, `meta`. Every feature has `id` (string, e.g. `"way/123"` or `"relation/456"`), `name` (string, may be empty), `tags` (Dictionary of kept OSM tags), `kind` (string), and `polys`: an Array of polygons, each polygon an Array of rings (`[outer, hole1, ...]`), each ring an Array of `[x, y]` points in meters (rings are not closed). Roads additionally have `width` (m), `oneway` (bool, the `line` already points in the travel direction), `layer` (int), `bridge`, `tunnel` (bool), and `line` (the centerline, Array of `[x, y]`). Waterways additionally have `line`. Buildings additionally have `levels`. `meta` has `crs`, `origin_utm`, `size_m`, `bounds_m`, `attribution`, `counts`.
 - Developer-authored data (interiors, entrances, spawn points, building properties) lives in `res://data/overlays/` **keyed by OSM ID**, never by array index or node path, so the map can be re-imported without losing work.
-- Map styling is data-driven through `MapStyle` / `TerrainStyle` (`id`, `kind`, `surface`, color/texture/scale). Resolution order is: exact style-id override → kind + surface → kind → category default. Surface keys are normalized to lowercase and stripped before `;` and `:` (for example `concrete:lanes` becomes `concrete`). No colors or textures are hard-coded in loader logic.
+- Map styling is data-driven through `MapStyle` / `TerrainStyle` (`id`, `kind`, `surface`, color/texture/scale). Resolution order is: exact style-id override → kind + surface → kind → category default. Surface keys are normalized to lowercase and stripped before `;` and `:` (for example `concrete:lanes` becomes `concrete`). Road `*_link` kinds fall back to their base kind (`trunk_link` → `trunk`). No colors or textures are hard-coded in loader logic.
+- “Add missing styles” on a `MapStyle` merges the built-in palette into an authored resource without touching existing entries or values; “Reset to defaults” is destructive. Use the merge when the map import introduces new kinds or surfaces.
+- `TerrainSample.WATER_LANDUSE_KINDS` (`water`, `reservoir`, `swimming_pool`, `basin`) is the single list for water-like landuse. Those polygons get water styling, block entity movement, and block vegetation.
 - `res://data/overlays/style_overrides.json` maps OSM ID to style ID, for example `{"version": 1, "overrides": {"way/123": "residential_asphalt"}}`. Unknown OSM IDs and unknown style IDs fall back safely and produce one aggregated warning per rebuild, not one per feature.
 - Attribution "© OpenStreetMap contributors (ODbL)" must be shown in the credits before any release.
 
@@ -85,8 +88,8 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 `Landuse` → `Waterways` → `Roads` → `Buildings` (footprints draw as roofs) → `Decals` (vegetation ground batches, shadows) → `TerrainState` (reserved for future dynamic overlays) → `Objects` (y-sorted: entities, vehicles, items) → `Canopy` (vegetation tree tops, roof fade-outs).
 
 - Base ground/road/building polygons are **static art**: never modify them at runtime. Anything dynamic (burn marks, wetness, regrowth, puddles) goes in an overlay layer above.
-- Terrain appearance is data-driven through `MapStyle` / `TerrainStyle` (style id + kind + surface → color/texture/scale). No colors or textures hard-coded in loader logic. A new `MapStyle` resource can be seeded from the inspector with its “Reset to defaults” button.
-- `scripts/world/map_loader.gd` is the only `@tool` **node** script. The resource scripts it uses in the editor (`resources/map_style.gd`, `resources/terrain_style.gd`) are also `@tool`, because Godot loads non-tool resource scripts as placeholder instances whose methods cannot be called from the preview. `MapLoader` previews the generated layers in the editor, has a “Rebuild map” inspector button, and auto-frames the 2D editor view once when the map bounds are completely off-screen. Generated layer/polygon nodes deliberately have no `owner`, so they are never saved into a scene. Other node scripts (including `world.gd`) stay non-tool and connect `map_loaded` in `_ready()`.
+- Terrain appearance is data-driven through `MapStyle` / `TerrainStyle` (style id + kind + surface → color/texture/scale). No colors or textures hard-coded in loader logic. A new `MapStyle` resource can be seeded from the inspector with “Reset to defaults” (destructive); “Add missing styles” appends only the palette entries the resource does not have yet.
+- `scripts/world/map_loader.gd` is the only `@tool` **node** script. The resource scripts it uses in the editor (`resources/map_style.gd`, `resources/terrain_style.gd`) are also `@tool`, because Godot loads non-tool resource scripts as placeholder instances whose methods cannot be called from the preview. `MapLoader` previews the full generated map in the editor by default, has “Rebuild map” and “Frame full map” inspector buttons, and opens the 2D view on `editor_initial_view_m` once per editor session instead of fitting the whole city. `editor_preview = false` skips generation entirely for a fast, empty editor. Generated layer/polygon nodes deliberately have no `owner`, so they are never saved into a scene. Other node scripts (including `world.gd`) stay non-tool and connect `map_loaded` in `_ready()`.
 - `scripts/world/map_picker.gd` is a non-tool debug node. The `debug_pick` action picks the top-most polygon under the mouse (or the screen center for the pad), draws a closed white `Line2D` outline, copies the OSM ID to the clipboard, and sends the feature report (category, kind, surface, style, up to eight tags) to the HUD.
 
 ### Data versus nodes
@@ -122,7 +125,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - `EntityData` is a `Resource` holding identity and D&D 5.5e ability scores; the `Entity` node is only presentation. The player and debug NPCs share the same `Entity` body and swap behavior through an `EntityController` (`PlayerController` or `WanderController`).
 - Movement is mode-selectable on the controller via `movement_mode` (`OMNI` = move in the stick/key direction, today’s behavior; `RELATIVE` = up/down throttle along facing, left/right turn in place). The option is set on `PlayerController` in `scenes/entities/player.tscn` before launch (defaults to `OMNI`). `get_move_intent()` provides axis intent for RELATIVE; both modes reuse the same input actions so keyboard, gamepad, and touch work. `Entity.facing` remains the heading (used by `PlayerInteraction`). NPCs/default to `OMNI`. Vehicles in future will use `RELATIVE` only.
 - `EntityRegistry` is the `autoloaders/entity_registry.gd` autoload. It assigns IDs of the form `e_000001`, stores `EntityData` by ID, and stores relationship edges as directed ID pairs. Relationship resources never hold references to other resources.
-- Entities collide with `PhysicsLayers.WORLD` only for now. They do not block each other. Buildings and `water` landuse polygons block entities; waterways (streams) do not block. Collision bodies are generated at runtime only, never saved into the editor scene.
+- Entities collide with `PhysicsLayers.WORLD` only for now. They do not block each other. Buildings and water-like landuse polygons (`TerrainSample.WATER_LANDUSE_KINDS`) block entities; waterways (streams) do not block. Collision bodies are generated at runtime only, never saved into the editor scene.
 
 ### Physics layers (named in project settings)
 
@@ -135,6 +138,7 @@ Canonical actions, persisted in `project.godot`, one keyboard key + one pad butt
 ### Performance
 
 - Target 60 fps on the laptop and a stable frame rate on the low-end phone (see Testing). Keep node counts low: prefer one node per feature at most, and plan for chunked streaming of the map when the imported area grows. Do not build per-frame work that scales with the total number of map features.
+- The full-city import currently loads monolithically: roughly 5–7 s and ~125k nodes at runtime on the desktop, with collision and terrain indexing included, and `VegetationManager` also precomputes ~50k street trees (~7 s) at startup. Full-map editor preview follows the same node cost. Visible-feature streaming and lazy street-tree generation are the next performance work before the phone release; measure with `make bench`.
 
 ### Interaction and interiors
 
@@ -156,8 +160,9 @@ Agents must validate scripts without running gameplay. Use the headless harness:
 
 - `make check` — imports the project headlessly (refreshes class/UID caches), runs `gdparse` over every game script, then loads every game script with autoloads through `res://tests/compile_check.tscn`.
 - `make smoke` — runs `make check`, then the headless map + vegetation integration test in `res://tests/smoke.tscn` (map load, chunk streaming, collider and interaction pools, inspection output).
+- `make bench` — runs `make check`, then the headless runtime map benchmark in `res://tests/map_benchmark.tscn` (build timings, node count, static memory).
 - `make lint` / `make format` — run `gdlint` / `gdformat` through `uv`; `.gdlintrc` sets a 120-column project baseline and disables legacy structural rules. `make format` rewrites files, so use it deliberately.
-- `make map` — regenerate `res://data/map.json` with the pinned Python dependencies.
+- `make map` — regenerate `res://data/map.json` from `data/export_0002.geojson` (or `MAP_SOURCE=... make map`) with the pinned Python dependencies.
 
 `tools/godot_bin.sh` resolves Godot from `GODOT_BIN`, then `godot` on `PATH`, then the known local 4.7.2 binary. Keep the editor closed while agents write and run automated checks; open it only for manual playtesting. Add new automated validation under `tests/`, not as temporary scenes in the project root. If export presets are added, exclude `tests/*` from release builds.
 
@@ -176,7 +181,7 @@ Before shipping a build: remove any `_mcp_game_helper` dev autoload and its edit
 - Never reference `EditorInterface` directly from a script that is shipped in a game: editor classes are stripped from export templates and the script then fails to load. Access it only under `Engine.is_editor_hint()` through `Engine.get_singleton(&"EditorInterface")`.
 - Run `make check` after script changes and `make smoke` after systems that load the world; do not leave `.tmp_*` scenes or scripts in the project root.
 - Godot generates `.gd.uid` sidecars; keep them tracked so scenes and references stay stable.
-- Regenerate the map with `make map` (or `uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py data/export.geojson data/map.json` when the system Python lacks the geo dependencies).
+- Regenerate the map with `make map` (or `MAP_SOURCE=data/export_0002.geojson make map`; raw exports are gitignored, so keep one locally).
 
 ## Commit Convention
 

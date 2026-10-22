@@ -54,6 +54,264 @@ kind = &"playground"
 surface = &"asphalt"
 color = Color(0.8509804, 0.78431374, 0.627451, 1)
 
+[sub_resource type="Resource" id="Resource_ikqq8"]
+script = ExtResource("1_x3ued")
+id = &"garages"
+kind = &"garages"
+color = Color(0.7882353, 0.76862746, 0.7372549, 1)
+
+[sub_resource type="Resource" id="Resource_5fexh"]
+script = ExtResource("1_x3ued")
+id = &"commercial"
+kind = &"commercial"
+color = Color(0.90588236, 0.8392157, 0.76862746, 1)
+
+[sub_resource type="Resource" id="Resource_lu4ol"]
+script = ExtResource("1_x3ued")
+id = &"retail"
+kind = &"retail"
+color = Color(0.9098039, 0.8509804, 0.7882353, 1)
+
+[sub_resource type="Resource" id="Resource_glcxm"]
+script = ExtResource("1_x3ued")
+id = &"industrial"
+kind = &"industrial"
+color = Color(0.8392157, 0.8039216, 0.76862746, 1)
+
+[sub_resource type="Resource" id="Resource_sv2l4"]
+script = ExtResource("1_x3ued")
+id = &"railway"
+kind = &"railway"
+color = Color(0.8117647, 0.7764706, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_xw3lb"]
+script = ExtResource("1_x3ued")
+id = &"military"
+kind = &"military"
+color = Color(0.7882353, 0.7607843, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_kwtkh"]
+script = ExtResource("1_x3ued")
+id = &"farmland"
+kind = &"farmland"
+color = Color(0.8509804, 0.8117647, 0.6, 1)
+
+[sub_resource type="Resource" id="Resource_m3r6d"]
+script = ExtResource("1_x3ued")
+id = &"orchard"
+kind = &"orchard"
+color = Color(0.7137255, 0.8, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_wksr7"]
+script = ExtResource("1_x3ued")
+id = &"vineyard"
+kind = &"vineyard"
+color = Color(0.7254902, 0.78039217, 0.49803922, 1)
+
+[sub_resource type="Resource" id="Resource_1igxs"]
+script = ExtResource("1_x3ued")
+id = &"allotments"
+kind = &"allotments"
+color = Color(0.78431374, 0.827451, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_0aw3v"]
+script = ExtResource("1_x3ued")
+id = &"meadow"
+kind = &"meadow"
+color = Color(0.7647059, 0.8509804, 0.60784316, 1)
+
+[sub_resource type="Resource" id="Resource_j55bi"]
+script = ExtResource("1_x3ued")
+id = &"grassland"
+kind = &"grassland"
+color = Color(0.7529412, 0.8392157, 0.5764706, 1)
+
+[sub_resource type="Resource" id="Resource_wpruw"]
+script = ExtResource("1_x3ued")
+id = &"park"
+kind = &"park"
+color = Color(0.6627451, 0.8352941, 0.54901963, 1)
+
+[sub_resource type="Resource" id="Resource_hyypc"]
+script = ExtResource("1_x3ued")
+id = &"garden"
+kind = &"garden"
+color = Color(0.8117647, 0.8862745, 0.654902, 1)
+
+[sub_resource type="Resource" id="Resource_5d3pr"]
+script = ExtResource("1_x3ued")
+id = &"recreation_ground"
+kind = &"recreation_ground"
+color = Color(0.7254902, 0.8509804, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_1o2rw"]
+script = ExtResource("1_x3ued")
+id = &"playground"
+kind = &"playground"
+color = Color(0.8509804, 0.78431374, 0.627451, 1)
+
+[sub_resource type="Resource" id="Resource_ogqow"]
+script = ExtResource("1_x3ued")
+id = &"stadium"
+kind = &"stadium"
+color = Color(0.7176471, 0.827451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_l3p1v"]
+script = ExtResource("1_x3ued")
+id = &"sports_centre"
+kind = &"sports_centre"
+color = Color(0.7176471, 0.827451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_prk7l"]
+script = ExtResource("1_x3ued")
+id = &"fitness_station"
+kind = &"fitness_station"
+color = Color(0.7529412, 0.8392157, 0.6509804, 1)
+
+[sub_resource type="Resource" id="Resource_a7rrj"]
+script = ExtResource("1_x3ued")
+id = &"dog_park"
+kind = &"dog_park"
+color = Color(0.78431374, 0.8509804, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_tf31n"]
+script = ExtResource("1_x3ued")
+id = &"nature_reserve"
+kind = &"nature_reserve"
+color = Color(0.62352943, 0.7882353, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_ditln"]
+script = ExtResource("1_x3ued")
+id = &"forest"
+kind = &"forest"
+color = Color(0.43529412, 0.6117647, 0.36078432, 1)
+
+[sub_resource type="Resource" id="Resource_csk1s"]
+script = ExtResource("1_x3ued")
+id = &"scrub"
+kind = &"scrub"
+color = Color(0.6039216, 0.7490196, 0.47843137, 1)
+
+[sub_resource type="Resource" id="Resource_s6txm"]
+script = ExtResource("1_x3ued")
+id = &"tree_row"
+kind = &"tree_row"
+color = Color(0.56078434, 0.68235296, 0.44705883, 1)
+
+[sub_resource type="Resource" id="Resource_ell0f"]
+script = ExtResource("1_x3ued")
+id = &"fell"
+kind = &"fell"
+color = Color(0.7058824, 0.7647059, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_1q1wx"]
+script = ExtResource("1_x3ued")
+id = &"cemetery"
+kind = &"cemetery"
+color = Color(0.73333335, 0.7764706, 0.6784314, 1)
+
+[sub_resource type="Resource" id="Resource_c001i"]
+script = ExtResource("1_x3ued")
+id = &"religious"
+kind = &"religious"
+color = Color(0.84705883, 0.8235294, 0.7647059, 1)
+
+[sub_resource type="Resource" id="Resource_p6sej"]
+script = ExtResource("1_x3ued")
+id = &"greenfield"
+kind = &"greenfield"
+color = Color(0.7882353, 0.8392157, 0.627451, 1)
+
+[sub_resource type="Resource" id="Resource_7x1n0"]
+script = ExtResource("1_x3ued")
+id = &"brownfield"
+kind = &"brownfield"
+color = Color(0.78431374, 0.7490196, 0.69803923, 1)
+
+[sub_resource type="Resource" id="Resource_l0el1"]
+script = ExtResource("1_x3ued")
+id = &"construction"
+kind = &"construction"
+color = Color(0.7882353, 0.75686276, 0.70980394, 1)
+
+[sub_resource type="Resource" id="Resource_mg2cs"]
+script = ExtResource("1_x3ued")
+id = &"landfill"
+kind = &"landfill"
+color = Color(0.7254902, 0.6784314, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_aciqy"]
+script = ExtResource("1_x3ued")
+id = &"quarry"
+kind = &"quarry"
+color = Color(0.7176471, 0.6901961, 0.64705884, 1)
+
+[sub_resource type="Resource" id="Resource_e5uci"]
+script = ExtResource("1_x3ued")
+id = &"cliff"
+kind = &"cliff"
+color = Color(0.6901961, 0.6627451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_mwggv"]
+script = ExtResource("1_x3ued")
+id = &"sand"
+kind = &"sand"
+color = Color(0.87058824, 0.8235294, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_3y2uq"]
+script = ExtResource("1_x3ued")
+id = &"wetland"
+kind = &"wetland"
+color = Color(0.60784316, 0.7490196, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_owmch"]
+script = ExtResource("1_x3ued")
+id = &"water"
+kind = &"water"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_4ha8y"]
+script = ExtResource("1_x3ued")
+id = &"reservoir"
+kind = &"reservoir"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_xsiy0"]
+script = ExtResource("1_x3ued")
+id = &"swimming_pool"
+kind = &"swimming_pool"
+color = Color(0.54901963, 0.79607844, 0.8784314, 1)
+
+[sub_resource type="Resource" id="Resource_wv77e"]
+script = ExtResource("1_x3ued")
+id = &"basin"
+kind = &"basin"
+color = Color(0.54901963, 0.79607844, 0.8784314, 1)
+
+[sub_resource type="Resource" id="Resource_b7t7q"]
+script = ExtResource("1_x3ued")
+id = &"salt_pond"
+kind = &"salt_pond"
+color = Color(0.654902, 0.8156863, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_0iwkk"]
+script = ExtResource("1_x3ued")
+id = &"track"
+kind = &"track"
+color = Color(0.79607844, 0.72156864, 0.5803922, 1)
+
+[sub_resource type="Resource" id="Resource_3eiad"]
+script = ExtResource("1_x3ued")
+id = &"bleachers"
+kind = &"bleachers"
+color = Color(0.7882353, 0.7607843, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_roljg"]
+script = ExtResource("1_x3ued")
+id = &"yes"
+kind = &"yes"
+color = Color(0.84705883, 0.8784314, 0.78431374, 1)
+
 [sub_resource type="Resource" id="Resource_u5li1"]
 script = ExtResource("1_x3ued")
 id = &"tertiary"
@@ -306,10 +564,402 @@ kind = &"unclassified"
 surface = &"gravel"
 color = Color(0.78431374, 0.6901961, 0.5411765, 1)
 
+[sub_resource type="Resource" id="Resource_84tk8"]
+script = ExtResource("1_x3ued")
+id = &"motorway"
+kind = &"motorway"
+color = Color(0.9490196, 0.6901961, 0.41960785, 1)
+
+[sub_resource type="Resource" id="Resource_i1hfb"]
+script = ExtResource("1_x3ued")
+id = &"motorway_link"
+kind = &"motorway_link"
+color = Color(0.9490196, 0.6901961, 0.41960785, 1)
+
+[sub_resource type="Resource" id="Resource_v2mgo"]
+script = ExtResource("1_x3ued")
+id = &"trunk"
+kind = &"trunk"
+color = Color(0.9411765, 0.7529412, 0.5019608, 1)
+
+[sub_resource type="Resource" id="Resource_pkr6x"]
+script = ExtResource("1_x3ued")
+id = &"trunk_link"
+kind = &"trunk_link"
+color = Color(0.9411765, 0.7529412, 0.5019608, 1)
+
+[sub_resource type="Resource" id="Resource_il5e7"]
+script = ExtResource("1_x3ued")
+id = &"primary"
+kind = &"primary"
+color = Color(0.95686275, 0.8352941, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_stfww"]
+script = ExtResource("1_x3ued")
+id = &"primary_link"
+kind = &"primary_link"
+color = Color(0.95686275, 0.8352941, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_u1wlh"]
+script = ExtResource("1_x3ued")
+id = &"secondary"
+kind = &"secondary"
+color = Color(0.96862745, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_kxj2f"]
+script = ExtResource("1_x3ued")
+id = &"secondary_link"
+kind = &"secondary_link"
+color = Color(0.96862745, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_gooqv"]
+script = ExtResource("1_x3ued")
+id = &"tertiary"
+kind = &"tertiary"
+color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+
+[sub_resource type="Resource" id="Resource_ya0rd"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_link"
+kind = &"tertiary_link"
+color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+
+[sub_resource type="Resource" id="Resource_kber1"]
+script = ExtResource("1_x3ued")
+id = &"unclassified"
+kind = &"unclassified"
+color = Color(0.9607843, 0.9411765, 0.89411765, 1)
+
+[sub_resource type="Resource" id="Resource_epinc"]
+script = ExtResource("1_x3ued")
+id = &"residential"
+kind = &"residential"
+
+[sub_resource type="Resource" id="Resource_qmtef"]
+script = ExtResource("1_x3ued")
+id = &"living_street"
+kind = &"living_street"
+color = Color(0.96862745, 0.9490196, 0.9098039, 1)
+
+[sub_resource type="Resource" id="Resource_86v8n"]
+script = ExtResource("1_x3ued")
+id = &"pedestrian"
+kind = &"pedestrian"
+color = Color(0.9529412, 0.90588236, 0.8666667, 1)
+
+[sub_resource type="Resource" id="Resource_jxeoc"]
+script = ExtResource("1_x3ued")
+id = &"service"
+kind = &"service"
+color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+
+[sub_resource type="Resource" id="Resource_1m081"]
+script = ExtResource("1_x3ued")
+id = &"footway"
+kind = &"footway"
+color = Color(0.8784314, 0.72156864, 0.6901961, 1)
+
+[sub_resource type="Resource" id="Resource_8bycc"]
+script = ExtResource("1_x3ued")
+id = &"path"
+kind = &"path"
+color = Color(0.9019608, 0.7882353, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_qu5kx"]
+script = ExtResource("1_x3ued")
+id = &"cycleway"
+kind = &"cycleway"
+color = Color(0.8509804, 0.7607843, 0.78431374, 1)
+
+[sub_resource type="Resource" id="Resource_lytm8"]
+script = ExtResource("1_x3ued")
+id = &"steps"
+kind = &"steps"
+color = Color(0.84705883, 0.7529412, 0.72156864, 1)
+
+[sub_resource type="Resource" id="Resource_l8fac"]
+script = ExtResource("1_x3ued")
+id = &"track"
+kind = &"track"
+color = Color(0.8392157, 0.7647059, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_t1p4s"]
+script = ExtResource("1_x3ued")
+id = &"raceway"
+kind = &"raceway"
+color = Color(0.7882353, 0.7882353, 0.7882353, 1)
+
+[sub_resource type="Resource" id="Resource_oyj86"]
+script = ExtResource("1_x3ued")
+id = &"bridleway"
+kind = &"bridleway"
+color = Color(0.8509804, 0.78039217, 0.6431373, 1)
+
+[sub_resource type="Resource" id="Resource_jc6qe"]
+script = ExtResource("1_x3ued")
+id = &"service_paved"
+kind = &"service"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_r7bn0"]
+script = ExtResource("1_x3ued")
+id = &"service_compacted"
+kind = &"service"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_erx7w"]
+script = ExtResource("1_x3ued")
+id = &"service_sett"
+kind = &"service"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_uare2"]
+script = ExtResource("1_x3ued")
+id = &"service_fine_gravel"
+kind = &"service"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_13odn"]
+script = ExtResource("1_x3ued")
+id = &"service_earth"
+kind = &"service"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_kmqpf"]
+script = ExtResource("1_x3ued")
+id = &"service_metal"
+kind = &"service"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_uih01"]
+script = ExtResource("1_x3ued")
+id = &"service_wood"
+kind = &"service"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_3bgwd"]
+script = ExtResource("1_x3ued")
+id = &"service_grass"
+kind = &"service"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_p1vd0"]
+script = ExtResource("1_x3ued")
+id = &"residential_paved"
+kind = &"residential"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_efgdd"]
+script = ExtResource("1_x3ued")
+id = &"residential_compacted"
+kind = &"residential"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_mak7m"]
+script = ExtResource("1_x3ued")
+id = &"residential_sett"
+kind = &"residential"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_53a53"]
+script = ExtResource("1_x3ued")
+id = &"residential_fine_gravel"
+kind = &"residential"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_dchs8"]
+script = ExtResource("1_x3ued")
+id = &"residential_earth"
+kind = &"residential"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_klqpx"]
+script = ExtResource("1_x3ued")
+id = &"residential_metal"
+kind = &"residential"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_xe2yn"]
+script = ExtResource("1_x3ued")
+id = &"residential_wood"
+kind = &"residential"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_1d0up"]
+script = ExtResource("1_x3ued")
+id = &"residential_grass"
+kind = &"residential"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_fswvl"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_paved"
+kind = &"tertiary"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_8trm2"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_compacted"
+kind = &"tertiary"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_q4vhl"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_sett"
+kind = &"tertiary"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_wt3pd"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_fine_gravel"
+kind = &"tertiary"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_vf6kd"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_earth"
+kind = &"tertiary"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_cfepo"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_metal"
+kind = &"tertiary"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_l58n8"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_wood"
+kind = &"tertiary"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_s1ss4"]
+script = ExtResource("1_x3ued")
+id = &"tertiary_grass"
+kind = &"tertiary"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_gypfs"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_paved"
+kind = &"unclassified"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_ruwgp"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_compacted"
+kind = &"unclassified"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_nsovm"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_sett"
+kind = &"unclassified"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_3w1ho"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_fine_gravel"
+kind = &"unclassified"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_ur6di"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_earth"
+kind = &"unclassified"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_7wffg"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_metal"
+kind = &"unclassified"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_03vd0"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_wood"
+kind = &"unclassified"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_mx6lf"]
+script = ExtResource("1_x3ued")
+id = &"unclassified_grass"
+kind = &"unclassified"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_2atmc"]
+script = ExtResource("1_x3ued")
+id = &"stream"
+kind = &"stream"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_em6f6"]
+script = ExtResource("1_x3ued")
+id = &"river"
+kind = &"river"
+color = Color(0.43529412, 0.65882355, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_bturf"]
+script = ExtResource("1_x3ued")
+id = &"dam"
+kind = &"dam"
+color = Color(0.6039216, 0.64705884, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_11k2l"]
+script = ExtResource("1_x3ued")
+id = &"weir"
+kind = &"weir"
+color = Color(0.6039216, 0.64705884, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_vrajc"]
+script = ExtResource("1_x3ued")
+id = &"ditch"
+kind = &"ditch"
+color = Color(0.56078434, 0.7254902, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_4q4d7"]
+script = ExtResource("1_x3ued")
+id = &"drain"
+kind = &"drain"
+color = Color(0.60784316, 0.70980394, 0.7490196, 1)
+
 [resource]
 script = ExtResource("2_f05cq")
-landuse = Array[ExtResource("1_x3ued")]([SubResource("Resource_ym4de"), SubResource("Resource_legmu"), SubResource("Resource_6m05q"), SubResource("Resource_isrgh"), SubResource("Resource_mdfsp")])
-roads = Array[ExtResource("1_x3ued")]([SubResource("Resource_u5li1"), SubResource("Resource_kto0e"), SubResource("Resource_rs0by"), SubResource("Resource_56hir"), SubResource("Resource_41qvm"), SubResource("Resource_h6y42"), SubResource("Resource_1ooxv"), SubResource("Resource_g0vej"), SubResource("Resource_6evjd"), SubResource("Resource_uof1o"), SubResource("Resource_m44pd"), SubResource("Resource_ccxhl"), SubResource("Resource_ki0wh"), SubResource("Resource_6sg4h"), SubResource("Resource_sd8bd"), SubResource("Resource_uupte"), SubResource("Resource_akmfd"), SubResource("Resource_3ags5"), SubResource("Resource_qai0e"), SubResource("Resource_pdjn4"), SubResource("Resource_vwthw"), SubResource("Resource_42gpr"), SubResource("Resource_g4lcv"), SubResource("Resource_x0sm7"), SubResource("Resource_2w3x8"), SubResource("Resource_qdwpt"), SubResource("Resource_r7tjs"), SubResource("Resource_jsll8"), SubResource("Resource_7120w"), SubResource("Resource_61dpc"), SubResource("Resource_7rycd"), SubResource("Resource_h4s66"), SubResource("Resource_u2qxn"), SubResource("Resource_t3nth"), SubResource("Resource_08fl1"), SubResource("Resource_61vo4")])
+landuse = Array[ExtResource("1_x3ued")]([SubResource("Resource_ym4de"), SubResource("Resource_legmu"), SubResource("Resource_6m05q"), SubResource("Resource_isrgh"), SubResource("Resource_mdfsp"), SubResource("Resource_ikqq8"), SubResource("Resource_5fexh"), SubResource("Resource_lu4ol"), SubResource("Resource_glcxm"), SubResource("Resource_sv2l4"), SubResource("Resource_xw3lb"), SubResource("Resource_kwtkh"), SubResource("Resource_m3r6d"), SubResource("Resource_wksr7"), SubResource("Resource_1igxs"), SubResource("Resource_0aw3v"), SubResource("Resource_j55bi"), SubResource("Resource_wpruw"), SubResource("Resource_hyypc"), SubResource("Resource_5d3pr"), SubResource("Resource_1o2rw"), SubResource("Resource_ogqow"), SubResource("Resource_l3p1v"), SubResource("Resource_prk7l"), SubResource("Resource_a7rrj"), SubResource("Resource_tf31n"), SubResource("Resource_ditln"), SubResource("Resource_csk1s"), SubResource("Resource_s6txm"), SubResource("Resource_ell0f"), SubResource("Resource_1q1wx"), SubResource("Resource_c001i"), SubResource("Resource_p6sej"), SubResource("Resource_7x1n0"), SubResource("Resource_l0el1"), SubResource("Resource_mg2cs"), SubResource("Resource_aciqy"), SubResource("Resource_e5uci"), SubResource("Resource_mwggv"), SubResource("Resource_3y2uq"), SubResource("Resource_owmch"), SubResource("Resource_4ha8y"), SubResource("Resource_xsiy0"), SubResource("Resource_wv77e"), SubResource("Resource_b7t7q"), SubResource("Resource_0iwkk"), SubResource("Resource_3eiad"), SubResource("Resource_roljg")])
+waterways = Array[ExtResource("1_x3ued")]([SubResource("Resource_2atmc"), SubResource("Resource_em6f6"), SubResource("Resource_bturf"), SubResource("Resource_11k2l"), SubResource("Resource_vrajc"), SubResource("Resource_4q4d7")])
+roads = Array[ExtResource("1_x3ued")]([SubResource("Resource_u5li1"), SubResource("Resource_kto0e"), SubResource("Resource_rs0by"), SubResource("Resource_56hir"), SubResource("Resource_41qvm"), SubResource("Resource_h6y42"), SubResource("Resource_1ooxv"), SubResource("Resource_g0vej"), SubResource("Resource_6evjd"), SubResource("Resource_uof1o"), SubResource("Resource_m44pd"), SubResource("Resource_ccxhl"), SubResource("Resource_ki0wh"), SubResource("Resource_6sg4h"), SubResource("Resource_sd8bd"), SubResource("Resource_uupte"), SubResource("Resource_akmfd"), SubResource("Resource_3ags5"), SubResource("Resource_qai0e"), SubResource("Resource_pdjn4"), SubResource("Resource_vwthw"), SubResource("Resource_42gpr"), SubResource("Resource_g4lcv"), SubResource("Resource_x0sm7"), SubResource("Resource_2w3x8"), SubResource("Resource_qdwpt"), SubResource("Resource_r7tjs"), SubResource("Resource_jsll8"), SubResource("Resource_7120w"), SubResource("Resource_61dpc"), SubResource("Resource_7rycd"), SubResource("Resource_h4s66"), SubResource("Resource_u2qxn"), SubResource("Resource_t3nth"), SubResource("Resource_08fl1"), SubResource("Resource_61vo4"), SubResource("Resource_84tk8"), SubResource("Resource_i1hfb"), SubResource("Resource_v2mgo"), SubResource("Resource_pkr6x"), SubResource("Resource_il5e7"), SubResource("Resource_stfww"), SubResource("Resource_u1wlh"), SubResource("Resource_kxj2f"), SubResource("Resource_gooqv"), SubResource("Resource_ya0rd"), SubResource("Resource_kber1"), SubResource("Resource_epinc"), SubResource("Resource_qmtef"), SubResource("Resource_86v8n"), SubResource("Resource_jxeoc"), SubResource("Resource_1m081"), SubResource("Resource_8bycc"), SubResource("Resource_qu5kx"), SubResource("Resource_lytm8"), SubResource("Resource_l8fac"), SubResource("Resource_t1p4s"), SubResource("Resource_oyj86"), SubResource("Resource_jc6qe"), SubResource("Resource_r7bn0"), SubResource("Resource_erx7w"), SubResource("Resource_uare2"), SubResource("Resource_13odn"), SubResource("Resource_kmqpf"), SubResource("Resource_uih01"), SubResource("Resource_3bgwd"), SubResource("Resource_p1vd0"), SubResource("Resource_efgdd"), SubResource("Resource_mak7m"), SubResource("Resource_53a53"), SubResource("Resource_dchs8"), SubResource("Resource_klqpx"), SubResource("Resource_xe2yn"), SubResource("Resource_1d0up"), SubResource("Resource_fswvl"), SubResource("Resource_8trm2"), SubResource("Resource_q4vhl"), SubResource("Resource_wt3pd"), SubResource("Resource_vf6kd"), SubResource("Resource_cfepo"), SubResource("Resource_l58n8"), SubResource("Resource_s1ss4"), SubResource("Resource_gypfs"), SubResource("Resource_ruwgp"), SubResource("Resource_nsovm"), SubResource("Resource_3w1ho"), SubResource("Resource_ur6di"), SubResource("Resource_7wffg"), SubResource("Resource_03vd0"), SubResource("Resource_mx6lf")])
 default_landuse = SubResource("Resource_tvbdg")
 default_waterway = SubResource("Resource_76hd2")
 default_road = SubResource("Resource_fmxaa")

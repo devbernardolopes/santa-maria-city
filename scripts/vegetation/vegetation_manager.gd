@@ -94,7 +94,14 @@ func start(map: MapLoader) -> void:
 		set_process(false)
 		return
 	_generator = VegetationGenerator.new(_active_rules, vegetation_seed, bounds)
+	var street_start_usec: int = Time.get_ticks_usec()
 	_generator.prepare_street_trees(_map.get_road_features_m())
+	if OS.is_debug_build():
+		var street_ms: int = int(round(float(Time.get_ticks_usec() - street_start_usec) / 1000.0))
+		print(
+			"VegetationManager: prepared %d street trees in %d ms."
+			% [_generator.get_street_tree_count(), street_ms]
+		)
 	_running = true
 	_area_dirty = true
 	_stream_timer = 0.0

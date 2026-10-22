@@ -65,6 +65,264 @@ kind = &"playground"
 surface = &"asphalt"
 color = Color(0.8509804, 0.78431374, 0.627451, 1)
 
+[sub_resource type="Resource" id="Resource_u6odi"]
+script = ExtResource("1_mud50")
+id = &"garages"
+kind = &"garages"
+color = Color(0.7882353, 0.76862746, 0.7372549, 1)
+
+[sub_resource type="Resource" id="Resource_8rljw"]
+script = ExtResource("1_mud50")
+id = &"commercial"
+kind = &"commercial"
+color = Color(0.90588236, 0.8392157, 0.76862746, 1)
+
+[sub_resource type="Resource" id="Resource_bbaqt"]
+script = ExtResource("1_mud50")
+id = &"retail"
+kind = &"retail"
+color = Color(0.9098039, 0.8509804, 0.7882353, 1)
+
+[sub_resource type="Resource" id="Resource_frd4u"]
+script = ExtResource("1_mud50")
+id = &"industrial"
+kind = &"industrial"
+color = Color(0.8392157, 0.8039216, 0.76862746, 1)
+
+[sub_resource type="Resource" id="Resource_bavty"]
+script = ExtResource("1_mud50")
+id = &"railway"
+kind = &"railway"
+color = Color(0.8117647, 0.7764706, 0.7411765, 1)
+
+[sub_resource type="Resource" id="Resource_dw30d"]
+script = ExtResource("1_mud50")
+id = &"military"
+kind = &"military"
+color = Color(0.7882353, 0.7607843, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_fn0gl"]
+script = ExtResource("1_mud50")
+id = &"farmland"
+kind = &"farmland"
+color = Color(0.8509804, 0.8117647, 0.6, 1)
+
+[sub_resource type="Resource" id="Resource_i83f8"]
+script = ExtResource("1_mud50")
+id = &"orchard"
+kind = &"orchard"
+color = Color(0.7137255, 0.8, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_7vqgq"]
+script = ExtResource("1_mud50")
+id = &"vineyard"
+kind = &"vineyard"
+color = Color(0.7254902, 0.78039217, 0.49803922, 1)
+
+[sub_resource type="Resource" id="Resource_q3t8c"]
+script = ExtResource("1_mud50")
+id = &"allotments"
+kind = &"allotments"
+color = Color(0.78431374, 0.827451, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_ueoaj"]
+script = ExtResource("1_mud50")
+id = &"meadow"
+kind = &"meadow"
+color = Color(0.7647059, 0.8509804, 0.60784316, 1)
+
+[sub_resource type="Resource" id="Resource_rxp1s"]
+script = ExtResource("1_mud50")
+id = &"grassland"
+kind = &"grassland"
+color = Color(0.7529412, 0.8392157, 0.5764706, 1)
+
+[sub_resource type="Resource" id="Resource_382ou"]
+script = ExtResource("1_mud50")
+id = &"park"
+kind = &"park"
+color = Color(0.6627451, 0.8352941, 0.54901963, 1)
+
+[sub_resource type="Resource" id="Resource_4bv5f"]
+script = ExtResource("1_mud50")
+id = &"garden"
+kind = &"garden"
+color = Color(0.8117647, 0.8862745, 0.654902, 1)
+
+[sub_resource type="Resource" id="Resource_w7auc"]
+script = ExtResource("1_mud50")
+id = &"recreation_ground"
+kind = &"recreation_ground"
+color = Color(0.7254902, 0.8509804, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_qluyu"]
+script = ExtResource("1_mud50")
+id = &"playground"
+kind = &"playground"
+color = Color(0.8509804, 0.78431374, 0.627451, 1)
+
+[sub_resource type="Resource" id="Resource_vtcog"]
+script = ExtResource("1_mud50")
+id = &"stadium"
+kind = &"stadium"
+color = Color(0.7176471, 0.827451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_td861"]
+script = ExtResource("1_mud50")
+id = &"sports_centre"
+kind = &"sports_centre"
+color = Color(0.7176471, 0.827451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_tx7nd"]
+script = ExtResource("1_mud50")
+id = &"fitness_station"
+kind = &"fitness_station"
+color = Color(0.7529412, 0.8392157, 0.6509804, 1)
+
+[sub_resource type="Resource" id="Resource_c6mdw"]
+script = ExtResource("1_mud50")
+id = &"dog_park"
+kind = &"dog_park"
+color = Color(0.78431374, 0.8509804, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_qvyxv"]
+script = ExtResource("1_mud50")
+id = &"nature_reserve"
+kind = &"nature_reserve"
+color = Color(0.62352943, 0.7882353, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_s0ngd"]
+script = ExtResource("1_mud50")
+id = &"forest"
+kind = &"forest"
+color = Color(0.43529412, 0.6117647, 0.36078432, 1)
+
+[sub_resource type="Resource" id="Resource_0uahb"]
+script = ExtResource("1_mud50")
+id = &"scrub"
+kind = &"scrub"
+color = Color(0.6039216, 0.7490196, 0.47843137, 1)
+
+[sub_resource type="Resource" id="Resource_71qbx"]
+script = ExtResource("1_mud50")
+id = &"tree_row"
+kind = &"tree_row"
+color = Color(0.56078434, 0.68235296, 0.44705883, 1)
+
+[sub_resource type="Resource" id="Resource_t4wq8"]
+script = ExtResource("1_mud50")
+id = &"fell"
+kind = &"fell"
+color = Color(0.7058824, 0.7647059, 0.6039216, 1)
+
+[sub_resource type="Resource" id="Resource_nlvmt"]
+script = ExtResource("1_mud50")
+id = &"cemetery"
+kind = &"cemetery"
+color = Color(0.73333335, 0.7764706, 0.6784314, 1)
+
+[sub_resource type="Resource" id="Resource_52vt4"]
+script = ExtResource("1_mud50")
+id = &"religious"
+kind = &"religious"
+color = Color(0.84705883, 0.8235294, 0.7647059, 1)
+
+[sub_resource type="Resource" id="Resource_pcji0"]
+script = ExtResource("1_mud50")
+id = &"greenfield"
+kind = &"greenfield"
+color = Color(0.7882353, 0.8392157, 0.627451, 1)
+
+[sub_resource type="Resource" id="Resource_k44ro"]
+script = ExtResource("1_mud50")
+id = &"brownfield"
+kind = &"brownfield"
+color = Color(0.78431374, 0.7490196, 0.69803923, 1)
+
+[sub_resource type="Resource" id="Resource_ua8vt"]
+script = ExtResource("1_mud50")
+id = &"construction"
+kind = &"construction"
+color = Color(0.7882353, 0.75686276, 0.70980394, 1)
+
+[sub_resource type="Resource" id="Resource_idprt"]
+script = ExtResource("1_mud50")
+id = &"landfill"
+kind = &"landfill"
+color = Color(0.7254902, 0.6784314, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_gukew"]
+script = ExtResource("1_mud50")
+id = &"quarry"
+kind = &"quarry"
+color = Color(0.7176471, 0.6901961, 0.64705884, 1)
+
+[sub_resource type="Resource" id="Resource_ygw6b"]
+script = ExtResource("1_mud50")
+id = &"cliff"
+kind = &"cliff"
+color = Color(0.6901961, 0.6627451, 0.6117647, 1)
+
+[sub_resource type="Resource" id="Resource_15ak1"]
+script = ExtResource("1_mud50")
+id = &"sand"
+kind = &"sand"
+color = Color(0.87058824, 0.8235294, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_q2gn0"]
+script = ExtResource("1_mud50")
+id = &"wetland"
+kind = &"wetland"
+color = Color(0.60784316, 0.7490196, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_sww1i"]
+script = ExtResource("1_mud50")
+id = &"water"
+kind = &"water"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_hgp64"]
+script = ExtResource("1_mud50")
+id = &"reservoir"
+kind = &"reservoir"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_xkpmp"]
+script = ExtResource("1_mud50")
+id = &"swimming_pool"
+kind = &"swimming_pool"
+color = Color(0.54901963, 0.79607844, 0.8784314, 1)
+
+[sub_resource type="Resource" id="Resource_hgwwq"]
+script = ExtResource("1_mud50")
+id = &"basin"
+kind = &"basin"
+color = Color(0.54901963, 0.79607844, 0.8784314, 1)
+
+[sub_resource type="Resource" id="Resource_eta7o"]
+script = ExtResource("1_mud50")
+id = &"salt_pond"
+kind = &"salt_pond"
+color = Color(0.654902, 0.8156863, 0.8627451, 1)
+
+[sub_resource type="Resource" id="Resource_3sijq"]
+script = ExtResource("1_mud50")
+id = &"track"
+kind = &"track"
+color = Color(0.79607844, 0.72156864, 0.5803922, 1)
+
+[sub_resource type="Resource" id="Resource_1jg0e"]
+script = ExtResource("1_mud50")
+id = &"bleachers"
+kind = &"bleachers"
+color = Color(0.7882353, 0.7607843, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_5elmw"]
+script = ExtResource("1_mud50")
+id = &"yes"
+kind = &"yes"
+color = Color(0.84705883, 0.8784314, 0.78431374, 1)
+
 [sub_resource type="Resource" id="Resource_u5li1"]
 script = ExtResource("1_mud50")
 id = &"tertiary"
@@ -320,10 +578,402 @@ kind = &"unclassified"
 surface = &"gravel"
 color = Color(0.78431374, 0.6901961, 0.5411765, 1)
 
+[sub_resource type="Resource" id="Resource_v3nul"]
+script = ExtResource("1_mud50")
+id = &"motorway"
+kind = &"motorway"
+color = Color(0.9490196, 0.6901961, 0.41960785, 1)
+
+[sub_resource type="Resource" id="Resource_iaooi"]
+script = ExtResource("1_mud50")
+id = &"motorway_link"
+kind = &"motorway_link"
+color = Color(0.9490196, 0.6901961, 0.41960785, 1)
+
+[sub_resource type="Resource" id="Resource_h0lw4"]
+script = ExtResource("1_mud50")
+id = &"trunk"
+kind = &"trunk"
+color = Color(0.9411765, 0.7529412, 0.5019608, 1)
+
+[sub_resource type="Resource" id="Resource_5duiw"]
+script = ExtResource("1_mud50")
+id = &"trunk_link"
+kind = &"trunk_link"
+color = Color(0.9411765, 0.7529412, 0.5019608, 1)
+
+[sub_resource type="Resource" id="Resource_f54sd"]
+script = ExtResource("1_mud50")
+id = &"primary"
+kind = &"primary"
+color = Color(0.95686275, 0.8352941, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_ufiq1"]
+script = ExtResource("1_mud50")
+id = &"primary_link"
+kind = &"primary_link"
+color = Color(0.95686275, 0.8352941, 0.5411765, 1)
+
+[sub_resource type="Resource" id="Resource_bm4ak"]
+script = ExtResource("1_mud50")
+id = &"secondary"
+kind = &"secondary"
+color = Color(0.96862745, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_old5d"]
+script = ExtResource("1_mud50")
+id = &"secondary_link"
+kind = &"secondary_link"
+color = Color(0.96862745, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_s8h8o"]
+script = ExtResource("1_mud50")
+id = &"tertiary"
+kind = &"tertiary"
+color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+
+[sub_resource type="Resource" id="Resource_g2euy"]
+script = ExtResource("1_mud50")
+id = &"tertiary_link"
+kind = &"tertiary_link"
+color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+
+[sub_resource type="Resource" id="Resource_7xl7u"]
+script = ExtResource("1_mud50")
+id = &"unclassified"
+kind = &"unclassified"
+color = Color(0.9607843, 0.9411765, 0.89411765, 1)
+
+[sub_resource type="Resource" id="Resource_x445e"]
+script = ExtResource("1_mud50")
+id = &"residential"
+kind = &"residential"
+
+[sub_resource type="Resource" id="Resource_krw6i"]
+script = ExtResource("1_mud50")
+id = &"living_street"
+kind = &"living_street"
+color = Color(0.96862745, 0.9490196, 0.9098039, 1)
+
+[sub_resource type="Resource" id="Resource_bf04l"]
+script = ExtResource("1_mud50")
+id = &"pedestrian"
+kind = &"pedestrian"
+color = Color(0.9529412, 0.90588236, 0.8666667, 1)
+
+[sub_resource type="Resource" id="Resource_5u3xc"]
+script = ExtResource("1_mud50")
+id = &"service"
+kind = &"service"
+color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+
+[sub_resource type="Resource" id="Resource_bqk33"]
+script = ExtResource("1_mud50")
+id = &"footway"
+kind = &"footway"
+color = Color(0.8784314, 0.72156864, 0.6901961, 1)
+
+[sub_resource type="Resource" id="Resource_u0f2p"]
+script = ExtResource("1_mud50")
+id = &"path"
+kind = &"path"
+color = Color(0.9019608, 0.7882353, 0.65882355, 1)
+
+[sub_resource type="Resource" id="Resource_6ym8g"]
+script = ExtResource("1_mud50")
+id = &"cycleway"
+kind = &"cycleway"
+color = Color(0.8509804, 0.7607843, 0.78431374, 1)
+
+[sub_resource type="Resource" id="Resource_6u5sm"]
+script = ExtResource("1_mud50")
+id = &"steps"
+kind = &"steps"
+color = Color(0.84705883, 0.7529412, 0.72156864, 1)
+
+[sub_resource type="Resource" id="Resource_0hgdl"]
+script = ExtResource("1_mud50")
+id = &"track"
+kind = &"track"
+color = Color(0.8392157, 0.7647059, 0.6313726, 1)
+
+[sub_resource type="Resource" id="Resource_3qy1p"]
+script = ExtResource("1_mud50")
+id = &"raceway"
+kind = &"raceway"
+color = Color(0.7882353, 0.7882353, 0.7882353, 1)
+
+[sub_resource type="Resource" id="Resource_t1804"]
+script = ExtResource("1_mud50")
+id = &"bridleway"
+kind = &"bridleway"
+color = Color(0.8509804, 0.78039217, 0.6431373, 1)
+
+[sub_resource type="Resource" id="Resource_gxqyi"]
+script = ExtResource("1_mud50")
+id = &"service_paved"
+kind = &"service"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_qvnor"]
+script = ExtResource("1_mud50")
+id = &"service_compacted"
+kind = &"service"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_6ywjk"]
+script = ExtResource("1_mud50")
+id = &"service_sett"
+kind = &"service"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_n0b27"]
+script = ExtResource("1_mud50")
+id = &"service_fine_gravel"
+kind = &"service"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_e0g83"]
+script = ExtResource("1_mud50")
+id = &"service_earth"
+kind = &"service"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_7kiu3"]
+script = ExtResource("1_mud50")
+id = &"service_metal"
+kind = &"service"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_qj2eb"]
+script = ExtResource("1_mud50")
+id = &"service_wood"
+kind = &"service"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_i46dp"]
+script = ExtResource("1_mud50")
+id = &"service_grass"
+kind = &"service"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_gqqwp"]
+script = ExtResource("1_mud50")
+id = &"residential_paved"
+kind = &"residential"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_gbmg5"]
+script = ExtResource("1_mud50")
+id = &"residential_compacted"
+kind = &"residential"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_6bnci"]
+script = ExtResource("1_mud50")
+id = &"residential_sett"
+kind = &"residential"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_wnxnb"]
+script = ExtResource("1_mud50")
+id = &"residential_fine_gravel"
+kind = &"residential"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_tukds"]
+script = ExtResource("1_mud50")
+id = &"residential_earth"
+kind = &"residential"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_pumlu"]
+script = ExtResource("1_mud50")
+id = &"residential_metal"
+kind = &"residential"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_rsmvs"]
+script = ExtResource("1_mud50")
+id = &"residential_wood"
+kind = &"residential"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_t6sgc"]
+script = ExtResource("1_mud50")
+id = &"residential_grass"
+kind = &"residential"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_f4nqb"]
+script = ExtResource("1_mud50")
+id = &"tertiary_paved"
+kind = &"tertiary"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_higno"]
+script = ExtResource("1_mud50")
+id = &"tertiary_compacted"
+kind = &"tertiary"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_2p14q"]
+script = ExtResource("1_mud50")
+id = &"tertiary_sett"
+kind = &"tertiary"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_rlfiu"]
+script = ExtResource("1_mud50")
+id = &"tertiary_fine_gravel"
+kind = &"tertiary"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_k1nc0"]
+script = ExtResource("1_mud50")
+id = &"tertiary_earth"
+kind = &"tertiary"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_7jpg1"]
+script = ExtResource("1_mud50")
+id = &"tertiary_metal"
+kind = &"tertiary"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_435wf"]
+script = ExtResource("1_mud50")
+id = &"tertiary_wood"
+kind = &"tertiary"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_c1q6p"]
+script = ExtResource("1_mud50")
+id = &"tertiary_grass"
+kind = &"tertiary"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_rrc2m"]
+script = ExtResource("1_mud50")
+id = &"unclassified_paved"
+kind = &"unclassified"
+surface = &"paved"
+color = Color(0.8235294, 0.8235294, 0.83137256, 1)
+
+[sub_resource type="Resource" id="Resource_l3l4e"]
+script = ExtResource("1_mud50")
+id = &"unclassified_compacted"
+kind = &"unclassified"
+surface = &"compacted"
+color = Color(0.7882353, 0.72156864, 0.57254905, 1)
+
+[sub_resource type="Resource" id="Resource_1qoh5"]
+script = ExtResource("1_mud50")
+id = &"unclassified_sett"
+kind = &"unclassified"
+surface = &"sett"
+color = Color(0.8156863, 0.76862746, 0.7058824, 1)
+
+[sub_resource type="Resource" id="Resource_s0kvh"]
+script = ExtResource("1_mud50")
+id = &"unclassified_fine_gravel"
+kind = &"unclassified"
+surface = &"fine_gravel"
+color = Color(0.83137256, 0.7647059, 0.63529414, 1)
+
+[sub_resource type="Resource" id="Resource_yqp6d"]
+script = ExtResource("1_mud50")
+id = &"unclassified_earth"
+kind = &"unclassified"
+surface = &"earth"
+color = Color(0.7607843, 0.6666667, 0.5176471, 1)
+
+[sub_resource type="Resource" id="Resource_i5faj"]
+script = ExtResource("1_mud50")
+id = &"unclassified_metal"
+kind = &"unclassified"
+surface = &"metal"
+color = Color(0.7647059, 0.78039217, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_gcvcb"]
+script = ExtResource("1_mud50")
+id = &"unclassified_wood"
+kind = &"unclassified"
+surface = &"wood"
+color = Color(0.7254902, 0.6039216, 0.44313726, 1)
+
+[sub_resource type="Resource" id="Resource_hvuy0"]
+script = ExtResource("1_mud50")
+id = &"unclassified_grass"
+kind = &"unclassified"
+surface = &"grass"
+color = Color(0.6627451, 0.7764706, 0.52156866, 1)
+
+[sub_resource type="Resource" id="Resource_j86xr"]
+script = ExtResource("1_mud50")
+id = &"stream"
+kind = &"stream"
+color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+
+[sub_resource type="Resource" id="Resource_mnlcc"]
+script = ExtResource("1_mud50")
+id = &"river"
+kind = &"river"
+color = Color(0.43529412, 0.65882355, 0.8, 1)
+
+[sub_resource type="Resource" id="Resource_b8y5k"]
+script = ExtResource("1_mud50")
+id = &"dam"
+kind = &"dam"
+color = Color(0.6039216, 0.64705884, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_yjhub"]
+script = ExtResource("1_mud50")
+id = &"weir"
+kind = &"weir"
+color = Color(0.6039216, 0.64705884, 0.6392157, 1)
+
+[sub_resource type="Resource" id="Resource_lt7wf"]
+script = ExtResource("1_mud50")
+id = &"ditch"
+kind = &"ditch"
+color = Color(0.56078434, 0.7254902, 0.8117647, 1)
+
+[sub_resource type="Resource" id="Resource_6e2s3"]
+script = ExtResource("1_mud50")
+id = &"drain"
+kind = &"drain"
+color = Color(0.60784316, 0.70980394, 0.7490196, 1)
+
 [resource]
 script = ExtResource("2_y6kca")
-landuse = Array[ExtResource("1_mud50")]([SubResource("Resource_ym4de"), SubResource("Resource_legmu"), SubResource("Resource_6m05q"), SubResource("Resource_isrgh"), SubResource("Resource_mdfsp")])
-roads = Array[ExtResource("1_mud50")]([SubResource("Resource_u5li1"), SubResource("Resource_kto0e"), SubResource("Resource_rs0by"), SubResource("Resource_56hir"), SubResource("Resource_41qvm"), SubResource("Resource_h6y42"), SubResource("Resource_1ooxv"), SubResource("Resource_g0vej"), SubResource("Resource_6evjd"), SubResource("Resource_uof1o"), SubResource("Resource_m44pd"), SubResource("Resource_ccxhl"), SubResource("Resource_ki0wh"), SubResource("Resource_6sg4h"), SubResource("Resource_sd8bd"), SubResource("Resource_uupte"), SubResource("Resource_akmfd"), SubResource("Resource_3ags5"), SubResource("Resource_qai0e"), SubResource("Resource_pdjn4"), SubResource("Resource_vwthw"), SubResource("Resource_42gpr"), SubResource("Resource_g4lcv"), SubResource("Resource_x0sm7"), SubResource("Resource_2w3x8"), SubResource("Resource_qdwpt"), SubResource("Resource_r7tjs"), SubResource("Resource_jsll8"), SubResource("Resource_7120w"), SubResource("Resource_61dpc"), SubResource("Resource_7rycd"), SubResource("Resource_h4s66"), SubResource("Resource_u2qxn"), SubResource("Resource_t3nth"), SubResource("Resource_08fl1"), SubResource("Resource_61vo4")])
+landuse = Array[ExtResource("1_mud50")]([SubResource("Resource_ym4de"), SubResource("Resource_legmu"), SubResource("Resource_6m05q"), SubResource("Resource_isrgh"), SubResource("Resource_mdfsp"), SubResource("Resource_u6odi"), SubResource("Resource_8rljw"), SubResource("Resource_bbaqt"), SubResource("Resource_frd4u"), SubResource("Resource_bavty"), SubResource("Resource_dw30d"), SubResource("Resource_fn0gl"), SubResource("Resource_i83f8"), SubResource("Resource_7vqgq"), SubResource("Resource_q3t8c"), SubResource("Resource_ueoaj"), SubResource("Resource_rxp1s"), SubResource("Resource_382ou"), SubResource("Resource_4bv5f"), SubResource("Resource_w7auc"), SubResource("Resource_qluyu"), SubResource("Resource_vtcog"), SubResource("Resource_td861"), SubResource("Resource_tx7nd"), SubResource("Resource_c6mdw"), SubResource("Resource_qvyxv"), SubResource("Resource_s0ngd"), SubResource("Resource_0uahb"), SubResource("Resource_71qbx"), SubResource("Resource_t4wq8"), SubResource("Resource_nlvmt"), SubResource("Resource_52vt4"), SubResource("Resource_pcji0"), SubResource("Resource_k44ro"), SubResource("Resource_ua8vt"), SubResource("Resource_idprt"), SubResource("Resource_gukew"), SubResource("Resource_ygw6b"), SubResource("Resource_15ak1"), SubResource("Resource_q2gn0"), SubResource("Resource_sww1i"), SubResource("Resource_hgp64"), SubResource("Resource_xkpmp"), SubResource("Resource_hgwwq"), SubResource("Resource_eta7o"), SubResource("Resource_3sijq"), SubResource("Resource_1jg0e"), SubResource("Resource_5elmw")])
+waterways = Array[ExtResource("1_mud50")]([SubResource("Resource_j86xr"), SubResource("Resource_mnlcc"), SubResource("Resource_b8y5k"), SubResource("Resource_yjhub"), SubResource("Resource_lt7wf"), SubResource("Resource_6e2s3")])
+roads = Array[ExtResource("1_mud50")]([SubResource("Resource_u5li1"), SubResource("Resource_kto0e"), SubResource("Resource_rs0by"), SubResource("Resource_56hir"), SubResource("Resource_41qvm"), SubResource("Resource_h6y42"), SubResource("Resource_1ooxv"), SubResource("Resource_g0vej"), SubResource("Resource_6evjd"), SubResource("Resource_uof1o"), SubResource("Resource_m44pd"), SubResource("Resource_ccxhl"), SubResource("Resource_ki0wh"), SubResource("Resource_6sg4h"), SubResource("Resource_sd8bd"), SubResource("Resource_uupte"), SubResource("Resource_akmfd"), SubResource("Resource_3ags5"), SubResource("Resource_qai0e"), SubResource("Resource_pdjn4"), SubResource("Resource_vwthw"), SubResource("Resource_42gpr"), SubResource("Resource_g4lcv"), SubResource("Resource_x0sm7"), SubResource("Resource_2w3x8"), SubResource("Resource_qdwpt"), SubResource("Resource_r7tjs"), SubResource("Resource_jsll8"), SubResource("Resource_7120w"), SubResource("Resource_61dpc"), SubResource("Resource_7rycd"), SubResource("Resource_h4s66"), SubResource("Resource_u2qxn"), SubResource("Resource_t3nth"), SubResource("Resource_08fl1"), SubResource("Resource_61vo4"), SubResource("Resource_v3nul"), SubResource("Resource_iaooi"), SubResource("Resource_h0lw4"), SubResource("Resource_5duiw"), SubResource("Resource_f54sd"), SubResource("Resource_ufiq1"), SubResource("Resource_bm4ak"), SubResource("Resource_old5d"), SubResource("Resource_s8h8o"), SubResource("Resource_g2euy"), SubResource("Resource_7xl7u"), SubResource("Resource_x445e"), SubResource("Resource_krw6i"), SubResource("Resource_bf04l"), SubResource("Resource_5u3xc"), SubResource("Resource_bqk33"), SubResource("Resource_u0f2p"), SubResource("Resource_6ym8g"), SubResource("Resource_6u5sm"), SubResource("Resource_0hgdl"), SubResource("Resource_3qy1p"), SubResource("Resource_t1804"), SubResource("Resource_gxqyi"), SubResource("Resource_qvnor"), SubResource("Resource_6ywjk"), SubResource("Resource_n0b27"), SubResource("Resource_e0g83"), SubResource("Resource_7kiu3"), SubResource("Resource_qj2eb"), SubResource("Resource_i46dp"), SubResource("Resource_gqqwp"), SubResource("Resource_gbmg5"), SubResource("Resource_6bnci"), SubResource("Resource_wnxnb"), SubResource("Resource_tukds"), SubResource("Resource_pumlu"), SubResource("Resource_rsmvs"), SubResource("Resource_t6sgc"), SubResource("Resource_f4nqb"), SubResource("Resource_higno"), SubResource("Resource_2p14q"), SubResource("Resource_rlfiu"), SubResource("Resource_k1nc0"), SubResource("Resource_7jpg1"), SubResource("Resource_435wf"), SubResource("Resource_c1q6p"), SubResource("Resource_rrc2m"), SubResource("Resource_l3l4e"), SubResource("Resource_1qoh5"), SubResource("Resource_s0kvh"), SubResource("Resource_yqp6d"), SubResource("Resource_i5faj"), SubResource("Resource_gcvcb"), SubResource("Resource_hvuy0")])
 default_landuse = SubResource("Resource_tvbdg")
 default_waterway = SubResource("Resource_76hd2")
 default_road = SubResource("Resource_fmxaa")
