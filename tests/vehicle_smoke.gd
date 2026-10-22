@@ -48,6 +48,7 @@ func _run() -> void:
 	_test_world_scene()
 	await _test_spawner()
 	await _test_drive_and_impact()
+	await _test_blocked_vehicle()
 	await _test_enter_exit()
 	_test_damage()
 
@@ -210,6 +211,52 @@ func _test_drive_and_impact() -> void:
 	var shape_node := vehicle.get_node_or_null("CollisionShape2D") as CollisionShape2D
 	if shape_node == null or not (shape_node.shape is CapsuleShape2D):
 		_fail("vehicle collision shape is not a capsule")
+	wall.queue_free()
+	actor.queue_free()
+	vehicle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_blocked_vehicle() -> void:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, 40.0), 0.0)
+	if vehicle == null:
+		_fail("could not spawn the blocked-vehicle car")
+		return
+	var actor := _make_actor(Vector2(2.0, 40.0))
+	if actor == null:
+		_fail("could not create the blocked-vehicle driver")
+		vehicle.queue_free()
+		return
+	if not vehicle.enter(actor):
+		_fail("could not seat the blocked-vehicle driver")
+	var controller := TestController.new()
+	controller.throttle_value = 1.0
+	vehicle.set_controller(controller)
+	var wall := _spawn_wall(Vector2(8.0, 40.0))
+	var damaged: bool = false
+	for _step: int in range(DRIVE_STEPS):
+		await get_tree().physics_frame
+		if vehicle.health < vehicle.data.max_health:
+			damaged = true
+			break
+	if not damaged:
+		_fail("blocked vehicle did not take initial impact damage")
+	# Keep the throttle held against the wall; the body must stop and stop taking damage.
+	for _step: int in range(120):
+		await get_tree().physics_frame
+	var blocked_speed: float = vehicle.get_speed_mps()
+	var health_before: float = vehicle.health
+	for _step: int in range(120):
+		await get_tree().physics_frame
+	var health_after: float = vehicle.health
+	print(
+		"VEHICLE SMOKE blocked speed: %.3f m/s, health %.1f -> %.1f"
+		% [blocked_speed, health_before, health_after]
+	)
+	if blocked_speed > 0.5:
+		_fail("blocked vehicle still reports %.2f m/s" % blocked_speed)
+	if health_after < health_before:
+		_fail("blocked vehicle kept losing health (%.1f -> %.1f)" % [health_before, health_after])
 	wall.queue_free()
 	actor.queue_free()
 	vehicle.queue_free()

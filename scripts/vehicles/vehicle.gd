@@ -34,7 +34,7 @@ var wheels: Array[WheelState] = []
 ## Item instances once the item system exists; store_item() enforces the capacity.
 var contents: Array = []
 var current_terrain: TerrainSample = null
-## Signed forward speed in m/s (negative while reversing).
+## Signed forward speed in m/s from the body's actual movement (negative while reversing).
 var speed_mps: float = 0.0
 ## Frozen during transitions: velocity zero and controls are ignored.
 var locked: bool = false
@@ -45,6 +45,7 @@ var _terrain_speed_factor: float = 1.0
 var _terrain_grip_factor: float = 1.0
 var _last_sample_pos_m: Vector2 = Vector2.ZERO
 var _impact_cooldown: float = 0.0
+## Actual velocity before the last move_and_slide; used for impact damage.
 var _pre_move_velocity_mps: Vector2 = Vector2.ZERO
 
 @onready var _visual: VehicleVisual = get_node_or_null("Visual") as VehicleVisual
@@ -84,6 +85,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if locked:
 		velocity = Vector2.ZERO
+		speed_mps = 0.0
 		move_and_slide()
 		return
 	_update_terrain(delta)
@@ -349,7 +351,10 @@ func load_state(state: Dictionary) -> void:
 
 func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> void:
 	var forward: Vector2 = Vector2.from_angle(rotation)
-	var speed_before: float = Units.to_m(velocity).dot(forward)
+	# Use the body's actual motion, not the requested velocity. When the vehicle is
+	# pressed against an obstacle, velocity keeps growing while the body does not move.
+	var realized_velocity_m: Vector2 = Units.to_m(get_real_velocity())
+	var speed_before: float = realized_velocity_m.dot(forward)
 	var steer_scale: float = lerpf(
 		1.0,
 		data.high_speed_steer_factor,
@@ -366,18 +371,22 @@ func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> voi
 		rotation = wrapf(rotation + yaw_rate * delta, -PI, PI)
 	forward = Vector2.from_angle(rotation)
 	var right: Vector2 = forward.orthogonal()
-	var velocity_m: Vector2 = Units.to_m(velocity)
-	var forward_speed: float = velocity_m.dot(forward)
-	var lateral_speed: float = velocity_m.dot(right)
+	var forward_speed: float = realized_velocity_m.dot(forward)
+	var lateral_speed: float = realized_velocity_m.dot(right)
 	forward_speed = _integrate_forward_speed(forward_speed, throttle, delta)
 	var grip: float = data.lateral_grip * get_wheel_grip_factor() * _terrain_grip_factor
 	if handbrake:
 		grip *= data.handbrake_grip_factor
 	lateral_speed *= exp(-maxf(grip, 0.05) * delta)
 	velocity = (forward * forward_speed + right * lateral_speed) * Units.PX_PER_METER
-	_pre_move_velocity_mps = Units.to_m(velocity)
+	_pre_move_velocity_mps = realized_velocity_m
 	move_and_slide()
+	# Keep the requested velocity in sync with the achieved motion, so a blocked
+	# vehicle neither accumulates speed nor keeps triggering impact damage.
+	velocity = get_real_velocity()
 	speed_mps = Units.to_m(velocity).dot(forward)
+	if absf(speed_mps) < MIN_MOVING_SPEED_MPS:
+		speed_mps = 0.0
 
 
 func _integrate_forward_speed(forward_speed: float, throttle: float, delta: float) -> float:
