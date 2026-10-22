@@ -38,6 +38,7 @@ var _unknown_style_ids: Dictionary = {}
 var _computed_bounds_px: Rect2 = Rect2()
 var _has_computed_bounds: bool = false
 var _road_lines_m: Array[PackedVector2Array] = []
+var _road_features_m: Array[Dictionary] = []
 var _building_rings_m: Dictionary = {}
 var _building_collision: StaticBody2D = null
 var _water_collision: StaticBody2D = null
@@ -140,6 +141,13 @@ func get_road_lines_m() -> Array[PackedVector2Array]:
 	return lines
 
 
+## Runtime road metadata in meters: id, kind, width, and centerline.
+func get_road_features_m() -> Array[Dictionary]:
+	var features: Array[Dictionary] = []
+	features.assign(_road_features_m)
+	return features
+
+
 ## First outer ring of a building footprint in meters (runtime only); empty when unknown.
 func get_building_ring_m(osm_id: String) -> PackedVector2Array:
 	var ring_value: Variant = _building_rings_m.get(osm_id)
@@ -198,7 +206,7 @@ func _load_map() -> bool:
 	_build_layer(data["waterways"], "Waterways", &"waterways")
 	_build_layer(data["roads"], "Roads", &"roads")
 	_build_layer(data["buildings"], "Buildings", &"buildings")
-	_road_lines_m = _collect_road_lines(data["roads"])
+	_collect_road_features(data["roads"])
 	if not Engine.is_editor_hint():
 		_build_collisions(data)
 	if map_bounds_px.size == Vector2.ZERO and _has_computed_bounds:
@@ -494,8 +502,9 @@ func _warn_unknown_overrides() -> void:
 	push_warning("MapLoader: %s: %s" % [OVERRIDES_PATH, " | ".join(messages)])
 
 
-func _collect_road_lines(features: Array) -> Array[PackedVector2Array]:
-	var lines: Array[PackedVector2Array] = []
+func _collect_road_features(features: Array) -> void:
+	_road_lines_m.clear()
+	_road_features_m.clear()
 	for feature_value: Variant in features:
 		if not (feature_value is Dictionary):
 			continue
@@ -504,9 +513,17 @@ func _collect_road_lines(features: Array) -> Array[PackedVector2Array]:
 		if not (line_value is Array):
 			continue
 		var line: PackedVector2Array = _line_to_m(line_value)
-		if line.size() >= 2:
-			lines.append(line)
-	return lines
+		if line.size() < 2:
+			continue
+		_road_lines_m.append(line)
+		var width_value: Variant = feature_data.get("width")
+		var width: float = float(width_value) if _is_number(width_value) else 0.0
+		_road_features_m.append({
+			"id": str(feature_data.get("id", "")),
+			"kind": StringName(str(feature_data.get("kind", ""))),
+			"width": width,
+			"line": line,
+		})
 
 
 func _line_to_m(line: Array) -> PackedVector2Array:
@@ -598,6 +615,7 @@ func _clear_generated() -> void:
 	_seen_osm_ids.clear()
 	_unknown_style_ids.clear()
 	_road_lines_m.clear()
+	_road_features_m.clear()
 	_building_rings_m.clear()
 	_collision_skip_count = 0
 	if is_instance_valid(_building_collision):

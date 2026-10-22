@@ -3,7 +3,7 @@ extends Camera2D
 ## Follows the player and handles wheel and action zoom.
 
 const ZOOM_STEP: float = 1.15
-const MIN_ZOOM: float = 0.5
+const MIN_ZOOM: float = 0.05
 const MAX_ZOOM: float = 8.0
 const DEFAULT_LIMIT_PX: int = 10000000
 

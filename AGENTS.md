@@ -27,6 +27,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - scenes = scene files (per-area subfolders, e.g. `world/`, `entities/`, `objects/`, `interiors/`, `ui/`)
 - scripts = script files with the exception of the globals auto-loaded ones (per-area subfolders mirroring `scenes`)
 	- objects = reusable interactive objects and components
+	- vegetation = procedural vegetation generation, batched drawing, and streaming manager
 - assets = different assets
 	- fonts = TrueType Font files
 	- images = all images
@@ -50,6 +51,8 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - videos = all video files
 - shaders = 2D shaders files
 - resources = Godot resource files `.tres` and their associated scripts, if any (map styles, entity data, item data, and so on)
+	- objects = shared physical/interaction properties (`ObjectProperties`) used by vegetation, items, and vehicles
+	- vegetation = vegetation species, terrain rules, and street-tree rules
 	- world = world-level authored data resources
 - autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`, `game_clock.gd` ↔ `GameClock`, `game_weather.gd` ↔ `GameWeather`; do not rename without updating uids and references)
 - data = game data files read at runtime
@@ -78,7 +81,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 
 ### Rendering layers (draw order, bottom to top)
 
-`Landuse` → `Waterways` → `Roads` → `Buildings` (footprints draw as roofs) → `Decals` → `TerrainState` (reserved for future dynamic overlays) → `Objects` (y-sorted: entities, vehicles, items, vegetation) → `Canopy` (tree tops, roof fade-outs).
+`Landuse` → `Waterways` → `Roads` → `Buildings` (footprints draw as roofs) → `Decals` (vegetation ground batches, shadows) → `TerrainState` (reserved for future dynamic overlays) → `Objects` (y-sorted: entities, vehicles, items) → `Canopy` (vegetation tree tops, roof fade-outs).
 
 - Base ground/road/building polygons are **static art**: never modify them at runtime. Anything dynamic (burn marks, wetness, regrowth, puddles) goes in an overlay layer above.
 - Terrain appearance is data-driven through `MapStyle` / `TerrainStyle` (style id + kind + surface → color/texture/scale). No colors or textures hard-coded in loader logic. A new `MapStyle` resource can be seeded from the inspector with its “Reset to defaults” button.
@@ -92,9 +95,18 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - The player is an `Entity` driven by a `PlayerController`; NPCs are the same `Entity` driven by an AI controller. Same body, different controller.
 - Interactive world objects (doors, windows, vehicles, containers, vegetation) use composition: an `Interactable` component exposing `interact(actor)`; behavior-specific components are added as needed.
 - Items: `ItemData` (static definition, Resource) versus an item instance (runtime state: stack count, durability, owner/location). A dropped item is a node carrying an instance.
+- `ObjectProperties` is the shared physical/interaction description for world objects (vegetation, items, vehicles): mass, friction, flammability (ignition temperature and energy), breakability (force and energy), and lifespan/decay. Definitions live on the data resource; per-instance state does not. No simulation consumes these fields yet.
 - Buildings block entities (static collision). They are entered only through entrances (door objects) that switch to an interior scene.
 - "What terrain is at this point?" is answered by `TerrainQuery` (`TerrainQuery.active.sample(position_m)` → a `TerrainSample` with category, kind, surface, style id, and OSM id; `TerrainSample.default_sample()` when nothing matches; coordinates in **meters**). The index is a 32 m uniform grid built once per map load, at runtime only (`active` is `null` before `map_loaded`), outer rings only (holes ignored, exactly like drawing and collisions), priority buildings → roads → waterways → landuse with later features winning — the same top-most polygon `MapPicker` shows. `TerrainRules` maps a sample's surface, then kind, to a walking-speed factor that `Entity` re-samples at most every 0.25 s or per 1 m moved. Callers go through one method, so the implementation can later move from polygon tests to a raster grid without touching them.
-- Procedural placement (e.g. vegetation scatter) must be deterministic: seed from the OSM ID. Persist only the differences from the generated state, keyed by OSM ID plus index.
+- Procedural vegetation placement is deterministic (details under Vegetation). Any other procedural placement must also be deterministic: seed from the OSM ID. Persist only the differences from the generated state, keyed by OSM ID plus index.
+
+### Vegetation
+
+- `VegetationGenerator` places plants on a **global 4 m cell grid**, 1,024 cells per **128 m chunk**. Each cell `(cx, cy)` is mixed with `vegetation_seed` through a stable integer seed, jittered inside the cell, sampled with `TerrainQuery`, matched through `VegetationRules` by category + kind (+ surface), then accepted by density and clearance. Clearance samples four cardinal points and requires the same landuse category, so plants never spill onto roads, building footprints, or streams.
+- `VegetationRules` holds `VegetationSpecies` definitions (trees, bushes, rock/boulders), per-terrain density rules, and per-road street-tree rules. Species colors and optional textures are placeholders until real art exists; trees batch a trunk/shadow in `Decals` and a canopy in `Canopy`, bushes and rocks draw only in `Decals`. Street trees are seeded per road ID, offset from the road edge, spaced along the centerline, and keyed `"s:<road_osm_id>:<index>"`.
+- Vegetation is **runtime-only**: no editor preview, no saved generated nodes, and no per-plant nodes. `VegetationManager` streams the chunks covering the camera view (plus margin and a 30 m focus area), generates at most one chunk per frame from a distance-sorted queue, caches up to 64 chunks, and frees views that leave the area. Pooled collisions (48 `StaticBody2D` on `PhysicsLayers.WORLD`) and inspections (6 `Interactable`s) follow the focus entity within 30 m / 3 m. NPCs outside the focus radius can walk through plants.
+- The same `Entity` remains the focus. The manager skips and clears vegetation when the camera or focus is outside `meta.bounds_m`; interiors are outside it, so the interior canvas never receives vegetation. `World._set_focus_entity()` is the one place the camera target and vegetation anchor are swapped (future vehicles reuse it).
+- Per-instance age lives in `VegetationChunkData.ages_years`, sampled from `ObjectProperties.max_age_years`. Stable keys are `"cx:cy"` for terrain plants and `"s:<road_osm_id>:<index>"` for street trees; only differences from generated state should ever be saved. Inspection shows name, radius, description, mass, ignition, breaking force, and age.
 
 ### World state
 

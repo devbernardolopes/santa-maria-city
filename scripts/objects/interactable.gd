@@ -14,16 +14,18 @@ signal rejected(actor: Entity, text: String)
 ## Shown while unavailable, for example "Locked" or "Closed · opens 08:00".
 @export var unavailable_text: String = ""
 
+var _shape: CollisionShape2D = null
+
 
 func _ready() -> void:
 	collision_layer = PhysicsLayers.INTERACTABLES
 	collision_mask = 0
 	monitoring = false
-	var shape_node := CollisionShape2D.new()
+	_shape = CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = Units.m_to_px(radius_m)
-	shape_node.shape = circle
-	add_child(shape_node)
+	_shape.shape = circle
+	add_child(_shape)
 
 
 ## Emits interacted when available, rejected otherwise; returns whether it ran.
@@ -43,3 +45,15 @@ func set_available(value: bool, new_unavailable_text: String = "") -> void:
 	available = value
 	if not new_unavailable_text.is_empty():
 		unavailable_text = new_unavailable_text
+
+
+## Resizes the interaction circle; safe before or after _ready().
+func set_radius_m(value: float) -> void:
+	radius_m = maxf(0.0, value)
+	if _shape == null:
+		return
+	var circle := _shape.shape as CircleShape2D
+	if circle == null:
+		circle = CircleShape2D.new()
+		_shape.shape = circle
+	circle.radius = Units.m_to_px(radius_m)

@@ -16,13 +16,17 @@ const SPAWNS_VERSION: int = 1
 @onready var _touch_controls: TouchControls = $Hud/TouchControls
 @onready var _entrance_spawner: EntranceSpawner = $EntranceSpawner
 @onready var _interior_manager: InteriorManager = $InteriorManager
+@onready var _vegetation: VegetationManager = $VegetationManager
 var _spawn_point_m: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	_map.map_loaded.connect(_on_map_loaded)
 	var hud0: Hud = get_node_or_null("Hud") as Hud
-	_picker.picked.connect(hud0.show_pick) if hud0 != null else null
+	if hud0 != null:
+		_picker.picked.connect(hud0.show_pick)
+		if _vegetation != null and not _vegetation.inspected.is_connected(hud0.show_message):
+			_vegetation.inspected.connect(hud0.show_message)
 	if _map.is_loaded:
 		var counts: Dictionary = {}
 		var counts_value: Variant = _map.meta.get("counts")
@@ -50,6 +54,8 @@ func _on_map_loaded(counts: Dictionary) -> void:
 		hud.on_map_loaded(counts)
 	_picker.clear_pick()
 	_spawn_player()
+	if _vegetation != null:
+		_vegetation.start(_map)
 	if _entrance_spawner != null:
 		_entrance_spawner.spawn_entrances(_spawn_point_m)
 	if _debug_spawner != null:
@@ -66,6 +72,8 @@ func _spawn_player() -> void:
 		tc_r.set_interact_available(false)
 	var player_ref: Entity = _player
 	if player_ref != null and is_instance_valid(player_ref):
+		if _vegetation != null:
+			_vegetation.set_collision_anchor(null)
 		player_ref.free()
 	_player = null
 	var rng := RandomNumberGenerator.new()
@@ -80,9 +88,7 @@ func _spawn_player() -> void:
 	player.position = Units.to_px(_spawn_point_m)
 	_objects.add_child(player)
 	_player = player
-	_follow_camera.target = player
-	_follow_camera.snap_to_target()
-	_follow_camera.make_current()
+	_set_focus_entity(player)
 	var hud_p: Hud = get_node_or_null("Hud") as Hud
 	if hud_p != null:
 		hud_p.set_player(player)
@@ -92,6 +98,15 @@ func _spawn_player() -> void:
 	var tc_p: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
 	if tc_p != null:
 		tc_p.set_interact_available(false)
+
+
+## Single focus point for the camera and vegetation; a future vehicle can replace the node.
+func _set_focus_entity(node: Node2D) -> void:
+	_follow_camera.target = node
+	_follow_camera.snap_to_target()
+	_follow_camera.make_current()
+	if _vegetation != null:
+		_vegetation.set_collision_anchor(node)
 
 
 func _player_spawn_point_m() -> Vector2:

@@ -9,7 +9,7 @@ func get_move_vector() -> Vector2:
 
 func get_move_intent() -> Vector2:
 	var x: float = Input.get_axis("move_left", "move_right")
-	var y: float = Input.get_axis("move_up", "move_down")
+	var y: float = Input.get_axis("move_down", "move_up")
 	return Vector2(x, y)
 
 

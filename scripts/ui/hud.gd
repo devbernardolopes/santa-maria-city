@@ -14,6 +14,7 @@ const DEBUG_BUTTON_MIN_HEIGHT: float = 44.0
 const DEBUG_BUTTON_HEIGHT_SCALE: float = 2.0
 const TIME_SCALE_OPTIONS: Array[float] = [1.0, 60.0, 600.0, 3600.0]
 const PROMPT_BOTTOM_MARGIN: float = 96.0
+const DEBUG_INFO_INTERVAL_S: float = 1.0
 const CONDITION_NAMES: Dictionary = {
 	WeatherSample.Condition.CLEAR: "Clear",
 	WeatherSample.Condition.CLOUDY: "Cloudy",
@@ -36,6 +37,9 @@ const CONDITION_NAMES: Dictionary = {
 var _map: MapLoader = null
 var _player: Entity = null
 var _player_update_timer: float = 0.0
+var _vegetation: VegetationManager = null
+var _debug_info_timer: float = 0.0
+var _pick_active: bool = false
 
 
 func _ready() -> void:
@@ -43,6 +47,7 @@ func _ready() -> void:
 		label.add_theme_color_override("font_color", Color("1e1e1e"))
 		label.add_theme_color_override("font_outline_color", Color(1.0, 1.0, 1.0, 0.85))
 	_map = get_parent().get_node_or_null("Map") as MapLoader
+	_vegetation = get_parent().get_node_or_null("VegetationManager") as VegetationManager
 	if _map != null and _map.is_loaded:
 		_update_text(_counts_from_map())
 	_time_debug.visible = OS.is_debug_build()
@@ -67,6 +72,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_update_debug_info(delta)
 	if _player == null:
 		return
 	if not is_instance_valid(_player):
@@ -85,6 +91,21 @@ func set_player(player: Entity) -> void:
 	_update_player_text()
 
 
+func _update_debug_info(delta: float) -> void:
+	if not OS.is_debug_build() or _pick_active or _vegetation == null:
+		return
+	_debug_info_timer -= delta
+	if _debug_info_timer > 0.0:
+		return
+	_debug_info_timer = DEBUG_INFO_INTERVAL_S
+	var stats: Dictionary = _vegetation.get_stats()
+	_info_label.text = "veg · chunks %d · plants %d · colliders %d" % [
+		int(stats.get("chunks", 0)),
+		int(stats.get("instances", 0)),
+		int(stats.get("colliders", 0)),
+	]
+
+
 func on_map_loaded(counts: Dictionary) -> void:
 	_update_text(counts)
 
@@ -92,7 +113,11 @@ func on_map_loaded(counts: Dictionary) -> void:
 func show_pick(info: Dictionary) -> void:
 	if info.is_empty():
 		_info_label.text = ""
+		_pick_active = false
+		_debug_info_timer = 0.0
+		_update_debug_info(0.0)
 		return
+	_pick_active = true
 	var osm_id: String = str(info.get("id", ""))
 	var category: String = str(info.get("category", ""))
 	var kind: String = str(info.get("kind", ""))

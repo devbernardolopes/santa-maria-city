@@ -5,7 +5,10 @@
 [ext_resource type="Texture2D" uid="uid://bhyec6spywrrp" path="res://assets/images/textures/asphalt_road.jpg" id="2_rduk6"]
 [ext_resource type="Script" uid="uid://cvgwo4nfal7e0" path="res://resources/map_style.gd" id="2_y6kca"]
 [ext_resource type="Texture2D" uid="uid://dmhyb613vnk37" path="res://assets/images/textures/grass-01.png" id="3_di6a0"]
-[ext_resource type="Texture2D" uid="uid://bcmnnoohglvu6" path="res://assets/images/textures/IMG_1887.png" id="4_ssj4p"]
+[ext_resource type="Texture2D" uid="uid://bnwyk073mtoao" path="res://assets/images/textures/dark_water.jpg" id="3_e6htv"]
+[ext_resource type="Texture2D" uid="uid://c3e2yjifm1la4" path="res://assets/images/textures/dirt_2.png" id="4_ed4a7"]
+[ext_resource type="Texture2D" uid="uid://blwfwev6fiddy" path="res://assets/images/textures/2010-09-04_11-56-33.jpg" id="5_e6htv"]
+[ext_resource type="Texture2D" uid="uid://d4fhwknqr4q68" path="res://assets/images/textures/2010-09-04_11-53-14.jpg" id="6_u6odi"]
 
 [sub_resource type="Resource" id="Resource_lxefa"]
 script = ExtResource("1_mud50")
@@ -27,6 +30,7 @@ color = Color(0.93333334, 0.93333334, 0.93333334, 1)
 script = ExtResource("1_mud50")
 id = &"default_waterway"
 color = Color(0.49803922, 0.7019608, 0.8352941, 1)
+texture = ExtResource("3_e6htv")
 
 [sub_resource type="Resource" id="Resource_ym4de"]
 script = ExtResource("1_mud50")
@@ -46,13 +50,13 @@ script = ExtResource("1_mud50")
 id = &"wood"
 kind = &"wood"
 color = Color(0.49803922, 0.6901961, 0.4117647, 1)
-texture = ExtResource("4_ssj4p")
+texture = ExtResource("4_ed4a7")
 
 [sub_resource type="Resource" id="Resource_isrgh"]
 script = ExtResource("1_mud50")
 id = &"pitch"
 kind = &"pitch"
-color = Color(0.6117647, 0.8, 0.47843137, 1)
+color = Color(0.91068107, 0.7929745, 0.49500948, 1)
 
 [sub_resource type="Resource" id="Resource_mdfsp"]
 script = ExtResource("1_mud50")
@@ -67,6 +71,7 @@ id = &"tertiary"
 kind = &"tertiary"
 surface = &"paving_stones"
 color = Color(0.9490196, 0.8509804, 0.5529412, 1)
+texture = ExtResource("6_u6odi")
 
 [sub_resource type="Resource" id="Resource_kto0e"]
 script = ExtResource("1_mud50")
@@ -102,7 +107,7 @@ id = &"service_paving_stones"
 kind = &"service"
 surface = &"paving_stones"
 color = Color(0.835905, 0.45570266, 0.27477047, 1)
-texture = ExtResource("2_rduk6")
+texture = ExtResource("5_e6htv")
 
 [sub_resource type="Resource" id="Resource_1ooxv"]
 script = ExtResource("1_mud50")
@@ -208,6 +213,7 @@ id = &"tertiary_asphalt"
 kind = &"tertiary"
 surface = &"asphalt"
 color = Color(0.7882353, 0.7882353, 0.8117647, 1)
+texture = ExtResource("2_rduk6")
 
 [sub_resource type="Resource" id="Resource_42gpr"]
 script = ExtResource("1_mud50")
