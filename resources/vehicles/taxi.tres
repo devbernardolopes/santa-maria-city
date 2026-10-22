@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="VehicleData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://resources/objects/object_properties.gd" id="2_props"]
+[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/taxi.png" id="3_tex"]
+
+[sub_resource type="Resource" id="ObjectProperties_taxi"]
+script = ExtResource("2_props")
+mass_kg = 1450.0
+movable = true
+friction = 0.7
+flammable = true
+ignition_temperature_c = 320.0
+
+[resource]
+script = ExtResource("1_data")
+id = &"taxi"
+display_name = "Taxi"
+kind = "car"
+properties = SubResource("ObjectProperties_taxi")
+length_m = 4.6
+width_m = 1.95
+sprite_length_px = 234.0
+frames = Array[Texture2D]([ExtResource("3_tex")])
+max_health = 900.0
+impact_damage_threshold_mps = 4.0
+impact_damage_per_mps = 8.0
+max_speed_mps = 33.0
+max_reverse_speed_mps = 8.0
+acceleration_mps2 = 7.0
+brake_mps2 = 18.0
+engine_braking_mps2 = 2.0
+rolling_resistance_mps2 = 0.6
+max_steer_deg = 32.0
+steer_rate_deg_s = 140.0
+high_speed_steer_factor = 0.35
+lateral_grip = 9.0
+wheelbase_m = 2.76
+wheel_count = 4
+seat_count = 4
+can_store_items = true
+storage_slots = 6
+storage_capacity_kg = 150.0

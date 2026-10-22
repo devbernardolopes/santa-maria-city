@@ -14,6 +14,7 @@ const FRONT_DOT_THRESHOLD: float = 0.5
 var _overlapping: Array[Interactable] = []
 var _current: Interactable = null
 var _current_prompt: String = ""
+var _active: bool = true
 
 
 func _ready() -> void:
@@ -27,6 +28,18 @@ func _ready() -> void:
 	add_child(shape_node)
 	area_entered.connect(_on_area_entered)
 	area_exited.connect(_on_area_exited)
+
+
+## Disables the sensor while riding a vehicle and clears the current target.
+func set_active(value: bool) -> void:
+	if _active == value:
+		return
+	_active = value
+	monitoring = value
+	set_physics_process(value)
+	if not value:
+		_overlapping.clear()
+		_set_target(null)
 
 
 func _physics_process(_delta: float) -> void:

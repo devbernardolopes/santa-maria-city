@@ -36,7 +36,9 @@ const CONDITION_NAMES: Dictionary = {
 
 var _map: MapLoader = null
 var _player: Entity = null
+var _vehicle: Vehicle = null
 var _player_update_timer: float = 0.0
+var _vehicle_update_timer: float = 0.0
 var _vegetation: VegetationManager = null
 var _debug_info_timer: float = 0.0
 var _pick_active: bool = false
@@ -73,6 +75,15 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_update_debug_info(delta)
+	if _vehicle != null:
+		if not is_instance_valid(_vehicle):
+			_vehicle = null
+		else:
+			_vehicle_update_timer -= delta
+			if _vehicle_update_timer <= 0.0:
+				_vehicle_update_timer = PLAYER_UPDATE_INTERVAL_S
+				_update_vehicle_text()
+			return
 	if _player == null:
 		return
 	if not is_instance_valid(_player):
@@ -89,6 +100,16 @@ func set_player(player: Entity) -> void:
 	_player = player
 	_player_update_timer = 0.0
 	_update_player_text()
+
+
+## While driving, the player line shows the vehicle instead of the entity.
+func set_vehicle(vehicle: Vehicle) -> void:
+	_vehicle = vehicle
+	_vehicle_update_timer = 0.0
+	if vehicle != null and is_instance_valid(vehicle):
+		_update_vehicle_text()
+	else:
+		_update_player_text()
 
 
 func _update_debug_info(delta: float) -> void:
@@ -195,6 +216,18 @@ func _update_player_text() -> void:
 		"x %.1f m · y %.1f m" % [position_m.x, position_m.y],
 	]
 	var terrain_text: String = _terrain_text(_player.current_terrain)
+	if not terrain_text.is_empty():
+		parts.append(terrain_text)
+	_player_label.text = " · ".join(parts)
+
+
+func _update_vehicle_text() -> void:
+	if _vehicle == null or not is_instance_valid(_vehicle) or _vehicle.data == null:
+		_player_label.text = ""
+		return
+	var parts: PackedStringArray = ["Driving %s" % _vehicle.data.get_display_name()]
+	parts.append(_vehicle.describe_state())
+	var terrain_text: String = _terrain_text(_vehicle.current_terrain)
 	if not terrain_text.is_empty():
 		parts.append(terrain_text)
 	_player_label.text = " · ".join(parts)

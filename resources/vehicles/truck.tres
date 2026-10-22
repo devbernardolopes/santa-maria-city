@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="VehicleData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://resources/objects/object_properties.gd" id="2_props"]
+[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/truck.png" id="3_tex"]
+
+[sub_resource type="Resource" id="ObjectProperties_truck"]
+script = ExtResource("2_props")
+mass_kg = 7500.0
+movable = true
+friction = 0.65
+flammable = true
+ignition_temperature_c = 300.0
+
+[resource]
+script = ExtResource("1_data")
+id = &"truck"
+display_name = "Truck"
+kind = "truck"
+properties = SubResource("ObjectProperties_truck")
+length_m = 7.0
+width_m = 2.5
+sprite_length_px = 216.0
+frames = Array[Texture2D]([ExtResource("3_tex")])
+max_health = 2800.0
+impact_damage_threshold_mps = 5.0
+impact_damage_per_mps = 10.0
+max_speed_mps = 24.0
+max_reverse_speed_mps = 6.0
+acceleration_mps2 = 3.2
+brake_mps2 = 12.0
+engine_braking_mps2 = 3.0
+rolling_resistance_mps2 = 1.0
+max_steer_deg = 28.0
+steer_rate_deg_s = 90.0
+high_speed_steer_factor = 0.4
+lateral_grip = 7.0
+wheelbase_m = 4.2
+wheel_count = 6
+seat_count = 2
+can_store_items = true
+storage_slots = 24
+storage_capacity_kg = 4000.0

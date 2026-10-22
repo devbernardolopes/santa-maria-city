@@ -53,11 +53,12 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - resources = Godot resource files `.tres` and their associated scripts, if any (map styles, entity data, item data, and so on)
 	- objects = shared physical/interaction properties (`ObjectProperties`) used by vegetation, items, and vehicles
 	- vegetation = vegetation species, terrain rules, and street-tree rules
+	- vehicles = vehicle definitions (`VehicleData`, `WheelSpec`, `VehicleTerrainProfile` scripts) and their `.tres` data
 	- world = world-level authored data resources
 - autoloaders = all globals auto-loaded `.gd` scripts (file `entity_registry.gd` ↔ autoload `EntityRegistry`, `game_clock.gd` ↔ `GameClock`, `game_weather.gd` ↔ `GameWeather`; do not rename without updating uids and references)
 - data = game data files read at runtime
 	- `map.json` = GENERATED map data (never hand-edit)
-	- overlays = developer-authored data layered on the map, keyed by OSM ID
+	- overlays = developer-authored data layered on the map, keyed by OSM ID (`entrances.json`, `spawns.json`, `style_overrides.json`, `vehicles.json`)
 - tools = offline tooling outside the game runtime (the OSM Python pipeline, validation shell scripts). Contains a `.gdignore` so Godot does not import it.
 - tests = headless validation scenes and scripts (compile check, smoke tests). Never part of the game runtime; exclude from release exports.
 
@@ -109,7 +110,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - `VegetationGenerator` places plants on a **global 4 m cell grid**, 1,024 cells per **128 m chunk**. Each cell `(cx, cy)` is mixed with `vegetation_seed` through a stable integer seed, jittered inside the cell, sampled with `TerrainQuery`, matched through `VegetationRules` by category + kind (+ surface), then accepted by density and clearance. Clearance samples four cardinal points and requires the same landuse category, so plants never spill onto roads, building footprints, or streams.
 - `VegetationRules` holds `VegetationSpecies` definitions (trees, bushes, rock/boulders), per-terrain density rules, and per-road street-tree rules. Species colors and optional textures are placeholders until real art exists; trees batch a trunk/shadow in `Decals` and a canopy in `Canopy`, bushes and rocks draw only in `Decals`. Street trees are seeded per road ID, offset from the road edge, spaced along the centerline, and keyed `"s:<road_osm_id>:<index>"`. `prepare_street_tree_index()` indexes street-tree roads by 128 m chunk at startup (~31 ms for the full city); each road's trees are generated lazily the first time a visible chunk needs them, so the ~50k street trees no longer block startup.
 - Vegetation is **runtime-only**: no editor preview, no saved generated nodes, and no per-plant nodes. `VegetationManager` streams the chunks covering the camera view (plus margin and a 30 m focus area), generates at most one chunk per frame from a distance-sorted queue, caches up to 64 chunks, and frees views that leave the area. Pooled collisions (48 `StaticBody2D` on `PhysicsLayers.WORLD`) and inspections (6 `Interactable`s) follow the focus entity within 30 m / 3 m. NPCs outside the focus radius can walk through plants.
-- The same `Entity` remains the focus. The manager skips and clears vegetation when the camera or focus is outside `meta.bounds_m`; interiors are outside it, so the interior canvas never receives vegetation. `World._set_focus_entity()` is the one place the camera target and vegetation anchor are swapped (future vehicles reuse it).
+- The same `Entity` remains the focus on foot. The manager skips and clears vegetation when the camera or focus is outside `meta.bounds_m`; interiors are outside it, so the interior canvas never receives vegetation. `World._set_focus_entity()` is the one place the camera target and vegetation anchor are swapped; driving passes the vehicle instead (the manager accepts any `Node2D`).
 - Per-instance age lives in `VegetationChunkData.ages_years`, sampled from `ObjectProperties.max_age_years`. Stable keys are `"cx:cy"` for terrain plants and `"s:<road_osm_id>:<index>"` for street trees; only differences from generated state should ever be saved. Inspection shows name, radius, description, mass, ignition, breaking force, and age.
 
 ### World state
@@ -123,9 +124,23 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 ### Entities
 
 - `EntityData` is a `Resource` holding identity and D&D 5.5e ability scores; the `Entity` node is only presentation. The player and debug NPCs share the same `Entity` body and swap behavior through an `EntityController` (`PlayerController` or `WanderController`).
-- Movement is mode-selectable on the controller via `movement_mode` (`OMNI` = move in the stick/key direction, today’s behavior; `RELATIVE` = up/down throttle along facing, left/right turn in place). The option is set on `PlayerController` in `scenes/entities/player.tscn` before launch (defaults to `OMNI`). `get_move_intent()` provides axis intent for RELATIVE; both modes reuse the same input actions so keyboard, gamepad, and touch work. `Entity.facing` remains the heading (used by `PlayerInteraction`). NPCs/default to `OMNI`. Vehicles in future will use `RELATIVE` only.
+- Movement is mode-selectable on the controller via `movement_mode` (`OMNI` = move in the stick/key direction, today’s behavior; `RELATIVE` = up/down throttle along facing, left/right turn in place). The option is set on `PlayerController` in `scenes/entities/player.tscn` before launch (defaults to `OMNI`). `get_move_intent()` provides axis intent for RELATIVE; both modes reuse the same input actions so keyboard, gamepad, and touch work. `Entity.facing` remains the heading (used by `PlayerInteraction`). NPCs default to `OMNI`.
 - `EntityRegistry` is the `autoloaders/entity_registry.gd` autoload. It assigns IDs of the form `e_000001`, stores `EntityData` by ID, and stores relationship edges as directed ID pairs. Relationship resources never hold references to other resources.
-- Entities collide with `PhysicsLayers.WORLD` only for now. They do not block each other. Buildings and water-like landuse polygons (`TerrainSample.WATER_LANDUSE_KINDS`) block entities; waterways (streams) do not block. Collision bodies are generated at runtime only, never saved into the editor scene.
+- Entities collide with `PhysicsLayers.WORLD` and `PhysicsLayers.VEHICLES` (parked cars are solid), and do not block each other. Buildings and water-like landuse polygons (`TerrainSample.WATER_LANDUSE_KINDS`) block entities; waterways (streams) do not block. Collision bodies are generated at runtime only, never saved into the editor scene.
+- `set_riding(true)` is the shared "inside a vehicle" body state: hidden, physics disabled, collision layer 0. Only the vehicle that seated the entity calls it, and `exit()` restores the defaults.
+
+### Vehicles
+
+- `VehicleData` (`resources/vehicles/*.tres`) is the static definition: identity, body size, sprite frames, durability, handling, wheel layout, seats, storage, and a composed `ObjectProperties`. Runtime state (health, per-wheel `WheelState`, occupants, contents) lives on the `Vehicle` node, never in the `.tres`.
+- `Vehicle` is a `CharacterBody2D` with an arcade bicycle model (yaw from wheelbase + steer, lateral slip damped by grip). It mirrors the entity split: `VehicleController` returns throttle/steer/handbrake intent, and `PlayerVehicleController` reads the shared movement actions. A vehicle only reads its controller while occupied, so parked cars ignore input; NPC controllers are future work.
+- Handling is authored in metres and m/s (`max_speed_mps`, `acceleration_mps2`, `brake_mps2`, `max_steer_deg`, `wheelbase_m`, `lateral_grip`, tyre grip) and converted once at the edge. Art is scaled from `length_m` and `sprite_length_px`; north-facing sprites get a fixed +90° child rotation, so the vehicle node's rotation is always the heading.
+- Terrain handling uses `VehicleTerrainProfile` (surface, then kind → speed and grip multipliers): asphalt 1.0, grass ~0.6, gravel ~0.7, and so on. Water-like landuse blocks vehicles, with a slow/loose fallback if one ever gets there.
+- Wheels come from `wheel_count` (2, 4, or 6) or an authored `WheelSpec` list. Each runtime `WheelState` has `present`, `pressure_kpa`, and `tread`; a missing wheel gives zero traction, and flat or worn tires reduce grip and top speed. No wheel visuals yet.
+- Vehicles collide with `WORLD`, `VEHICLES`, and `ENTITIES`, so they are solid to pedestrians and to each other. Entering reuses the normal `Interactable` component; exiting is polled by `World` from the `interact` action (keyboard, gamepad, and touch) with a 300 ms entry cooldown. The exit spot is searched left, right, rear, then front and validated against collision and water.
+- Impacts above `impact_damage_threshold_mps` reduce `health` using the velocity component along the collision normal, scaled by mass; `damaged` and `destroyed` signals exist, but visual damage and fire are not implemented. `get_state()` / `load_state()` are save hooks for position, heading, health, lights, and tire condition.
+- Placement is `data/overlays/vehicles.json` (`{"version":1,"vehicles":[{"id","data","position":[x,y],"heading_deg","lights"}]}`), keyed by stable IDs and spawned after the map and before NPCs. Debug builds with an empty list place two cars on the nearest road; `V` (pad east) spawns the inspector-assigned `debug_vehicle_data` (default `car.tres`) in front of the player. Blocked spawn points are skipped with an aggregated warning.
+- Camera: `FollowCamera` has `MANUAL` (wheel and zoom actions) and `AUTO` (speed-based zoom and look-ahead). Driving forces `AUTO` and restores the previous mode and manual zoom on exit. The follow update and Camera2D smoothing run on the physics clock (`process_callback = PHYSICS`) so the camera samples bodies on the same tick they move; idle-time smoothing jitters moving sprites when the frame rate differs from physics. F1 keeps the free `DebugCamera`; debug builds cycle modes on foot with `C` (pad north). Pan is never player-controlled in `AUTO`. The HUD replaces the player line with the vehicle name, speed, health, tire count, and terrain while driving.
+- Storage is capacity metadata plus `contents` and `store_item()` / `take_item()`; the item system does not exist yet. Multiple occupants are supported by the seat list, but only the driver is wired to input.
 
 ### Physics layers (named in project settings)
 
@@ -133,7 +148,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 
 ### Input actions
 
-Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start) · `debug_pick` (right mouse button / pad right-stick press) · `debug_camera` (F1 / pad back). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
+Canonical actions, persisted in `project.godot`, one keyboard key + one pad button each, left stick implicitly bound to movement: `move_up` (Up, W / D-pad up) · `move_down` (Down, S / D-pad down) · `move_left` (Left, A / D-pad left) · `move_right` (Right, D / D-pad right) · `run` (Shift / pad button west) · `interact` (E / pad button south) · `zoom_in` (= / pad right shoulder) · `zoom_out` (- / pad left shoulder) · `menu` (Esc / pad start) · `debug_pick` (right mouse button / pad right-stick press) · `debug_camera` (F1 / pad back) · `camera_mode` (C / pad north, debug builds only) · `debug_spawn_vehicle` (V / pad east, debug builds only). Add actions here when a phase introduces them. Gameplay code only reads actions, never raw keys.
 
 ### Performance
 
@@ -160,6 +175,7 @@ Agents must validate scripts without running gameplay. Use the headless harness:
 
 - `make check` — imports the project headlessly (refreshes class/UID caches), runs `gdparse` over every game script, then loads every game script with autoloads through `res://tests/compile_check.tscn`.
 - `make smoke` — runs `make check`, then the headless map + vegetation integration test in `res://tests/smoke.tscn` (map load, lazy street-tree generation, chunk streaming, collider and interaction pools, inspection output).
+- `make vehicle-smoke` — runs `make check`, then the headless vehicle test in `res://tests/vehicle_smoke.tscn` (all nine data resources, wheel/tire grip, terrain profile, acceleration and impact damage, enter/exit, overlay spawning, and world-scene wiring).
 - `make bench` — runs `make check`, then the headless runtime map benchmark in `res://tests/map_benchmark.tscn` (build timings, node count, static memory).
 - `make lint` / `make format` — run `gdlint` / `gdformat` through `uv`; `.gdlintrc` sets a 120-column project baseline and disables legacy structural rules. `make format` rewrites files, so use it deliberately.
 - `make map` — regenerate `res://data/map.json` from `data/export_0002.geojson` (or `MAP_SOURCE=... make map`) with the pinned Python dependencies.
@@ -179,7 +195,7 @@ Before shipping a build: remove any `_mcp_game_helper` dev autoload and its edit
 - Godot 4 API differs from Godot 3 memory (e.g. `ScrollContainer.horizontal_scroll_mode`). When unsure about a property or method, check the Godot 4.7 docs instead of guessing.
 - Editor-log ghosts: the log buffer re-emits stale diagnostics on scans — confirm errors against current file contents (grep) before treating them as live.
 - Never reference `EditorInterface` directly from a script that is shipped in a game: editor classes are stripped from export templates and the script then fails to load. Access it only under `Engine.is_editor_hint()` through `Engine.get_singleton(&"EditorInterface")`.
-- Run `make check` after script changes and `make smoke` after systems that load the world; do not leave `.tmp_*` scenes or scripts in the project root.
+- Run `make check` after script changes, `make smoke` after systems that load the world, and `make vehicle-smoke` after vehicle changes; do not leave `.tmp_*` scenes or scripts in the project root.
 - Godot generates `.gd.uid` sidecars; keep them tracked so scenes and references stay stable.
 - Regenerate the map with `make map` (or `MAP_SOURCE=data/export_0002.geojson make map`; raw exports are gitignored, so keep one locally).
 

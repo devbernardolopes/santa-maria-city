@@ -15,3 +15,7 @@ static func px_to_m(pixels: float) -> float:
 
 static func to_px(point_m: Vector2) -> Vector2:
 	return point_m * PX_PER_METER
+
+
+static func to_m(point_px: Vector2) -> Vector2:
+	return point_px / PX_PER_METER

@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://bjwfcgswah318" path="res://scripts/world/interior_manager.gd" id="11_interior_manager"]
 [ext_resource type="Script" uid="uid://clgnsatsjxo3a" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
 [ext_resource type="Script" uid="uid://b7khg7p18e3w1" path="res://scripts/vegetation/vegetation_manager.gd" id="13_vegetation"]
+[ext_resource type="Script" uid="uid://cxws2svhp3mpo" path="res://scripts/vehicles/vehicle_spawner.gd" id="14_vehicles"]
 
 [node name="World" type="Node2D" unique_id=1946698986]
 script = ExtResource("1_world")
@@ -53,7 +54,10 @@ script = ExtResource("6_follow")
 
 [node name="DebugSpawner" type="Node" parent="." unique_id=79334371]
 script = ExtResource("7_spawner")
-npc_count = 200
+npc_count = 1
+
+[node name="VehicleSpawner" type="Node" parent="." unique_id=1322025233]
+script = ExtResource("14_vehicles")
 
 [node name="EntranceSpawner" type="Node" parent="." unique_id=1414353084]
 script = ExtResource("10_entrance_spawner")

@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/vehicles/vehicle.gd" id="1_vehicle"]
+[ext_resource type="Script" path="res://scripts/vehicles/vehicle_visual.gd" id="2_visual"]
+[ext_resource type="Script" path="res://scripts/vehicles/player_vehicle_controller.gd" id="3_controller"]
+[ext_resource type="Script" path="res://scripts/objects/interactable.gd" id="4_interact"]
+
+[node name="Vehicle" type="CharacterBody2D"]
+script = ExtResource("1_vehicle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("2_visual")
+
+[node name="PlayerVehicleController" type="Node" parent="."]
+script = ExtResource("3_controller")
+
+[node name="Interactable" type="Area2D" parent="."]
+script = ExtResource("4_interact")

@@ -18,6 +18,8 @@ var facing: Vector2 = Vector2.DOWN
 var current_terrain: TerrainSample = null
 ## Frozen during screen transitions: velocity zero and the controller is not read.
 var locked: bool = false
+## Hidden and physics-disabled while seated in a vehicle.
+var riding: bool = false
 
 var _terrain_timer: float = 0.0
 var _terrain_speed_factor: float = 1.0
@@ -30,7 +32,7 @@ var _last_sample_pos_m: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	collision_layer = PhysicsLayers.ENTITIES
-	collision_mask = PhysicsLayers.WORLD
+	collision_mask = PhysicsLayers.WORLD | PhysicsLayers.VEHICLES
 	_configure_collision_shape()
 	current_terrain = TerrainSample.default_sample()
 	if controller == null:
@@ -61,6 +63,25 @@ func set_locked(value: bool) -> void:
 	locked = value
 	if locked:
 		velocity = Vector2.ZERO
+
+
+## Seated in a vehicle: hidden, physics off, and no collision until released.
+func set_riding(value: bool) -> void:
+	riding = value
+	visible = not value
+	set_physics_process(not value)
+	collision_layer = 0 if value else PhysicsLayers.ENTITIES
+	collision_mask = 0 if value else PhysicsLayers.WORLD | PhysicsLayers.VEHICLES
+	if value:
+		velocity = Vector2.ZERO
+
+
+func get_speed_mps() -> float:
+	return Units.px_to_m(velocity.length())
+
+
+func get_velocity_mps() -> Vector2:
+	return Units.to_m(velocity)
 
 
 func _physics_process(delta: float) -> void:

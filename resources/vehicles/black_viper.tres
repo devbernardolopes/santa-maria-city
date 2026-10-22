@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="VehicleData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
+[ext_resource type="Script" path="res://resources/objects/object_properties.gd" id="2_props"]
+[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/Black_viper.png" id="3_tex"]
+
+[sub_resource type="Resource" id="ObjectProperties_viper"]
+script = ExtResource("2_props")
+mass_kg = 1400.0
+movable = true
+friction = 0.75
+flammable = true
+ignition_temperature_c = 320.0
+
+[resource]
+script = ExtResource("1_data")
+id = &"black_viper"
+display_name = "Black Viper"
+kind = "car"
+properties = SubResource("ObjectProperties_viper")
+length_m = 4.7
+width_m = 2.05
+sprite_length_px = 220.0
+frames = Array[Texture2D]([ExtResource("3_tex")])
+max_health = 850.0
+impact_damage_threshold_mps = 4.0
+impact_damage_per_mps = 9.0
+max_speed_mps = 42.0
+max_reverse_speed_mps = 8.0
+acceleration_mps2 = 11.0
+brake_mps2 = 20.0
+engine_braking_mps2 = 2.5
+rolling_resistance_mps2 = 0.55
+max_steer_deg = 30.0
+steer_rate_deg_s = 150.0
+high_speed_steer_factor = 0.3
+lateral_grip = 10.0
+wheelbase_m = 2.8
+wheel_count = 4
+seat_count = 2
+can_store_items = false
+storage_slots = 0
+storage_capacity_kg = 0.0
