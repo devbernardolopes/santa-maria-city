@@ -11,9 +11,12 @@ const CLOSED_TEXT_FORMAT: String = "Closed · opens %s"
 
 @onready var _interactable: Area2D = $Interactable
 
-## Set by EntranceSpawner before the node enters the tree.
+## Set by EntranceSpawner or editor before the node enters the tree.
 var data: Resource = null
 var _is_open: bool = true
+
+## The InteriorManager reference; set automatically by the spawner.
+var _interior_manager_name: String = "/root/InteriorManager"
 
 
 func _ready() -> void:
@@ -26,6 +29,11 @@ func _ready() -> void:
 	_refresh_availability()
 
 
+func get_interior_manager() -> Node:
+	var im = get_node_or_null(_interior_manager_name)
+	return im
+
+
 func _refresh_availability() -> void:
 	if data == null:
 		return
@@ -35,18 +43,16 @@ func _refresh_availability() -> void:
 	if data.locked:
 		_interactable.set_available(false, "Locked")
 	elif not _is_open:
-		_interactable.set_available(false, CLOSED_TEXT_FORMAT % data.next_opening_text(weekday, hour))
+		_interactable.set_available(
+			false, CLOSED_TEXT_FORMAT % data.next_opening_text(weekday, hour)
+		)
 	else:
 		_interactable.set_available(true)
 	queue_redraw()
 
 
 func _on_interacted(actor: Entity) -> void:
-	var im := get_node_or_null("/root/InteriorManager")
-	if im == null:
-		for node in get_tree().get_nodes_in_group("interior_manager"):
-			im = node
-			break
+	var im := get_interior_manager()
 	if im == null:
 		push_warning("Entrance: no InteriorManager in the scene; cannot enter.")
 		return
@@ -65,11 +71,13 @@ func _draw() -> void:
 	var half_length: Vector2 = data.normal.orthogonal() * Units.m_to_px(DOOR_LENGTH_M * 0.5)
 	var half_thickness: Vector2 = data.normal * Units.m_to_px(DOOR_THICKNESS_M * 0.5)
 	draw_colored_polygon(
-		PackedVector2Array([
-			-half_length - half_thickness,
-			half_length - half_thickness,
-			half_length + half_thickness,
-			-half_length + half_thickness,
-		]),
+		PackedVector2Array(
+			[
+				-half_length - half_thickness,
+				half_length - half_thickness,
+				half_length + half_thickness,
+				-half_length + half_thickness,
+			]
+		),
 		color
 	)

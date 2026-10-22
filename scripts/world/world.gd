@@ -171,14 +171,20 @@ func _read_spawn_override() -> Variant:
 	if player_value == null:
 		return null
 	if not (player_value is Array):
-		push_warning("World: '%s.player' must be null or [x_m, y_m]; using the map center." % SPAWNS_PATH)
+		push_warning(
+			"World: '%s.player' must be null or [x_m, y_m]; using the map center." % SPAWNS_PATH
+		)
 		return null
 	var player_array: Array = player_value
 	if player_array.size() != 2:
-		push_warning("World: '%s.player' must contain two numbers; using the map center." % SPAWNS_PATH)
+		push_warning(
+			"World: '%s.player' must contain two numbers; using the map center." % SPAWNS_PATH
+		)
 		return null
 	if not _is_number(player_array[0]) or not _is_number(player_array[1]):
-		push_warning("World: '%s.player' must contain two numbers; using the map center." % SPAWNS_PATH)
+		push_warning(
+			"World: '%s.player' must contain two numbers; using the map center." % SPAWNS_PATH
+		)
 		return null
 	return Vector2(float(player_array[0]), float(player_array[1]))
 
@@ -311,5 +317,6 @@ func _show_message(text: String) -> void:
 
 func _is_number(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
+
 
 var _player: Entity = null

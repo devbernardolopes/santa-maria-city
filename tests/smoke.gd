@@ -143,8 +143,10 @@ func _validate_lazy_street_trees() -> bool:
 				street_count += 1
 		if street_count > 0:
 			print(
-				"VEGETATION SMOKE lazy street trees: %d in chunk %s (road %s)"
-				% [street_count, str(chunk), str(road.get("id", ""))]
+				(
+					"VEGETATION SMOKE lazy street trees: %d in chunk %s (road %s)"
+					% [street_count, str(chunk), str(road.get("id", ""))]
+				)
 			)
 			return true
 	_fail("lazy street-tree generation produced no trees")

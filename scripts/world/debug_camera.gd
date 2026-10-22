@@ -69,7 +69,9 @@ func _frame_map() -> void:
 	var map_pixels: Vector2 = _map.map_bounds_px.size
 	if map_pixels.x <= 0.0 or map_pixels.y <= 0.0:
 		return
-	var fit_zoom: float = minf(viewport_size.x / map_pixels.x, viewport_size.y / map_pixels.y) * FRAME_MARGIN
+	var fit_zoom: float = (
+		minf(viewport_size.x / map_pixels.x, viewport_size.y / map_pixels.y) * FRAME_MARGIN
+	)
 	zoom = Vector2.ONE * clampf(fit_zoom, MIN_ZOOM, MAX_ZOOM)
 	position = _map.map_bounds_px.get_center()
 

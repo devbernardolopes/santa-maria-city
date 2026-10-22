@@ -61,7 +61,13 @@ func spawn_in_front_of(actor: Entity, data: VehicleData = null) -> Vehicle:
 	for extra_m: float in [0.0, 3.0, 6.0]:
 		var point_m: Vector2 = origin_m + forward * (base_distance_m + extra_m)
 		if _is_clear(point_m, heading, vehicle_data):
-			return _spawn(vehicle_data, point_m, heading, StringName("debug/%d" % Time.get_ticks_msec()), false)
+			return _spawn(
+				vehicle_data,
+				point_m,
+				heading,
+				StringName("debug/%d" % Time.get_ticks_msec()),
+				false
+			)
 	return null
 
 
@@ -122,13 +128,18 @@ func _read_overlay() -> Array[Dictionary]:
 			entry_id = "v_%04d" % index
 		var lights_value: Variant = entry.get("lights")
 		var lights: bool = lights_value is bool and bool(lights_value)
-		result.append({
-			"id": entry_id,
-			"data": data_path,
-			"position": position_m,
-			"heading_rad": deg_to_rad(heading_deg),
-			"lights": lights,
-		})
+		(
+			result
+			. append(
+				{
+					"id": entry_id,
+					"data": data_path,
+					"position": position_m,
+					"heading_rad": deg_to_rad(heading_deg),
+					"lights": lights,
+				}
+			)
+		)
 	if skipped > 0:
 		push_warning("VehicleSpawner: skipped %d invalid entries in %s." % [skipped, overlay_path])
 	return result
@@ -200,13 +211,18 @@ func _debug_entries(spawn_point_m: Vector2) -> Array[Dictionary]:
 	var first: float = -float(debug_fallback_count - 1) * 0.5
 	for index: int in range(debug_fallback_count):
 		var offset_m: float = (first + float(index)) * debug_fallback_spacing_m
-		result.append({
-			"id": "debug/%d" % index,
-			"data": vehicle_data,
-			"position": point_m + direction * offset_m,
-			"heading_rad": heading_rad,
-			"lights": false,
-		})
+		(
+			result
+			. append(
+				{
+					"id": "debug/%d" % index,
+					"data": vehicle_data,
+					"position": point_m + direction * offset_m,
+					"heading_rad": heading_rad,
+					"lights": false,
+				}
+			)
+		)
 	return result
 
 
@@ -221,9 +237,7 @@ func _nearest_road_frame(from_m: Vector2) -> Dictionary:
 			continue
 		for index: int in range(line.size() - 1):
 			var candidate: Vector2 = Geometry2D.get_closest_point_to_segment(
-				from_m,
-				line[index],
-				line[index + 1]
+				from_m, line[index], line[index + 1]
 			)
 			var distance: float = from_m.distance_squared_to(candidate)
 			if distance >= best:

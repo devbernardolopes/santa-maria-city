@@ -30,9 +30,11 @@ func _draw() -> void:
 	var tip := Vector2(radius + Units.m_to_px(FACING_LENGTH_M), 0.0)
 	var half_width: float = Units.m_to_px(FACING_HALF_WIDTH_M)
 	var base_x: float = radius * 0.55
-	var triangle := PackedVector2Array([
-		tip,
-		Vector2(base_x, -half_width),
-		Vector2(base_x, half_width),
-	])
+	var triangle := PackedVector2Array(
+		[
+			tip,
+			Vector2(base_x, -half_width),
+			Vector2(base_x, half_width),
+		]
+	)
 	draw_colored_polygon(triangle, body_color.lightened(0.18))

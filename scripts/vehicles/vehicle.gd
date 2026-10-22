@@ -9,7 +9,7 @@ signal entered(actor: Entity)
 signal exited(actor: Entity)
 signal entry_rejected(actor: Entity, reason: String)
 signal damaged(amount: float, cause: StringName)
-signal destroyed()
+signal destroyed
 
 const TERRAIN_SAMPLE_INTERVAL_S: float = 0.25
 const TERRAIN_SAMPLE_DISTANCE_M: float = 1.0
@@ -50,7 +50,8 @@ var _pre_move_velocity_mps: Vector2 = Vector2.ZERO
 
 @onready var _visual: VehicleVisual = get_node_or_null("Visual") as VehicleVisual
 @onready var _interactable: Interactable = get_node_or_null("Interactable") as Interactable
-@onready var _collision_shape: CollisionShape2D = get_node_or_null("CollisionShape2D") as CollisionShape2D
+@onready
+var _collision_shape: CollisionShape2D = get_node_or_null("CollisionShape2D") as CollisionShape2D
 
 
 func _ready() -> void:
@@ -305,11 +306,16 @@ func get_state() -> Dictionary:
 	var position_m: Vector2 = Units.to_m(global_position)
 	var wheel_states: Array[Dictionary] = []
 	for wheel: WheelState in wheels:
-		wheel_states.append({
-			"present": wheel.present,
-			"pressure_kpa": wheel.pressure_kpa,
-			"tread": wheel.tread,
-		})
+		(
+			wheel_states
+			. append(
+				{
+					"present": wheel.present,
+					"pressure_kpa": wheel.pressure_kpa,
+					"tread": wheel.tread,
+				}
+			)
+		)
 	return {
 		"id": String(vehicle_id),
 		"position_m": [position_m.x, position_m.y],
@@ -362,9 +368,7 @@ func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> voi
 	)
 	var steer_target: float = steer * deg_to_rad(data.max_steer_deg) * steer_scale
 	_steer_angle = move_toward(
-		_steer_angle,
-		steer_target,
-		deg_to_rad(data.steer_rate_deg_s) * delta
+		_steer_angle, steer_target, deg_to_rad(data.steer_rate_deg_s) * delta
 	)
 	if absf(speed_before) > MIN_MOVING_SPEED_MPS:
 		var yaw_rate: float = (speed_before / data.get_wheelbase_m()) * tan(_steer_angle)
@@ -415,7 +419,10 @@ func _integrate_forward_speed(forward_speed: float, throttle: float, delta: floa
 func _update_terrain(delta: float) -> void:
 	_terrain_timer -= delta
 	var position_m: Vector2 = Units.to_m(global_position)
-	if _terrain_timer > 0.0 and position_m.distance_to(_last_sample_pos_m) < TERRAIN_SAMPLE_DISTANCE_M:
+	if (
+		_terrain_timer > 0.0
+		and position_m.distance_to(_last_sample_pos_m) < TERRAIN_SAMPLE_DISTANCE_M
+	):
 		return
 	_terrain_timer = TERRAIN_SAMPLE_INTERVAL_S
 	_last_sample_pos_m = position_m
@@ -444,7 +451,7 @@ func _apply_impact_damage() -> void:
 		if impact_speed <= data.impact_damage_threshold_mps:
 			continue
 		var mass_scale: float = clampf(data.get_mass_kg() / MASS_DAMAGE_REFERENCE_KG, 0.5, 3.0)
-		var amount: float = (impact_speed - data.impact_damage_threshold_mps)
+		var amount: float = impact_speed - data.impact_damage_threshold_mps
 		amount *= data.impact_damage_per_mps * mass_scale
 		_impact_cooldown = IMPACT_COOLDOWN_S
 		damage(amount, &"impact")

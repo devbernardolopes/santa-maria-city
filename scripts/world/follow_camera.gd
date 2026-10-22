@@ -100,13 +100,13 @@ func _update_follow(delta: float) -> void:
 		if target_offset_m.length() > look_ahead_max_m:
 			target_offset_m = target_offset_m.normalized() * look_ahead_max_m
 		var speed_ratio: float = clampf(
-			velocity_mps.length() / maxf(auto_speed_reference_mps, 0.1),
-			0.0,
-			1.0
+			velocity_mps.length() / maxf(auto_speed_reference_mps, 0.1), 0.0, 1.0
 		)
 		var target_zoom: Vector2 = Vector2.ONE * lerpf(auto_idle_zoom, auto_speed_zoom, speed_ratio)
 		var zoom_factor: float = 1.0 - exp(-maxf(auto_zoom_response, 0.01) * delta)
-		zoom = zoom.lerp(target_zoom, zoom_factor).clamp(Vector2.ONE * MIN_ZOOM, Vector2.ONE * MAX_ZOOM)
+		zoom = zoom.lerp(target_zoom, zoom_factor).clamp(
+			Vector2.ONE * MIN_ZOOM, Vector2.ONE * MAX_ZOOM
+		)
 	var offset_factor: float = 1.0 - exp(-maxf(auto_zoom_response, 0.01) * delta)
 	_look_ahead_m = _look_ahead_m.lerp(target_offset_m, offset_factor)
 	global_position = target.global_position + Units.to_px(_look_ahead_m)

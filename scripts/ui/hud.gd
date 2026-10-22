@@ -45,7 +45,9 @@ var _pick_active: bool = false
 
 
 func _ready() -> void:
-	for label: Label in [_label, _clock_label, _player_label, _info_label, _message_label, _prompt_label]:
+	for label: Label in [
+		_label, _clock_label, _player_label, _info_label, _message_label, _prompt_label
+	]:
 		label.add_theme_color_override("font_color", Color("1e1e1e"))
 		label.add_theme_color_override("font_outline_color", Color(1.0, 1.0, 1.0, 0.85))
 	_map = get_parent().get_node_or_null("Map") as MapLoader
@@ -120,11 +122,14 @@ func _update_debug_info(delta: float) -> void:
 		return
 	_debug_info_timer = DEBUG_INFO_INTERVAL_S
 	var stats: Dictionary = _vegetation.get_stats()
-	_info_label.text = "veg · chunks %d · plants %d · colliders %d" % [
-		int(stats.get("chunks", 0)),
-		int(stats.get("instances", 0)),
-		int(stats.get("colliders", 0)),
-	]
+	_info_label.text = (
+		"veg · chunks %d · plants %d · colliders %d"
+		% [
+			int(stats.get("chunks", 0)),
+			int(stats.get("instances", 0)),
+			int(stats.get("colliders", 0)),
+		]
+	)
 
 
 func on_map_loaded(counts: Dictionary) -> void:
@@ -204,15 +209,19 @@ func _update_player_text() -> void:
 		_player_label.text = ""
 		return
 	var position_m := Vector2(
-		Units.px_to_m(_player.global_position.x),
-		Units.px_to_m(_player.global_position.y)
+		Units.px_to_m(_player.global_position.x), Units.px_to_m(_player.global_position.y)
 	)
 	var data: EntityData = _player.data
 	var parts: PackedStringArray = [
-		"%s, %d" % [
-			data.full_name,
-			data.get_age_years(GameClock.get_year(), GameClock.get_month(), GameClock.get_day()),
-		],
+		(
+			"%s, %d"
+			% [
+				data.full_name,
+				data.get_age_years(
+					GameClock.get_year(), GameClock.get_month(), GameClock.get_day()
+				),
+			]
+		),
 		"x %.1f m · y %.1f m" % [position_m.x, position_m.y],
 	]
 	var terrain_text: String = _terrain_text(_player.current_terrain)
@@ -323,13 +332,16 @@ func _update_text(counts: Dictionary) -> void:
 	if _map == null:
 		return
 	var attribution: String = str(_map.meta.get("attribution", FALLBACK_ATTRIBUTION))
-	_label.text = "Landuse %d · Waterways %d · Roads %d · Buildings %d\n%s" % [
-		int(counts.get("landuse", 0)),
-		int(counts.get("waterways", 0)),
-		int(counts.get("roads", 0)),
-		int(counts.get("buildings", 0)),
-		attribution,
-	]
+	_label.text = (
+		"Landuse %d · Waterways %d · Roads %d · Buildings %d\n%s"
+		% [
+			int(counts.get("landuse", 0)),
+			int(counts.get("waterways", 0)),
+			int(counts.get("roads", 0)),
+			int(counts.get("buildings", 0)),
+			attribution,
+		]
+	)
 
 
 func _truncate(value: String) -> String:
@@ -346,7 +358,9 @@ func _on_message_timeout() -> void:
 
 func _update_font_size() -> void:
 	var viewport_height: float = get_viewport().get_visible_rect().size.y
-	var font_size: int = int(clampf(viewport_height / FONT_REFERENCE_HEIGHT, float(MIN_FONT_SIZE), float(MAX_FONT_SIZE)))
+	var font_size: int = int(
+		clampf(viewport_height / FONT_REFERENCE_HEIGHT, float(MIN_FONT_SIZE), float(MAX_FONT_SIZE))
+	)
 	_label.add_theme_font_size_override("font_size", font_size)
 	_label.add_theme_constant_override("outline_size", maxi(2, int(font_size * 0.12)))
 	var info_font_size: int = maxi(MIN_FONT_SIZE, int(round(font_size * INFO_FONT_SCALE)))

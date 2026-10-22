@@ -19,7 +19,9 @@ func _ready() -> void:
 		return
 	print("MAP BENCH: stats=%s" % str(_map.build_stats))
 	print("MAP BENCH: size_m=%s bounds_px=%s" % [str(_map.map_size_m), str(_map.map_bounds_px)])
-	print("MAP BENCH: nodes=%d static_memory=%d" % [_count_nodes(_map), OS.get_static_memory_usage()])
+	print(
+		"MAP BENCH: nodes=%d static_memory=%d" % [_count_nodes(_map), OS.get_static_memory_usage()]
+	)
 	get_tree().quit(0)
 
 

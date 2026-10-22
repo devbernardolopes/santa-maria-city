@@ -99,8 +99,10 @@ func start(map: MapLoader) -> void:
 	if OS.is_debug_build():
 		var street_ms: int = int(round(float(Time.get_ticks_usec() - street_start_usec) / 1000.0))
 		print(
-			"VegetationManager: indexed %d street-tree roads in %d ms (lazy generation)."
-			% [_generator.get_indexed_street_road_count(), street_ms]
+			(
+				"VegetationManager: indexed %d street-tree roads in %d ms (lazy generation)."
+				% [_generator.get_indexed_street_road_count(), street_ms]
+			)
 		)
 	_running = true
 	_area_dirty = true
@@ -178,7 +180,11 @@ func _update_needed_area(camera: Camera2D, center_m: Vector2) -> void:
 		_pending_chunks.clear()
 		_disable_pools()
 		return
-	if _anchor != null and is_instance_valid(_anchor) and not bounds.has_point(_anchor_position_m()):
+	if (
+		_anchor != null
+		and is_instance_valid(_anchor)
+		and not bounds.has_point(_anchor_position_m())
+	):
 		_focus_outside = true
 		_clear_views()
 		_pending_chunks.clear()
@@ -197,8 +203,7 @@ func _update_needed_area(camera: Camera2D, center_m: Vector2) -> void:
 	var cap_radius: float = maxf(max_view_radius_m, 0.0)
 	if cap_radius > 0.0:
 		var cap := Rect2(
-			center_m - Vector2(cap_radius, cap_radius),
-			Vector2(cap_radius, cap_radius) * 2.0
+			center_m - Vector2(cap_radius, cap_radius), Vector2(cap_radius, cap_radius) * 2.0
 		)
 		area = area.intersection(cap)
 	if _anchor != null and is_instance_valid(_anchor):
@@ -339,7 +344,10 @@ func _update_anchor_work() -> void:
 		_refresh_colliders(anchor_m)
 		_last_collision_anchor_m = anchor_m
 		_collision_dirty = false
-	if _interaction_dirty or _last_interaction_anchor_m.distance_to(anchor_m) >= INTERACTION_REFRESH_M:
+	if (
+		_interaction_dirty
+		or _last_interaction_anchor_m.distance_to(anchor_m) >= INTERACTION_REFRESH_M
+	):
 		_refresh_interactables(anchor_m)
 		_last_interaction_anchor_m = anchor_m
 		_interaction_dirty = false
@@ -370,12 +378,17 @@ func _refresh_colliders(anchor_m: Vector2) -> void:
 					radius_m = data.radii_m[index]
 				if radius_m <= 0.0:
 					continue
-				candidates.append({
-					"position_m": position_m,
-					"radius_m": radius_m,
-					"distance": distance,
-					"key": data.keys[index],
-				})
+				(
+					candidates
+					. append(
+						{
+							"position_m": position_m,
+							"radius_m": radius_m,
+							"distance": distance,
+							"key": data.keys[index],
+						}
+					)
+				)
 	candidates.sort_custom(_sort_candidates)
 	for index: int in range(_colliders.size()):
 		if index < candidates.size():
@@ -400,8 +413,12 @@ func _refresh_interactables(anchor_m: Vector2) -> void:
 		return
 	_ensure_pools()
 	var candidates: Array[Dictionary] = []
-	var min_chunk: Vector2i = _chunk_of(anchor_m - Vector2(INTERACTION_RADIUS_M, INTERACTION_RADIUS_M))
-	var max_chunk: Vector2i = _chunk_of(anchor_m + Vector2(INTERACTION_RADIUS_M, INTERACTION_RADIUS_M))
+	var min_chunk: Vector2i = _chunk_of(
+		anchor_m - Vector2(INTERACTION_RADIUS_M, INTERACTION_RADIUS_M)
+	)
+	var max_chunk: Vector2i = _chunk_of(
+		anchor_m + Vector2(INTERACTION_RADIUS_M, INTERACTION_RADIUS_M)
+	)
 	for chunk_y: int in range(min_chunk.y, max_chunk.y + 1):
 		for chunk_x: int in range(min_chunk.x, max_chunk.x + 1):
 			var chunk := Vector2i(chunk_x, chunk_y)
@@ -417,12 +434,17 @@ func _refresh_interactables(anchor_m: Vector2) -> void:
 				var distance: float = position_m.distance_to(anchor_m)
 				if distance > INTERACTION_RADIUS_M:
 					continue
-				candidates.append({
-					"data": data,
-					"index": index,
-					"distance": distance,
-					"key": data.keys[index],
-				})
+				(
+					candidates
+					. append(
+						{
+							"data": data,
+							"index": index,
+							"distance": distance,
+							"key": data.keys[index],
+						}
+					)
+				)
 	candidates.sort_custom(_sort_candidates)
 	for slot: int in range(_interactables.size()):
 		if slot < candidates.size():
@@ -439,11 +461,9 @@ func _refresh_interactables(anchor_m: Vector2) -> void:
 				continue
 			var interactable: Interactable = _interactables[slot]
 			interactable.position = Units.to_px(data.positions_m[index])
-			interactable.set_radius_m(clampf(
-				data.radii_m[index],
-				INTERACTABLE_MIN_RADIUS_M,
-				INTERACTABLE_MAX_RADIUS_M
-			))
+			interactable.set_radius_m(
+				clampf(data.radii_m[index], INTERACTABLE_MIN_RADIUS_M, INTERACTABLE_MAX_RADIUS_M)
+			)
 			interactable.prompt_text = "Inspect %s" % _display_name(species)
 			interactable.set_available(true)
 			_set_interactable_enabled(slot, true)
@@ -674,8 +694,7 @@ func _map_bounds_m() -> Rect2:
 				Units.px_to_m(_map.map_bounds_px.position.y)
 			),
 			Vector2(
-				Units.px_to_m(_map.map_bounds_px.size.x),
-				Units.px_to_m(_map.map_bounds_px.size.y)
+				Units.px_to_m(_map.map_bounds_px.size.x), Units.px_to_m(_map.map_bounds_px.size.y)
 			)
 		)
 	return Rect2()

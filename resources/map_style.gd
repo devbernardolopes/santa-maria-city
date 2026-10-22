@@ -154,8 +154,7 @@ const WATERWAY_COLORS: Dictionary = {
 @export_tool_button("Add missing styles")
 var add_missing_styles_button: Callable = add_missing_defaults
 
-@export_tool_button("Reset to defaults")
-var reset_to_defaults_button: Callable = fill_defaults
+@export_tool_button("Reset to defaults") var reset_to_defaults_button: Callable = fill_defaults
 
 var _kind_index: Dictionary = {}
 var _id_index: Dictionary = {}
@@ -423,7 +422,9 @@ func fill_defaults() -> void:
 	emit_changed()
 
 
-static func _make_style(id: StringName, kind: StringName, surface: StringName, color: Color) -> TerrainStyle:
+static func _make_style(
+	id: StringName, kind: StringName, surface: StringName, color: Color
+) -> TerrainStyle:
 	var style := TerrainStyle.new()
 	style.id = id
 	style.kind = kind

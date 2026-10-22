@@ -58,7 +58,12 @@ func _read_sources() -> Array:
 		return sources
 	var entries_value: Variant = data.get("entrances")
 	if not (entries_value is Array):
-		push_warning("EntranceSpawner: '%s' has no 'entrances' array; no file entrances spawned." % ENTRANCES_PATH)
+		push_warning(
+			(
+				"EntranceSpawner: '%s' has no 'entrances' array; no file entrances spawned."
+				% ENTRANCES_PATH
+			)
+		)
 		return sources
 	var entries: Array = entries_value
 	var seen_ids: Dictionary = {}
@@ -66,7 +71,11 @@ func _read_sources() -> Array:
 		if not (entries[index] is Dictionary):
 			_report_invalid += 1
 			continue
-		var source: Resource = ENTRANCE_DATA_SCRIPT.new().from_dict(entries[index]) if ENTRANCE_DATA_SCRIPT != null else null
+		var source: Resource = (
+			ENTRANCE_DATA_SCRIPT.new().from_dict(entries[index])
+			if ENTRANCE_DATA_SCRIPT != null
+			else null
+		)
 		if source == null:
 			# try global class if available
 			source = EntranceData.from_dict(entries[index])
@@ -87,24 +96,39 @@ func _read_file() -> Dictionary:
 		return {}
 	var file: FileAccess = FileAccess.open(ENTRANCES_PATH, FileAccess.READ)
 	if file == null:
-		push_warning("EntranceSpawner: could not open %s; no file entrances spawned." % ENTRANCES_PATH)
+		push_warning(
+			"EntranceSpawner: could not open %s; no file entrances spawned." % ENTRANCES_PATH
+		)
 		return {}
 	var json := JSON.new()
 	var parse_error: Error = json.parse(file.get_as_text())
 	file.close()
 	if parse_error != OK:
-		push_warning("EntranceSpawner: invalid JSON in %s at line %d; no file entrances spawned." % [
-			ENTRANCES_PATH, json.get_error_line(),
-		])
+		push_warning(
+			(
+				"EntranceSpawner: invalid JSON in %s at line %d; no file entrances spawned."
+				% [
+					ENTRANCES_PATH,
+					json.get_error_line(),
+				]
+			)
+		)
 		return {}
 	var parsed: Variant = json.data
 	if not (parsed is Dictionary):
-		push_warning("EntranceSpawner: %s must contain a JSON object; no file entrances spawned." % ENTRANCES_PATH)
+		push_warning(
+			(
+				"EntranceSpawner: %s must contain a JSON object; no file entrances spawned."
+				% ENTRANCES_PATH
+			)
+		)
 		return {}
 	var data: Dictionary = parsed
 	var version_value: Variant = data.get("version")
 	if not _is_number(version_value) or int(version_value) != ENTRANCES_VERSION:
-		push_warning("EntranceSpawner: unsupported %s version; no file entrances spawned." % ENTRANCES_PATH)
+		push_warning(
+			"EntranceSpawner: unsupported %s version; no file entrances spawned." % ENTRANCES_PATH
+		)
 		return {}
 	return data
 
@@ -117,11 +141,16 @@ func _auto_sources(spawn_point_m: Vector2) -> Array:
 		if ring.size() < 3:
 			continue
 		var center: Vector2 = _ring_center_m(ring)
-		candidates.append({
-			"id": osm_id,
-			"center": center,
-			"distance": spawn_point_m.distance_squared_to(center),
-		})
+		(
+			candidates
+			. append(
+				{
+					"id": osm_id,
+					"center": center,
+					"distance": spawn_point_m.distance_squared_to(center),
+				}
+			)
+		)
 	candidates.sort_custom(_sort_candidates)
 	var sources: Array[EntranceData] = []
 	for index: int in range(mini(debug_auto_count, candidates.size())):
@@ -166,7 +195,12 @@ func _spawn(source: Resource) -> void:
 	source.normal = normal
 	var entrance := ENTRANCE_SCENE.instantiate() as Node
 	if entrance == null:
-		push_warning("EntranceSpawner: could not instantiate %s; skipped '%s'." % [ENTRANCE_SCENE.resource_path, source.id])
+		push_warning(
+			(
+				"EntranceSpawner: could not instantiate %s; skipped '%s'."
+				% [ENTRANCE_SCENE.resource_path, source.id]
+			)
+		)
 		return
 	entrance.set("data", source)
 	entrance.position = Units.to_px(source.get("position_m"))

@@ -30,11 +30,9 @@ const EDITOR_FRAME_MARGIN: float = 0.9
 ## 2D editor view used once on first open, in meters. Defaults to the original playtest area.
 @export var editor_initial_view_m: Rect2 = Rect2(1721.9, 2995.3, 1118.8, 2136.5)
 
-@export_tool_button("Rebuild map")
-var rebuild_button: Callable = rebuild
+@export_tool_button("Rebuild map") var rebuild_button: Callable = rebuild
 
-@export_tool_button("Frame full map")
-var frame_full_map_button: Callable = frame_full_map_editor
+@export_tool_button("Frame full map") var frame_full_map_button: Callable = frame_full_map_editor
 
 var map_size_m: Vector2 = Vector2.ZERO
 var map_bounds_px: Rect2 = Rect2()
@@ -149,9 +147,7 @@ func nearest_road_point_m(from_m: Vector2) -> Vector2:
 			continue
 		for index: int in range(line.size() - 1):
 			var candidate: Vector2 = Geometry2D.get_closest_point_to_segment(
-				from_m,
-				line[index],
-				line[index + 1]
+				from_m, line[index], line[index + 1]
 			)
 			var distance: float = from_m.distance_squared_to(candidate)
 			if distance < best_distance:
@@ -194,7 +190,12 @@ func _load_map() -> bool:
 	var build_start_usec: int = Time.get_ticks_usec()
 	var file: FileAccess = FileAccess.open(MAP_PATH, FileAccess.READ)
 	if file == null:
-		push_error("MapLoader: could not open %s (error %s)." % [MAP_PATH, error_string(FileAccess.get_open_error())])
+		push_error(
+			(
+				"MapLoader: could not open %s (error %s)."
+				% [MAP_PATH, error_string(FileAccess.get_open_error())]
+			)
+		)
 		return false
 	var json := JSON.new()
 	var parse_error: Error = json.parse(file.get_as_text())
@@ -202,11 +203,14 @@ func _load_map() -> bool:
 	var parse_end_usec: int = Time.get_ticks_usec()
 	if parse_error != OK:
 		push_error(
-			"MapLoader: invalid JSON in %s at line %d: %s" % [
-				MAP_PATH,
-				json.get_error_line(),
-				json.get_error_message(),
-			]
+			(
+				"MapLoader: invalid JSON in %s at line %d: %s"
+				% [
+					MAP_PATH,
+					json.get_error_line(),
+					json.get_error_message(),
+				]
+			)
 		)
 		return false
 	var parsed: Variant = json.data
@@ -288,18 +292,21 @@ func _log_build_stats() -> void:
 		return
 	print(
 		(
-			"MapLoader: %d features, %d polygons, %d collision shapes in %d ms "
-			+ "(parse %d, layers %d, collisions %d, terrain %d)."
-		) % [
-			int(build_stats.get("features", 0)),
-			int(build_stats.get("polygons", 0)),
-			int(build_stats.get("collision_shapes", 0)),
-			int(build_stats.get("total_ms", 0)),
-			int(build_stats.get("parse_ms", 0)),
-			int(build_stats.get("layers_ms", 0)),
-			int(build_stats.get("collisions_ms", 0)),
-			int(build_stats.get("terrain_ms", 0)),
-		]
+			(
+				"MapLoader: %d features, %d polygons, %d collision shapes in %d ms "
+				+ "(parse %d, layers %d, collisions %d, terrain %d)."
+			)
+			% [
+				int(build_stats.get("features", 0)),
+				int(build_stats.get("polygons", 0)),
+				int(build_stats.get("collision_shapes", 0)),
+				int(build_stats.get("total_ms", 0)),
+				int(build_stats.get("parse_ms", 0)),
+				int(build_stats.get("layers_ms", 0)),
+				int(build_stats.get("collisions_ms", 0)),
+				int(build_stats.get("terrain_ms", 0)),
+			]
+		)
 	)
 
 
@@ -444,7 +451,9 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 				)
 
 
-func _resolve_style(category: StringName, osm_id: String, kind: String, raw_surface: String) -> TerrainStyle:
+func _resolve_style(
+	category: StringName, osm_id: String, kind: String, raw_surface: String
+) -> TerrainStyle:
 	var terrain_style: TerrainStyle = null
 	if not osm_id.is_empty() and _overrides.has(osm_id):
 		var override_id: StringName = StringName(str(_overrides[osm_id]))
@@ -548,16 +557,25 @@ func _read_overrides() -> Dictionary:
 		return {}
 	var parsed: Variant = json.data
 	if not (parsed is Dictionary):
-		push_warning("MapLoader: %s must contain a JSON object; ignoring style overrides." % OVERRIDES_PATH)
+		push_warning(
+			"MapLoader: %s must contain a JSON object; ignoring style overrides." % OVERRIDES_PATH
+		)
 		return {}
 	var data: Dictionary = parsed
 	var version_value: Variant = data.get("version")
 	if not _is_number(version_value) or int(version_value) != OVERRIDES_VERSION:
-		push_warning("MapLoader: unsupported %s version; ignoring style overrides." % OVERRIDES_PATH)
+		push_warning(
+			"MapLoader: unsupported %s version; ignoring style overrides." % OVERRIDES_PATH
+		)
 		return {}
 	var overrides_value: Variant = data.get("overrides")
 	if not (overrides_value is Dictionary):
-		push_warning("MapLoader: %s is missing an 'overrides' object; ignoring style overrides." % OVERRIDES_PATH)
+		push_warning(
+			(
+				"MapLoader: %s is missing an 'overrides' object; ignoring style overrides."
+				% OVERRIDES_PATH
+			)
+		)
 		return {}
 	var overrides_data: Dictionary = overrides_value
 	var result: Dictionary = {}
@@ -607,12 +625,17 @@ func _collect_road_features(features: Array) -> void:
 		_road_lines_m.append(line)
 		var width_value: Variant = feature_data.get("width")
 		var width: float = float(width_value) if _is_number(width_value) else 0.0
-		_road_features_m.append({
-			"id": str(feature_data.get("id", "")),
-			"kind": StringName(str(feature_data.get("kind", ""))),
-			"width": width,
-			"line": line,
-		})
+		(
+			_road_features_m
+			. append(
+				{
+					"id": str(feature_data.get("id", "")),
+					"kind": StringName(str(feature_data.get("kind", ""))),
+					"width": width,
+					"line": line,
+				}
+			)
+		)
 
 
 func _line_to_m(line: Array) -> PackedVector2Array:
@@ -682,7 +705,9 @@ func _outer_rings_px(feature_data: Dictionary) -> Array[PackedVector2Array]:
 	return rings_px
 
 
-func _add_collision_polygon(body: StaticBody2D, points_px: PackedVector2Array, osm_id: String) -> void:
+func _add_collision_polygon(
+	body: StaticBody2D, points_px: PackedVector2Array, osm_id: String
+) -> void:
 	if points_px.size() < 3 or Geometry2D.triangulate_polygon(points_px).is_empty():
 		_collision_skip_count += 1
 		return
@@ -742,8 +767,7 @@ func _frame_editor_view_once() -> bool:
 	var target_bounds: Rect2 = map_bounds_px
 	if editor_initial_view_m.size.x > 0.0 and editor_initial_view_m.size.y > 0.0:
 		target_bounds = Rect2(
-			Units.to_px(editor_initial_view_m.position),
-			Units.to_px(editor_initial_view_m.size)
+			Units.to_px(editor_initial_view_m.position), Units.to_px(editor_initial_view_m.size)
 		)
 	var visible_world: Rect2 = viewport.global_canvas_transform.affine_inverse() * view_rect
 	if visible_world.intersects(target_bounds):

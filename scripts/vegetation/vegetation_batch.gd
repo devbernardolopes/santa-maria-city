@@ -16,10 +16,7 @@ var _mode: Mode = Mode.GROUND
 
 
 func configure(
-	data: VegetationChunkData,
-	rules: VegetationRules,
-	origin_m: Vector2,
-	mode: Mode
+	data: VegetationChunkData, rules: VegetationRules, origin_m: Vector2, mode: Mode
 ) -> void:
 	_data = data
 	_rules = rules
@@ -67,11 +64,7 @@ func _draw_ground(species: VegetationSpecies, index: int) -> void:
 		VegetationSpecies.Kind.BUSH:
 			if species.ground_texture != null:
 				_draw_textured(
-					species.ground_texture,
-					position,
-					radius * 2.0,
-					rotation,
-					species.ground_color
+					species.ground_texture, position, radius * 2.0, rotation, species.ground_color
 				)
 			else:
 				draw_circle(position, radius, species.ground_color)
@@ -83,11 +76,7 @@ func _draw_ground(species: VegetationSpecies, index: int) -> void:
 		VegetationSpecies.Kind.ROCK:
 			if species.ground_texture != null:
 				_draw_textured(
-					species.ground_texture,
-					position,
-					radius * 2.0,
-					rotation,
-					species.ground_color
+					species.ground_texture, position, radius * 2.0, rotation, species.ground_color
 				)
 			else:
 				_draw_rock(position, radius, rotation, species.ground_color)
@@ -99,13 +88,7 @@ func _draw_canopy(species: VegetationSpecies, index: int) -> void:
 	var rotation: float = _data.rotations[index]
 	var canopy_color: Color = _with_alpha(species.canopy_color, species.canopy_alpha)
 	if species.canopy_texture != null:
-		_draw_textured(
-			species.canopy_texture,
-			position,
-			radius * 2.0,
-			rotation,
-			canopy_color
-		)
+		_draw_textured(species.canopy_texture, position, radius * 2.0, rotation, canopy_color)
 		return
 	draw_circle(position, radius, canopy_color)
 	draw_circle(
@@ -119,10 +102,7 @@ func _draw_shadow(position: Vector2, radius: float) -> void:
 	var center: Vector2 = position + Units.to_px(SHADOW_OFFSET_M)
 	var shadow_radius: float = maxf(radius * SHADOW_RADIUS_SCALE, 1.0)
 	var points: PackedVector2Array = _ellipse(
-		center,
-		shadow_radius,
-		shadow_radius * SHADOW_HEIGHT_SCALE,
-		16
+		center, shadow_radius, shadow_radius * SHADOW_HEIGHT_SCALE, 16
 	)
 	draw_colored_polygon(points, SHADOW_COLOR)
 
@@ -141,30 +121,20 @@ func _draw_rock(position: Vector2, radius: float, rotation: float, color: Color)
 
 
 func _draw_textured(
-	texture: Texture2D,
-	position: Vector2,
-	diameter: float,
-	rotation: float,
-	tint: Color
+	texture: Texture2D, position: Vector2, diameter: float, rotation: float, tint: Color
 ) -> void:
 	if texture == null:
 		return
 	var half: float = maxf(diameter * 0.5, 0.5)
 	draw_set_transform(position, rotation, Vector2.ONE)
 	draw_texture_rect(
-		texture,
-		Rect2(-Vector2(half, half), Vector2(diameter, diameter)),
-		false,
-		tint
+		texture, Rect2(-Vector2(half, half), Vector2(diameter, diameter)), false, tint
 	)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 func _ellipse(
-	center: Vector2,
-	radius_x: float,
-	radius_y: float,
-	segments: int
+	center: Vector2, radius_x: float, radius_y: float, segments: int
 ) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for index: int in range(maxi(segments, 3)):

@@ -107,9 +107,7 @@ func _resolve_omni(delta: float) -> void:
 		facing = move_vector.normalized()
 		if _visual != null:
 			_visual.rotation = lerp_angle(
-				_visual.rotation,
-				facing.angle(),
-				minf(1.0, delta * TURN_RATE)
+				_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
 			)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
@@ -127,9 +125,7 @@ func _resolve_relative(delta: float) -> void:
 		facing = facing.rotated(turn_input * turn_rate * delta)
 	if _visual != null and (absf(turn_input) > 0.001 or absf(throttle_input) > 0.001):
 		_visual.rotation = lerp_angle(
-			_visual.rotation,
-			facing.angle(),
-			minf(1.0, delta * TURN_RATE)
+			_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
 		)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	var move_speed_factor: float = 1.0
@@ -140,7 +136,10 @@ func _resolve_relative(delta: float) -> void:
 		move_speed_factor = reverse_factor
 	var throttle_magnitude: float = absf(throttle_input)
 	var move_vector: Vector2 = facing * throttle_input
-	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
+	velocity = (
+		move_vector
+		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
+	)
 	move_and_slide()
 
 
@@ -148,14 +147,21 @@ func _resolve_relative(delta: float) -> void:
 func _update_terrain(delta: float) -> void:
 	_terrain_timer -= delta
 	var position_m := Vector2(Units.px_to_m(global_position.x), Units.px_to_m(global_position.y))
-	if _terrain_timer > 0.0 and position_m.distance_to(_last_sample_pos_m) < TERRAIN_SAMPLE_DISTANCE_M:
+	if (
+		_terrain_timer > 0.0
+		and position_m.distance_to(_last_sample_pos_m) < TERRAIN_SAMPLE_DISTANCE_M
+	):
 		return
 	_terrain_timer = TERRAIN_SAMPLE_INTERVAL_S
 	_last_sample_pos_m = position_m
 	var query: TerrainQuery = TerrainQuery.active
-	var sample: TerrainSample = TerrainSample.default_sample() if query == null else query.sample(position_m)
+	var sample: TerrainSample = (
+		TerrainSample.default_sample() if query == null else query.sample(position_m)
+	)
 	current_terrain = sample
-	var rules: TerrainRules = terrain_rules if terrain_rules != null else TerrainRules.shared_default()
+	var rules: TerrainRules = (
+		terrain_rules if terrain_rules != null else TerrainRules.shared_default()
+	)
 	_terrain_speed_factor = rules.get_speed_factor(sample)
 
 

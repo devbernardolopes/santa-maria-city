@@ -100,9 +100,7 @@ func _generate_road_street_trees(road: Dictionary, road_index: int) -> void:
 		var segment_end: float = cumulative + segment_length
 		while next_distance <= segment_end + 0.0001:
 			var offset_in_segment: float = clampf(
-				(next_distance - cumulative) / segment_length,
-				0.0,
-				1.0
+				(next_distance - cumulative) / segment_length, 0.0, 1.0
 			)
 			var point: Vector2 = from.lerp(to, offset_in_segment)
 			var tangent: Vector2 = (to - from) / segment_length
@@ -154,9 +152,7 @@ func generate_chunk(chunk: Vector2i) -> VegetationChunkData:
 			if rule == null:
 				continue
 			var acceptance: float = clampf(
-				rule.density_per_100m2 * CELL_SIZE_M * CELL_SIZE_M / 100.0,
-				0.0,
-				1.0
+				rule.density_per_100m2 * CELL_SIZE_M * CELL_SIZE_M / 100.0, 0.0, 1.0
 			)
 			if rng.randf() > acceptance:
 				continue
@@ -244,16 +240,21 @@ func _add_street_tree(
 	var bucket_value: Variant = _street_by_chunk.get(chunk)
 	if bucket_value is Array:
 		bucket = bucket_value
-	bucket.append({
-		"position_m": position_m,
-		"species_index": species_index,
-		"radius_m": _random_radius(species, rng),
-		"rotation": rng.randf() * TAU,
-		"age_years": _random_age(species, rng),
-		"key": key,
-		"road_index": road_index,
-		"street_index": street_index,
-	})
+	(
+		bucket
+		. append(
+			{
+				"position_m": position_m,
+				"species_index": species_index,
+				"radius_m": _random_radius(species, rng),
+				"rotation": rng.randf() * TAU,
+				"age_years": _random_age(species, rng),
+				"key": key,
+				"road_index": road_index,
+				"street_index": street_index,
+			}
+		)
+	)
 	_street_by_chunk[chunk] = bucket
 	_street_tree_count += 1
 
@@ -269,10 +270,7 @@ func get_indexed_street_road_count() -> int:
 
 
 func _terrain_position_ok(
-	position_m: Vector2,
-	category: StringName,
-	clearance_m: float,
-	query: TerrainQuery
+	position_m: Vector2, category: StringName, clearance_m: float, query: TerrainQuery
 ) -> bool:
 	var clearance: float = maxf(clearance_m, 0.0)
 	if clearance <= 0.0:
@@ -386,10 +384,7 @@ func _find_max_street_clearance() -> float:
 
 
 func _chunk_of(position_m: Vector2) -> Vector2i:
-	return Vector2i(
-		floori(position_m.x / CHUNK_SIZE_M),
-		floori(position_m.y / CHUNK_SIZE_M)
-	)
+	return Vector2i(floori(position_m.x / CHUNK_SIZE_M), floori(position_m.y / CHUNK_SIZE_M))
 
 
 func _cell_key(cx: int, cy: int) -> String:

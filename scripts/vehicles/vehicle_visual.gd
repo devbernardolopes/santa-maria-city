@@ -19,7 +19,9 @@ func setup(data: VehicleData) -> void:
 	_ensure_sprite()
 	if _sprite != null:
 		_sprite.sprite_frames = _build_frames(data)
-		_sprite.rotation = NORTH_FACING_ROTATION if data != null and data.sprite_faces_north else 0.0
+		_sprite.rotation = (
+			NORTH_FACING_ROTATION if data != null and data.sprite_faces_north else 0.0
+		)
 		_sprite.scale = _sprite_scale(data)
 		_sprite.visible = data != null and not data.frames.is_empty()
 	_apply_lights()
@@ -93,10 +95,5 @@ func _draw() -> void:
 	var body := Rect2(-length_px * 0.5, -width_px * 0.5, length_px, width_px)
 	draw_rect(body, fallback_color)
 	draw_rect(body, fallback_color.darkened(0.3), false, maxf(1.0, Units.m_to_px(0.05)))
-	var windshield := Rect2(
-		length_px * 0.12,
-		-width_px * 0.36,
-		length_px * 0.16,
-		width_px * 0.72
-	)
+	var windshield := Rect2(length_px * 0.12, -width_px * 0.36, length_px * 0.16, width_px * 0.72)
 	draw_rect(windshield, fallback_color.lightened(0.35))

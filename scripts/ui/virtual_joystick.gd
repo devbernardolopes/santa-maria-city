@@ -90,16 +90,7 @@ func _draw() -> void:
 		return
 	var center: Vector2 = size * 0.5
 	draw_circle(center, radius, BASE_COLOR)
-	draw_arc(
-		center,
-		radius,
-		0.0,
-		TAU,
-		64,
-		RING_COLOR,
-		maxf(1.0, radius * RING_WIDTH_RATIO),
-		true
-	)
+	draw_arc(center, radius, 0.0, TAU, 64, RING_COLOR, maxf(1.0, radius * RING_WIDTH_RATIO), true)
 	var knob_radius: float = _knob_radius()
 	var knob_position: Vector2 = center + _value * (radius - knob_radius)
 	draw_circle(knob_position, knob_radius, KNOB_COLOR)

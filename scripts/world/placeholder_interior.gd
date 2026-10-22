@@ -16,11 +16,13 @@ const LABEL_COLOR: Color = Color(0.9, 0.88, 0.8)
 
 
 func _ready() -> void:
+	# bounds_m is set by the InteriorManager from the building footprint
+	# before we enter the tree; if empty, derive from room_size_m
+	if bounds_m.size.x <= 0.0 or bounds_m.size.y <= 0.0:
+		bounds_m = Rect2(
+			Vector2.ONE * -WALL_THICKNESS_M, room_size_m + Vector2.ONE * (WALL_THICKNESS_M * 2.0)
+		)
 	var size_px: Vector2 = Units.to_px(room_size_m)
-	bounds_m = Rect2(
-		Vector2.ONE * -WALL_THICKNESS_M,
-		room_size_m + Vector2.ONE * (WALL_THICKNESS_M * 2.0)
-	)
 	_build_floor(size_px)
 	_build_walls(size_px)
 	var objects_node := Node2D.new()
@@ -29,18 +31,23 @@ func _ready() -> void:
 	add_child(objects_node)
 	_build_entry_and_exit(size_px, objects_node)
 	_build_label()
+	# ensure entry point and objects are found
+	_entry_point = get_node_or_null("EntryPoint") as Marker2D
+	_objects = get_node_or_null("Objects") as Node2D
 	super._ready()
 
 
 func _build_floor(size_px: Vector2) -> void:
 	var floor_polygon := Polygon2D.new()
 	floor_polygon.name = "Floor"
-	floor_polygon.polygon = PackedVector2Array([
-		Vector2.ZERO,
-		Vector2(size_px.x, 0.0),
-		size_px,
-		Vector2(0.0, size_px.y),
-	])
+	floor_polygon.polygon = PackedVector2Array(
+		[
+			Vector2.ZERO,
+			Vector2(size_px.x, 0.0),
+			size_px,
+			Vector2(0.0, size_px.y),
+		]
+	)
 	floor_polygon.color = FLOOR_COLOR
 	add_child(floor_polygon)
 
@@ -95,9 +102,11 @@ func _build_label() -> void:
 
 
 func _rect_points(rect_px: Rect2) -> PackedVector2Array:
-	return PackedVector2Array([
-		rect_px.position,
-		Vector2(rect_px.end.x, rect_px.position.y),
-		rect_px.end,
-		Vector2(rect_px.position.x, rect_px.end.y),
-	])
+	return PackedVector2Array(
+		[
+			rect_px.position,
+			Vector2(rect_px.end.x, rect_px.position.y),
+			rect_px.end,
+			Vector2(rect_px.position.x, rect_px.end.y),
+		]
+	)

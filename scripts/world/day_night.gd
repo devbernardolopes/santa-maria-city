@@ -41,7 +41,12 @@ func _apply_target(instant: bool) -> void:
 		return
 	_kill_tween()
 	_tween = create_tween()
-	_tween.tween_property(self, "color", target, TWEEN_DURATION_S).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	(
+		_tween
+		. tween_property(self, "color", target, TWEEN_DURATION_S)
+		. set_trans(Tween.TRANS_CUBIC)
+		. set_ease(Tween.EASE_IN_OUT)
+	)
 
 
 func _target_color() -> Color:
@@ -54,15 +59,23 @@ func _target_color() -> Color:
 	if hour < sunrise - TWILIGHT_WINDOW_HOURS:
 		result = NIGHT_COLOR
 	elif hour < sunrise:
-		result = NIGHT_COLOR.lerp(TWILIGHT_COLOR, smoothstep(sunrise - TWILIGHT_WINDOW_HOURS, sunrise, hour))
+		result = NIGHT_COLOR.lerp(
+			TWILIGHT_COLOR, smoothstep(sunrise - TWILIGHT_WINDOW_HOURS, sunrise, hour)
+		)
 	elif hour < sunrise + TWILIGHT_WINDOW_HOURS:
-		result = TWILIGHT_COLOR.lerp(DAY_COLOR, smoothstep(sunrise, sunrise + TWILIGHT_WINDOW_HOURS, hour))
+		result = TWILIGHT_COLOR.lerp(
+			DAY_COLOR, smoothstep(sunrise, sunrise + TWILIGHT_WINDOW_HOURS, hour)
+		)
 	elif hour < sunset - TWILIGHT_WINDOW_HOURS:
 		result = DAY_COLOR
 	elif hour < sunset:
-		result = DAY_COLOR.lerp(TWILIGHT_COLOR, smoothstep(sunset - TWILIGHT_WINDOW_HOURS, sunset, hour))
+		result = DAY_COLOR.lerp(
+			TWILIGHT_COLOR, smoothstep(sunset - TWILIGHT_WINDOW_HOURS, sunset, hour)
+		)
 	elif hour < sunset + TWILIGHT_WINDOW_HOURS:
-		result = TWILIGHT_COLOR.lerp(NIGHT_COLOR, smoothstep(sunset, sunset + TWILIGHT_WINDOW_HOURS, hour))
+		result = TWILIGHT_COLOR.lerp(
+			NIGHT_COLOR, smoothstep(sunset, sunset + TWILIGHT_WINDOW_HOURS, hour)
+		)
 	else:
 		result = NIGHT_COLOR
 	var weather: WeatherSample = GameWeather.current

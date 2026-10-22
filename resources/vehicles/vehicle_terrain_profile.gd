@@ -106,6 +106,8 @@ func _factor_of(table: Dictionary, key: StringName) -> float:
 	if value == null:
 		return NAN
 	if not (value is float) and not (value is int):
-		push_warning("VehicleTerrainProfile: entry for '%s' is not a number; ignored." % String(key))
+		push_warning(
+			"VehicleTerrainProfile: entry for '%s' is not a number; ignored." % String(key)
+		)
 		return NAN
 	return float(value)

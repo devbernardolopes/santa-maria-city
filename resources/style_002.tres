@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="MapStyle" format=3 uid="uid://yk6r1f5gcvvx"]
 
 [ext_resource type="Script" uid="uid://crsl4l1sgw012" path="res://resources/terrain_style.gd" id="1_mud50"]
-[ext_resource type="Texture2D" uid="uid://bpkqvr63qu32m" path="res://assets/images/textures/roof_tiles_arched.png" id="2_di6a0"]
 [ext_resource type="Texture2D" uid="uid://bhyec6spywrrp" path="res://assets/images/textures/asphalt_road.jpg" id="2_rduk6"]
 [ext_resource type="Script" uid="uid://cvgwo4nfal7e0" path="res://resources/map_style.gd" id="2_y6kca"]
 [ext_resource type="Texture2D" uid="uid://dmhyb613vnk37" path="res://assets/images/textures/grass-01.png" id="3_di6a0"]
@@ -13,8 +12,7 @@
 [sub_resource type="Resource" id="Resource_lxefa"]
 script = ExtResource("1_mud50")
 id = &"default_building"
-color = Color(0.92775965, 0.41108245, 0.18517146, 1)
-texture = ExtResource("2_di6a0")
+color = Color(0.40770593, 0.086642064, 0.3120602, 1)
 
 [sub_resource type="Resource" id="Resource_tvbdg"]
 script = ExtResource("1_mud50")

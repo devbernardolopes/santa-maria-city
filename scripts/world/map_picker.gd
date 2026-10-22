@@ -57,7 +57,11 @@ func _pick_at(world_point: Vector2) -> void:
 		return
 	_outline.points = _to_local_points(world_points)
 	var camera: Camera2D = get_viewport().get_camera_2d()
-	_outline.width = OUTLINE_SCREEN_WIDTH / maxf(camera.zoom.x, 0.0001) if camera != null else OUTLINE_SCREEN_WIDTH
+	_outline.width = (
+		OUTLINE_SCREEN_WIDTH / maxf(camera.zoom.x, 0.0001)
+		if camera != null
+		else OUTLINE_SCREEN_WIDTH
+	)
 	_outline.visible = true
 	var osm_id: String = str(info.get("id", ""))
 	if not osm_id.is_empty():

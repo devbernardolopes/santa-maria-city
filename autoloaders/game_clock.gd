@@ -1,7 +1,7 @@
 extends Node
 ## In-game calendar and clock. total_seconds since 1970-01-01 00:00 is the single source of truth.
 
-signal minute_changed()
+signal minute_changed
 signal hour_changed(hour: int)
 signal day_changed(year: int, month: int, day: int)
 signal period_changed(period: int)
@@ -145,12 +145,15 @@ func format_time() -> String:
 func format_date() -> String:
 	var days: int = get_days()
 	var civil: Vector3i = GameCalendar.civil_from_days(days)
-	return "%s %d %s %d" % [
-		GameCalendar.weekday_name(GameCalendar.weekday_of_days(days)),
-		civil.z,
-		GameCalendar.month_name(civil.y),
-		civil.x,
-	]
+	return (
+		"%s %d %s %d"
+		% [
+			GameCalendar.weekday_name(GameCalendar.weekday_of_days(days)),
+			civil.z,
+			GameCalendar.month_name(civil.y),
+			civil.x,
+		]
+	)
 
 
 func set_time_scale(value: float) -> void:
@@ -173,7 +176,9 @@ func set_datetime(year: int, month: int, day: int, hour: float) -> void:
 		return
 	var max_day: int = GameCalendar.days_in_month(year, month)
 	if day < 1 or day > max_day:
-		push_warning("GameClock: set_datetime day %d out of range (1-%d); ignored." % [day, max_day])
+		push_warning(
+			"GameClock: set_datetime day %d out of range (1-%d); ignored." % [day, max_day]
+		)
 		return
 	if hour < 0.0 or hour > 24.0:
 		push_warning("GameClock: set_datetime hour %.2f out of range (0-24); ignored." % hour)

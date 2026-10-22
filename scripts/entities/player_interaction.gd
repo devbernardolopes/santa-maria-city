@@ -62,7 +62,11 @@ func _physics_process(_delta: float) -> void:
 
 
 func _set_target(target: Interactable) -> void:
-	if _current != null and is_instance_valid(_current) and _current.rejected.is_connected(_on_rejected):
+	if (
+		_current != null
+		and is_instance_valid(_current)
+		and _current.rejected.is_connected(_on_rejected)
+	):
 		_current.rejected.disconnect(_on_rejected)
 	_current = target
 	_current_prompt = ""

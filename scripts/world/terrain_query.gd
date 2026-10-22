@@ -106,7 +106,9 @@ func kind_at(position_m: Vector2) -> StringName:
 
 func _index_polygon_in_cells(polygon_index: int) -> void:
 	var bounds: Rect2 = _bounds[polygon_index]
-	var min_column: int = clampi(floori((bounds.position.x - _origin_m.x) / CELL_SIZE_M), 0, _columns - 1)
+	var min_column: int = clampi(
+		floori((bounds.position.x - _origin_m.x) / CELL_SIZE_M), 0, _columns - 1
+	)
 	var min_row: int = clampi(floori((bounds.position.y - _origin_m.y) / CELL_SIZE_M), 0, _rows - 1)
 	var max_column: int = clampi(ceili((bounds.end.x - _origin_m.x) / CELL_SIZE_M), 0, _columns - 1)
 	var max_row: int = clampi(ceili((bounds.end.y - _origin_m.y) / CELL_SIZE_M), 0, _rows - 1)

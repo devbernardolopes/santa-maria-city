@@ -6,17 +6,46 @@ enum Sex { MALE, FEMALE }
 enum Ability { STRENGTH, DEXTERITY, CONSTITUTION, INTELLIGENCE, WISDOM, CHARISMA }
 
 const MALE_FIRST_NAMES: Array[String] = [
-	"João", "Pedro", "Lucas", "Gabriel", "Rafael", "Bruno", "Carlos", "Eduardo",
+	"João",
+	"Pedro",
+	"Lucas",
+	"Gabriel",
+	"Rafael",
+	"Bruno",
+	"Carlos",
+	"Eduardo",
 ]
 const FEMALE_FIRST_NAMES: Array[String] = [
-	"Maria", "Ana", "Júlia", "Beatriz", "Camila", "Fernanda", "Larissa", "Patrícia",
+	"Maria",
+	"Ana",
+	"Júlia",
+	"Beatriz",
+	"Camila",
+	"Fernanda",
+	"Larissa",
+	"Patrícia",
 ]
 const LAST_NAMES: Array[String] = [
-	"Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida",
+	"Silva",
+	"Santos",
+	"Oliveira",
+	"Souza",
+	"Pereira",
+	"Costa",
+	"Rodrigues",
+	"Almeida",
 ]
 const INTEREST_TAGS: Array[StringName] = [
-	&"music", &"football", &"cooking", &"reading", &"gardening",
-	&"travel", &"coffee", &"fishing", &"movies", &"walking",
+	&"music",
+	&"football",
+	&"cooking",
+	&"reading",
+	&"gardening",
+	&"travel",
+	&"coffee",
+	&"fishing",
+	&"movies",
+	&"walking",
 ]
 const DAYS_IN_MONTH: Array[int] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
@@ -72,11 +101,16 @@ func get_age_years(year: int, month: int, day: int) -> int:
 static func create_random(rng: RandomNumberGenerator) -> EntityData:
 	var data := EntityData.new()
 	data.sex = EntityData.Sex.MALE if rng.randi_range(0, 1) == 0 else EntityData.Sex.FEMALE
-	var first_names: Array[String] = MALE_FIRST_NAMES if data.sex == EntityData.Sex.MALE else FEMALE_FIRST_NAMES
-	data.full_name = "%s %s" % [
-		first_names[rng.randi_range(0, first_names.size() - 1)],
-		LAST_NAMES[rng.randi_range(0, LAST_NAMES.size() - 1)],
-	]
+	var first_names: Array[String] = (
+		MALE_FIRST_NAMES if data.sex == EntityData.Sex.MALE else FEMALE_FIRST_NAMES
+	)
+	data.full_name = (
+		"%s %s"
+		% [
+			first_names[rng.randi_range(0, first_names.size() - 1)],
+			LAST_NAMES[rng.randi_range(0, LAST_NAMES.size() - 1)],
+		]
+	)
 	data.birth_year = rng.randi_range(1950, 2008)
 	data.birth_month = rng.randi_range(1, 12)
 	data.birth_day = rng.randi_range(1, _days_in_month(data.birth_month, data.birth_year))
@@ -111,7 +145,9 @@ static func _is_leap_year(year: int) -> bool:
 	return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
-static func _pick_tags(rng: RandomNumberGenerator, source: Array[StringName], count: int) -> Array[StringName]:
+static func _pick_tags(
+	rng: RandomNumberGenerator, source: Array[StringName], count: int
+) -> Array[StringName]:
 	var pool: Array[StringName] = []
 	pool.assign(source)
 	var result: Array[StringName] = []

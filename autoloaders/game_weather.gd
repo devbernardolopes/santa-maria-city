@@ -48,7 +48,9 @@ static func compute(seed_value: int, total_seconds: float) -> WeatherSample:
 		sample.condition = WeatherSample.Condition.CLOUDY
 	else:
 		sample.condition = WeatherSample.Condition.CLEAR
-	sample.temperature_c = _temperature_c(seed_value, total_seconds, sample.cloud_cover, sample.is_raining())
+	sample.temperature_c = _temperature_c(
+		seed_value, total_seconds, sample.cloud_cover, sample.is_raining()
+	)
 	return sample
 
 
@@ -91,14 +93,22 @@ func _publish() -> void:
 		weather_changed.emit(current)
 
 
-static func _temperature_c(seed_value: int, total_seconds: float, cloud_cover: float, raining: bool) -> float:
+static func _temperature_c(
+	seed_value: int, total_seconds: float, cloud_cover: float, raining: bool
+) -> float:
 	var t_days: float = total_seconds / GameCalendar.SECONDS_PER_DAY
 	var days: int = floori(t_days)
 	var civil: Vector3i = GameCalendar.civil_from_days(days)
 	var doy: int = GameCalendar.day_of_year(civil.x, civil.y, civil.z)
-	var hour: float = fposmod(total_seconds, GameCalendar.SECONDS_PER_DAY) / GameCalendar.SECONDS_PER_HOUR
-	var seasonal: float = SEASONAL_BASE_C + SEASONAL_AMPLITUDE_C * cos(TAU * (doy - SEASONAL_PEAK_DOY) / 365.0)
-	var diurnal: float = DIURNAL_AMPLITUDE_C * cos(TAU * (hour - DIURNAL_PEAK_HOUR) / DIURNAL_PERIOD_HOURS)
+	var hour: float = (
+		fposmod(total_seconds, GameCalendar.SECONDS_PER_DAY) / GameCalendar.SECONDS_PER_HOUR
+	)
+	var seasonal: float = (
+		SEASONAL_BASE_C + SEASONAL_AMPLITUDE_C * cos(TAU * (doy - SEASONAL_PEAK_DOY) / 365.0)
+	)
+	var diurnal: float = (
+		DIURNAL_AMPLITUDE_C * cos(TAU * (hour - DIURNAL_PEAK_HOUR) / DIURNAL_PERIOD_HOURS)
+	)
 	var day_offset: float = (
 		DAY_OFFSET_AMPLITUDE_C
 		* _noise_1d(seed_value + OFFSET_NOISE_SALT, t_days / DAY_OFFSET_SCALE_DAYS)

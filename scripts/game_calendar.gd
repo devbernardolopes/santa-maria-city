@@ -19,7 +19,9 @@ const DAY_LENGTH_PEAK_DOY: int = 355
 
 const DAYS_IN_MONTH: Array[int] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const WEEKDAY_NAMES: Array[String] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-const MONTH_NAMES: Array[String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const MONTH_NAMES: Array[String] = [
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+]
 
 
 static func is_leap_year(year: int) -> bool:
@@ -52,7 +54,9 @@ static func civil_from_days(days: int) -> Vector3i:
 	var shifted_days: int = days + EPOCH_SHIFT_DAYS
 	var era: int = _floor_div(shifted_days, DAYS_PER_ERA)
 	var day_of_era: int = shifted_days - era * DAYS_PER_ERA
-	var year_of_era: int = (day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365
+	var year_of_era: int = (
+		(day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365
+	)
 	var year: int = year_of_era + era * 400
 	var day_of_year: int = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100)
 	var month_prime: int = _floor_div(5 * day_of_year + 2, 153)

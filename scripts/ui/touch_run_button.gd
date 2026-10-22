@@ -64,16 +64,7 @@ func _draw() -> void:
 		return
 	var center: Vector2 = size * 0.5
 	draw_circle(center, radius, PRESSED_COLOR if _pressed else BASE_COLOR)
-	draw_arc(
-		center,
-		radius,
-		0.0,
-		TAU,
-		64,
-		RING_COLOR,
-		maxf(1.0, radius * RING_WIDTH_RATIO),
-		true
-	)
+	draw_arc(center, radius, 0.0, TAU, 64, RING_COLOR, maxf(1.0, radius * RING_WIDTH_RATIO), true)
 	var font: Font = ThemeDB.fallback_font
 	var font_size: int = maxi(12, int(size.x * 0.18))
 	var text := "RUN"

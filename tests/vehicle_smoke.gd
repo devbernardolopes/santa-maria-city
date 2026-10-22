@@ -152,15 +152,15 @@ func _test_spawner() -> void:
 		root.queue_free()
 		return
 	file.store_string(
-		'{"version":1,"vehicles":[{"id":"v_test",'
-		+ '"data":"res://resources/vehicles/taxi.tres",'
-		+ '"position":[200.0,0.0],"heading_deg":90}]}'
+		(
+			'{"version":1,"vehicles":[{"id":"v_test",'
+			+ '"data":"res://resources/vehicles/taxi.tres",'
+			+ '"position":[200.0,0.0],"heading_deg":90}]}'
+		)
 	)
 	file.close()
 	var spawned: Array[Vehicle] = []
-	spawner.vehicle_spawned.connect(
-		func(vehicle: Vehicle) -> void: spawned.append(vehicle)
-	)
+	spawner.vehicle_spawned.connect(func(vehicle: Vehicle) -> void: spawned.append(vehicle))
 	await get_tree().physics_frame
 	spawner.spawn_vehicles(Vector2.ZERO)
 	if spawned.size() != 1:
@@ -250,8 +250,10 @@ func _test_blocked_vehicle() -> void:
 		await get_tree().physics_frame
 	var health_after: float = vehicle.health
 	print(
-		"VEHICLE SMOKE blocked speed: %.3f m/s, health %.1f -> %.1f"
-		% [blocked_speed, health_before, health_after]
+		(
+			"VEHICLE SMOKE blocked speed: %.3f m/s, health %.1f -> %.1f"
+			% [blocked_speed, health_before, health_after]
+		)
 	)
 	if blocked_speed > 0.5:
 		_fail("blocked vehicle still reports %.2f m/s" % blocked_speed)

@@ -16,7 +16,12 @@ func register(data: EntityData) -> StringName:
 	if not data.id.is_empty():
 		if _data_by_id.has(data.id):
 			if _data_by_id[data.id] != data:
-				push_warning("EntityRegistry: id '%s' is already registered; keeping the existing data." % data.id)
+				push_warning(
+					(
+						"EntityRegistry: id '%s' is already registered; keeping the existing data."
+						% data.id
+					)
+				)
 			return data.id
 		_data_by_id[data.id] = data
 		entity_registered.emit(data.id)
