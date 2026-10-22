@@ -53,6 +53,7 @@ script = ExtResource("6_follow")
 
 [node name="DebugSpawner" type="Node" parent="." unique_id=79334371]
 script = ExtResource("7_spawner")
+npc_count = 200
 
 [node name="EntranceSpawner" type="Node" parent="." unique_id=1414353084]
 script = ExtResource("10_entrance_spawner")

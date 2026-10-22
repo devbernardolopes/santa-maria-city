@@ -32,6 +32,8 @@ func _run() -> void:
 	add_child(_map)
 	if not await _wait_for_map():
 		return
+	if not _validate_lazy_street_trees():
+		return
 
 	var decals := Node2D.new()
 	decals.name = "Decals"
@@ -103,6 +105,50 @@ func _wait_for_map() -> bool:
 		_fail("map did not load within %d ms" % MAP_WAIT_MS)
 		return false
 	return true
+
+
+func _validate_lazy_street_trees() -> bool:
+	var rules: VegetationRules = VegetationRules.shared_default()
+	var bounds_px: Rect2 = _map.map_bounds_px
+	var bounds_m := Rect2(
+		Vector2(Units.px_to_m(bounds_px.position.x), Units.px_to_m(bounds_px.position.y)),
+		Vector2(Units.px_to_m(bounds_px.size.x), Units.px_to_m(bounds_px.size.y))
+	)
+	var roads: Array[Dictionary] = _map.get_road_features_m()
+	var generator := VegetationGenerator.new(rules, 20261020, bounds_m)
+	generator.prepare_street_tree_index(roads)
+	var checked: int = 0
+	for road: Dictionary in roads:
+		if checked >= 8:
+			break
+		var kind := StringName(str(road.get("kind", "")))
+		if rules.find_street_rule(kind) == null:
+			continue
+		var line_value: Variant = road.get("line")
+		if not (line_value is PackedVector2Array):
+			continue
+		var line: PackedVector2Array = line_value
+		if line.size() < 2:
+			continue
+		checked += 1
+		var midpoint: Vector2 = line[line.size() / 2]
+		var chunk := Vector2i(
+			floori(midpoint.x / VegetationGenerator.CHUNK_SIZE_M),
+			floori(midpoint.y / VegetationGenerator.CHUNK_SIZE_M)
+		)
+		var data: VegetationChunkData = generator.generate_chunk(chunk)
+		var street_count: int = 0
+		for key: String in data.keys:
+			if key.begins_with("s:"):
+				street_count += 1
+		if street_count > 0:
+			print(
+				"VEGETATION SMOKE lazy street trees: %d in chunk %s (road %s)"
+				% [street_count, str(chunk), str(road.get("id", ""))]
+			)
+			return true
+	_fail("lazy street-tree generation produced no trees")
+	return false
 
 
 func _wait_for_instances() -> bool:

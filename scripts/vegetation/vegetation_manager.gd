@@ -95,12 +95,12 @@ func start(map: MapLoader) -> void:
 		return
 	_generator = VegetationGenerator.new(_active_rules, vegetation_seed, bounds)
 	var street_start_usec: int = Time.get_ticks_usec()
-	_generator.prepare_street_trees(_map.get_road_features_m())
+	_generator.prepare_street_tree_index(_map.get_road_features_m())
 	if OS.is_debug_build():
 		var street_ms: int = int(round(float(Time.get_ticks_usec() - street_start_usec) / 1000.0))
 		print(
-			"VegetationManager: prepared %d street trees in %d ms."
-			% [_generator.get_street_tree_count(), street_ms]
+			"VegetationManager: indexed %d street-tree roads in %d ms (lazy generation)."
+			% [_generator.get_indexed_street_road_count(), street_ms]
 		)
 	_running = true
 	_area_dirty = true
@@ -135,9 +135,11 @@ func get_stats() -> Dictionary:
 		if data_value is VegetationChunkData:
 			var data: VegetationChunkData = data_value
 			instances += data.count()
+	var street_trees: int = _generator.get_street_tree_count() if _generator != null else 0
 	return {
 		"chunks": _ground_views.size(),
 		"instances": instances,
+		"street_trees_generated": street_trees,
 		"colliders": _collider_count,
 		"interactables": _interactable_count,
 	}
