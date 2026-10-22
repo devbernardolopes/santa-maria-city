@@ -72,7 +72,11 @@ func rebuild() -> void:
 		var style_path: String = style.resource_path
 		if style_path.is_empty():
 			style_path = "<unsaved MapStyle>"
-		push_warning("MapLoader: %s has no style entries; using fallback colors. Click 'Reset to defaults' in the MapStyle inspector." % style_path)
+		var warning_text: String = (
+			"MapLoader: %s has no style entries; using fallback colors. "
+			+ "Click 'Reset to defaults' in the MapStyle inspector."
+		)
+		push_warning(warning_text % style_path)
 	_overrides = _read_overrides()
 	if not _load_map():
 		terrain = null
@@ -174,7 +178,13 @@ func _load_map() -> bool:
 	var parse_error: Error = json.parse(file.get_as_text())
 	file.close()
 	if parse_error != OK:
-		push_error("MapLoader: invalid JSON in %s at line %d: %s" % [MAP_PATH, json.get_error_line(), json.get_error_message()])
+		push_error(
+			"MapLoader: invalid JSON in %s at line %d: %s" % [
+				MAP_PATH,
+				json.get_error_line(),
+				json.get_error_message(),
+			]
+		)
 		return false
 	var parsed: Variant = json.data
 	if not (parsed is Dictionary):
@@ -644,7 +654,9 @@ func _frame_editor_view_once() -> bool:
 	var visible_world: Rect2 = viewport.global_canvas_transform.affine_inverse() * view_rect
 	if visible_world.intersects(map_bounds_px):
 		return true
-	var fit_zoom: float = minf(view_rect.size.x / map_bounds_px.size.x, view_rect.size.y / map_bounds_px.size.y) * EDITOR_FRAME_MARGIN
+	var fit_zoom_x: float = view_rect.size.x / map_bounds_px.size.x
+	var fit_zoom_y: float = view_rect.size.y / map_bounds_px.size.y
+	var fit_zoom: float = minf(fit_zoom_x, fit_zoom_y) * EDITOR_FRAME_MARGIN
 	fit_zoom = clampf(fit_zoom, 0.0001, 64.0)
 	var origin: Vector2 = view_rect.size * 0.5 - map_bounds_px.get_center() * fit_zoom
 	viewport.global_canvas_transform = Transform2D(0.0, Vector2(fit_zoom, fit_zoom), 0.0, origin)

@@ -58,7 +58,8 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - data = game data files read at runtime
 	- `map.json` = GENERATED map data (never hand-edit)
 	- overlays = developer-authored data layered on the map, keyed by OSM ID
-- tools = offline tooling outside the game runtime (the OSM Python pipeline). Contains a `.gdignore` so Godot does not import it.
+- tools = offline tooling outside the game runtime (the OSM Python pipeline, validation shell scripts). Contains a `.gdignore` so Godot does not import it.
+- tests = headless validation scenes and scripts (compile check, smoke tests). Never part of the game runtime; exclude from release exports.
 
 ## Architecture Contracts
 
@@ -146,13 +147,21 @@ Canonical actions, persisted in `project.godot`, one keyboard key + one pad butt
 
 ## Testing
 
-All testing will be done manually by human after every iteration, so don't run the game.
-The testing devices are:
+All **gameplay** testing is manual by the human after every iteration: do not run the main game scene. The testing devices are:
 
 1. Samsung Odyssey laptop running Omarchy Quattro in 1920 x 1080 @ 60 Hz.
 2. Samsung Galaxy A03 phone running Android in 360 x 800 (portrait mode).
 
-Agents must still rely on script parse-validation diagnostics (never ship a script with errors). Each phase prompt lists its own manual checklist.
+Agents must validate scripts without running gameplay. Use the headless harness:
+
+- `make check` — imports the project headlessly (refreshes class/UID caches), runs `gdparse` over every game script, then loads every game script with autoloads through `res://tests/compile_check.tscn`.
+- `make smoke` — runs `make check`, then the headless map + vegetation integration test in `res://tests/smoke.tscn` (map load, chunk streaming, collider and interaction pools, inspection output).
+- `make lint` / `make format` — run `gdlint` / `gdformat` through `uv`; `.gdlintrc` sets a 120-column project baseline and disables legacy structural rules. `make format` rewrites files, so use it deliberately.
+- `make map` — regenerate `res://data/map.json` with the pinned Python dependencies.
+
+`tools/godot_bin.sh` resolves Godot from `GODOT_BIN`, then `godot` on `PATH`, then the known local 4.7.2 binary. Keep the editor closed while agents write and run automated checks; open it only for manual playtesting. Add new automated validation under `tests/`, not as temporary scenes in the project root. If export presets are added, exclude `tests/*` from release builds.
+
+Never ship a script with parse or compile errors. Each phase prompt lists its own manual checklist.
 
 Before shipping a build: remove any `_mcp_game_helper` dev autoload and its editor plugin entry if present.
 
@@ -165,7 +174,9 @@ Before shipping a build: remove any `_mcp_game_helper` dev autoload and its edit
 - Godot 4 API differs from Godot 3 memory (e.g. `ScrollContainer.horizontal_scroll_mode`). When unsure about a property or method, check the Godot 4.7 docs instead of guessing.
 - Editor-log ghosts: the log buffer re-emits stale diagnostics on scans — confirm errors against current file contents (grep) before treating them as live.
 - Never reference `EditorInterface` directly from a script that is shipped in a game: editor classes are stripped from export templates and the script then fails to load. Access it only under `Engine.is_editor_hint()` through `Engine.get_singleton(&"EditorInterface")`.
-- Regenerate the map with `uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py data/export.geojson data/map.json` when the system Python lacks the geo dependencies.
+- Run `make check` after script changes and `make smoke` after systems that load the world; do not leave `.tmp_*` scenes or scripts in the project root.
+- Godot generates `.gd.uid` sidecars; keep them tracked so scenes and references stay stable.
+- Regenerate the map with `make map` (or `uv run --python 3.13 --with shapely --with pyproj --with numpy python tools/osm_to_godot.py data/export.geojson data/map.json` when the system Python lacks the geo dependencies).
 
 ## Commit Convention
 

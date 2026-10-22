@@ -2,3 +2,6 @@
 .godot/
 /android/
 /assets/
+
+# Agent scratch files (prefer tests/ or /tmp/opencode)
+/.tmp_*

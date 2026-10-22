@@ -160,7 +160,12 @@ func _draw_textured(
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-func _ellipse(center: Vector2, radius_x: float, radius_y: float, segments: int) -> PackedVector2Array:
+func _ellipse(
+	center: Vector2,
+	radius_x: float,
+	radius_y: float,
+	segments: int
+) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for index: int in range(maxi(segments, 3)):
 		var angle: float = TAU * float(index) / float(maxi(segments, 3))

@@ -480,8 +480,9 @@ func _on_pool_interacted(_actor: Entity, slot: int) -> void:
 	var properties_text: String = properties.describe()
 	if not properties_text.is_empty():
 		lines.append(properties_text)
-	if data.ages_years[index] > 0.0:
-		lines.append("age %.0f y" % data.ages_years[index])
+	var age_years: float = data.ages_years[index]
+	if age_years >= 0.1:
+		lines.append("age %.1f y" % age_years)
 	inspected.emit("\n".join(lines))
 
 

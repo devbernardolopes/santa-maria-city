@@ -38,7 +38,10 @@ func _ready() -> void:
 	_map = world.get_node_or_null("Map") as MapLoader
 	active = self
 	if not _is_configured():
-		push_error("InteriorManager: missing Interiors, ScreenFader, FollowCamera, or DayNight sibling; interiors are disabled.")
+		push_error(
+			"InteriorManager: missing Interiors, ScreenFader, FollowCamera, or DayNight sibling; "
+			+ "interiors are disabled."
+		)
 
 
 func _exit_tree() -> void:

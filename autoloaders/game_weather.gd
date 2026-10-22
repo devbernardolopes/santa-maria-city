@@ -99,7 +99,10 @@ static func _temperature_c(seed_value: int, total_seconds: float, cloud_cover: f
 	var hour: float = fposmod(total_seconds, GameCalendar.SECONDS_PER_DAY) / GameCalendar.SECONDS_PER_HOUR
 	var seasonal: float = SEASONAL_BASE_C + SEASONAL_AMPLITUDE_C * cos(TAU * (doy - SEASONAL_PEAK_DOY) / 365.0)
 	var diurnal: float = DIURNAL_AMPLITUDE_C * cos(TAU * (hour - DIURNAL_PEAK_HOUR) / DIURNAL_PERIOD_HOURS)
-	var day_offset: float = DAY_OFFSET_AMPLITUDE_C * _noise_1d(seed_value + OFFSET_NOISE_SALT, t_days / DAY_OFFSET_SCALE_DAYS)
+	var day_offset: float = (
+		DAY_OFFSET_AMPLITUDE_C
+		* _noise_1d(seed_value + OFFSET_NOISE_SALT, t_days / DAY_OFFSET_SCALE_DAYS)
+	)
 	var total: float = seasonal + diurnal + day_offset
 	if hour >= GameCalendar.sunrise_hour(doy) and hour < GameCalendar.sunset_hour(doy):
 		total -= CLOUD_COOLING_C * cloud_cover

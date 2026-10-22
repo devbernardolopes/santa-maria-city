@@ -158,7 +158,13 @@ func _map_center_m() -> Vector2:
 	var bounds_value: Variant = _map.meta.get("bounds_m")
 	if bounds_value is Array:
 		var bounds: Array = bounds_value
-		if bounds.size() == 4 and _is_number(bounds[0]) and _is_number(bounds[1]) and _is_number(bounds[2]) and _is_number(bounds[3]):
+		if (
+			bounds.size() == 4
+			and _is_number(bounds[0])
+			and _is_number(bounds[1])
+			and _is_number(bounds[2])
+			and _is_number(bounds[3])
+		):
 			var min_m := Vector2(float(bounds[0]), float(bounds[1]))
 			var max_m := Vector2(float(bounds[2]), float(bounds[3]))
 			return (min_m + max_m) * 0.5

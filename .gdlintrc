@@ -1,0 +1,7 @@
+disable:
+- class-definitions-order
+- expression-not-assigned
+- function-preload-variable-name
+- max-public-methods
+- max-returns
+max-line-length: 120
