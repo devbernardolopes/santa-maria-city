@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ObjectData" format=3 uid="uid://cip0sua3aknxm"]
+
+[ext_resource type="Script" uid="uid://bd2jtxovkj3n" path="res://resources/objects/object_properties.gd" id="1_ctkr2"]
+[ext_resource type="Script" uid="uid://nam1bq4ne4cn" path="res://resources/objects/object_data.gd" id="1_vl1n4"]
+[ext_resource type="Texture2D" uid="uid://bcidpokrj4wdf" path="res://assets/images/sprites/rugs/oriental_rug.png" id="3_8p1ab"]
+
+[sub_resource type="Resource" id="Resource_djinj"]
+script = ExtResource("1_ctkr2")
+mass_kg = 0.5
+flammable = true
+metadata/_custom_type_script = "uid://bd2jtxovkj3n"
+
+[resource]
+script = ExtResource("1_vl1n4")
+id = "oriental_rug"
+display_name = "Oriental Rug"
+kind = "rug"
+sprite_texture = ExtResource("3_8p1ab")
+properties = SubResource("Resource_djinj")
+obstacle = false
+movable = false
+metadata/_custom_type_script = "uid://nam1bq4ne4cn"
