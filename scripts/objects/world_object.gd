@@ -23,7 +23,7 @@ var container_title: String = ""
 ## --- constructor helpers ---
 
 
-func new_from_data(new_data: ObjectData) -> WorldObject:
+static func new_from_data(new_data: ObjectData) -> WorldObject:
 	# scene already has script assigned via ext_resource
 	var scene = load("res://scenes/objects/world_object.tscn") as PackedScene
 	if scene == null:
