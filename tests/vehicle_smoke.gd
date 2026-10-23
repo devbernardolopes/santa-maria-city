@@ -65,6 +65,7 @@ func _run() -> void:
 	await _test_enter_exit()
 	await _test_parked_idle()
 	await _test_exit_does_not_slide()
+	await _test_exit_keeps_momentum()
 	await _test_push_strength()
 	_test_damage()
 
@@ -426,6 +427,61 @@ func _test_exit_does_not_slide() -> void:
 	var drift_m: float = Units.px_to_m(vehicle.global_position.distance_to(parked_px))
 	if drift_m > 0.001:
 		_fail("car slid %.4f m after the driver exited" % drift_m)
+	actor.queue_free()
+	vehicle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_exit_keeps_momentum() -> void:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, 400.0), 0.0)
+	if vehicle == null:
+		_fail("could not spawn the momentum car")
+		return
+	var actor := _make_actor(Vector2(2.0, 400.0))
+	if actor == null:
+		_fail("could not create the momentum driver")
+		vehicle.queue_free()
+		return
+	if not vehicle.enter(actor):
+		_fail("could not seat the momentum driver")
+		return
+	var controller := TestController.new()
+	controller.throttle_value = 1.0
+	vehicle.set_controller(controller)
+	for _step: int in range(90):
+		await get_tree().physics_frame
+	var exit_speed: float = vehicle.get_speed_mps()
+	if exit_speed < 2.0:
+		_fail("momentum car did not reach speed before exit (%.2f m/s)" % exit_speed)
+	var exit_px: Vector2 = vehicle.global_position
+	if not vehicle.exit(actor):
+		_fail("exit() failed for the momentum car")
+		return
+	if vehicle.get_velocity_mps().length() < 1.0:
+		_fail("vehicle lost its velocity the moment the driver exited")
+	for _step: int in range(30):
+		await get_tree().physics_frame
+	var coasted_m: float = Units.px_to_m(vehicle.global_position.distance_to(exit_px))
+	if coasted_m < 0.3:
+		_fail("vehicle stopped instantly after the driver exited (%.3f m)" % coasted_m)
+	if vehicle.global_position.x < exit_px.x:
+		_fail("coasting vehicle moved against its heading")
+	var coast_speed: float = vehicle.get_speed_mps()
+	if coast_speed >= exit_speed:
+		_fail("coasting vehicle did not lose speed (%.2f -> %.2f m/s)" % [exit_speed, coast_speed])
+	var stopped: bool = false
+	for _step: int in range(600):
+		await get_tree().physics_frame
+		if vehicle.get_velocity_mps().length() < 0.001:
+			stopped = true
+			break
+	if not stopped:
+		_fail("coasting vehicle never came to a stop")
+	var settled_px: Vector2 = vehicle.global_position
+	for _step: int in range(60):
+		await get_tree().physics_frame
+	if Units.px_to_m(vehicle.global_position.distance_to(settled_px)) > 0.001:
+		_fail("coasting vehicle moved again after stopping")
 	actor.queue_free()
 	vehicle.queue_free()
 	await get_tree().process_frame

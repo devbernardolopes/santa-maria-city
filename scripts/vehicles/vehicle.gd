@@ -24,8 +24,10 @@ const INTERACT_RADIUS_PADDING_M: float = 0.5
 const MASS_DAMAGE_REFERENCE_KG: float = 1500.0
 ## How long an external push stays applied after the last contact frame.
 const PUSH_HOLD_S: float = 0.12
-## Static friction: a parked car stops almost immediately once the push ends.
+## Static friction: a pushed car stops almost immediately once the push ends.
 const PUSH_DECELERATION_MPS2: float = 6.0
+## Floor for the coasting deceleration, so a car never rolls forever.
+const MIN_COAST_DECELERATION_MPS2: float = 0.1
 const MIN_PARKED_SPEED_MPS: float = 0.05
 ## The model only follows the realized motion when it is smaller than the request;
 ## this margin keeps float noise from trimming free rolling.
@@ -60,8 +62,11 @@ var _pre_move_velocity_mps: Vector2 = Vector2.ZERO
 ## cannot creep or be nudged by a body resting against them.
 var _forward_speed_mps: float = 0.0
 var _lateral_speed_mps: float = 0.0
-## External push velocity in m/s; only used while the vehicle is unoccupied.
-var _push_velocity_mps: Vector2 = Vector2.ZERO
+## External motion in m/s while unoccupied: a push, or the momentum the driver left
+## behind. Only this may move a parked body.
+var _coast_velocity_mps: Vector2 = Vector2.ZERO
+## Deceleration applied to the coast velocity once the push hold expires.
+var _coast_deceleration_mps2: float = PUSH_DECELERATION_MPS2
 var _push_hold_s: float = 0.0
 
 @onready var _visual: VehicleVisual = get_node_or_null("Visual") as VehicleVisual
@@ -126,7 +131,7 @@ func enter(actor: Entity) -> bool:
 		entry_rejected.emit(actor, reason)
 		return false
 	occupants.append(actor)
-	_stop_motion()
+	_adopt_coast_motion()
 	actor.set_locked(true)
 	actor.set_riding(true)
 	actor.global_position = global_position
@@ -142,9 +147,9 @@ func exit(actor: Entity) -> bool:
 	if not occupants.has(actor):
 		return false
 	occupants.erase(actor)
-	# A parked car must be perfectly still: the displayed speed may round to 0 while
-	# the model still holds a small residual, and any leftover velocity would creep.
-	_stop_motion()
+	# A moving car keeps its momentum when the driver leaves; it coasts and loses
+	# energy to rolling resistance until it stops or hits something.
+	_leave_coast_motion()
 	var point_m: Vector2 = _find_exit_point_m()
 	actor.global_position = Units.to_px(point_m)
 	actor.set_riding(false)
@@ -266,7 +271,8 @@ func apply_push(actor: Entity, direction: Vector2) -> bool:
 	var push_dir: Vector2 = direction.normalized()
 	if push_dir.is_zero_approx():
 		return false
-	_push_velocity_mps = push_dir * PushRules.push_speed_mps(actor.get_strength(), load_kg)
+	_coast_velocity_mps = push_dir * PushRules.push_speed_mps(actor.get_strength(), load_kg)
+	_coast_deceleration_mps2 = PUSH_DECELERATION_MPS2
 	_push_hold_s = PUSH_HOLD_S
 	return true
 
@@ -440,26 +446,27 @@ func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> voi
 	_absorb_realized_motion(forward, right)
 
 
-## Parked vehicles are inert unless an eligible actor pushes them. While fully stopped
-## move_and_slide() is not called at all, so collision recovery cannot nudge the body.
+## Parked vehicles are inert unless an eligible actor pushed them or a driver left them
+## moving. While fully stopped move_and_slide() is not called at all, so collision
+## recovery cannot nudge the body.
 func _process_parked(delta: float) -> void:
-	# Only an external push may move a parked body; zero push means zero physics work.
-	if _push_velocity_mps.is_zero_approx():
+	# Only external motion may move a parked body; zero coast means zero physics work.
+	if _coast_velocity_mps.is_zero_approx():
 		_stop_motion()
 		return
 	_push_hold_s = maxf(0.0, _push_hold_s - delta)
 	if _push_hold_s <= 0.0:
-		_push_velocity_mps = _push_velocity_mps.move_toward(
-			Vector2.ZERO, PUSH_DECELERATION_MPS2 * delta
+		_coast_velocity_mps = _coast_velocity_mps.move_toward(
+			Vector2.ZERO, _coast_deceleration_mps2 * delta
 		)
-		if _push_velocity_mps.length() < MIN_PARKED_SPEED_MPS:
+		if _coast_velocity_mps.length() < MIN_PARKED_SPEED_MPS:
 			_stop_motion()
 			return
-	_pre_move_velocity_mps = _push_velocity_mps
-	velocity = _push_velocity_mps * Units.PX_PER_METER
+	_pre_move_velocity_mps = _coast_velocity_mps
+	velocity = _coast_velocity_mps * Units.PX_PER_METER
 	move_and_slide()
 	var realized_m: Vector2 = Units.to_m(get_real_velocity())
-	_push_velocity_mps = realized_m
+	_coast_velocity_mps = realized_m
 	speed_mps = realized_m.dot(Vector2.from_angle(rotation))
 	if absf(speed_mps) < MIN_MOVING_SPEED_MPS:
 		speed_mps = 0.0
@@ -487,10 +494,47 @@ func _stop_motion() -> void:
 	_forward_speed_mps = 0.0
 	_lateral_speed_mps = 0.0
 	_steer_angle = 0.0
-	_push_velocity_mps = Vector2.ZERO
+	_coast_velocity_mps = Vector2.ZERO
+	_coast_deceleration_mps2 = PUSH_DECELERATION_MPS2
 	_push_hold_s = 0.0
 	velocity = Vector2.ZERO
 	speed_mps = 0.0
+
+
+## Entering a moving car keeps its momentum in the driving model instead of stopping it.
+func _adopt_coast_motion() -> void:
+	var forward: Vector2 = Vector2.from_angle(rotation)
+	_forward_speed_mps = _coast_velocity_mps.dot(forward)
+	_lateral_speed_mps = _coast_velocity_mps.dot(forward.orthogonal())
+	_coast_velocity_mps = Vector2.ZERO
+	_coast_deceleration_mps2 = PUSH_DECELERATION_MPS2
+	_push_hold_s = 0.0
+	_steer_angle = 0.0
+
+
+## Leaving a moving car hands its actual momentum to the parked state, where it coasts
+## and loses energy to rolling resistance until it stops or collides.
+func _leave_coast_motion() -> void:
+	var momentum_mps: Vector2 = Units.to_m(velocity)
+	_forward_speed_mps = 0.0
+	_lateral_speed_mps = 0.0
+	_steer_angle = 0.0
+	_push_hold_s = 0.0
+	if momentum_mps.length() < MIN_PARKED_SPEED_MPS:
+		_stop_motion()
+		return
+	_coast_velocity_mps = momentum_mps
+	_coast_deceleration_mps2 = _rolling_deceleration_mps2()
+
+
+## Off-throttle deceleration authored on the vehicle: engine braking plus rolling
+## resistance, the same forces that slow a coasting car while it is driven.
+func _rolling_deceleration_mps2() -> float:
+	if data == null:
+		return MIN_COAST_DECELERATION_MPS2
+	return maxf(
+		MIN_COAST_DECELERATION_MPS2, data.engine_braking_mps2 + data.rolling_resistance_mps2
+	)
 
 
 func _integrate_forward_speed(forward_speed: float, throttle: float, delta: float) -> float:
