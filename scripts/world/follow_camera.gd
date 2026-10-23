@@ -9,6 +9,7 @@ enum Mode {
 	AUTO,
 }
 
+#const ZOOM_STEP: float = 1.15
 const ZOOM_STEP: float = 1.15
 const MIN_ZOOM: float = 0.05
 const MAX_ZOOM: float = 8.0
