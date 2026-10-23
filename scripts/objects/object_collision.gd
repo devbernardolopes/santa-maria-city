@@ -19,7 +19,7 @@ func set_data(new_data: ObjectData) -> void:
 		circle.radius = Units.m_to_px(radius)
 		var shape := CollisionShape2D.new()
 		# set offset before shape, as Godot may validate differently
-		shape.offset = Vector2(
+		shape.position = Vector2(
 			Units.m_to_px(data.collision_offset_m.x), Units.m_to_px(data.collision_offset_m.y)
 		)
 		shape.shape = circle

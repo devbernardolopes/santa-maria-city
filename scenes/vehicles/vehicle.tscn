@@ -1,20 +1,20 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://cv6ayx2srvpt"]
 
-[ext_resource type="Script" path="res://scripts/vehicles/vehicle.gd" id="1_vehicle"]
-[ext_resource type="Script" path="res://scripts/vehicles/vehicle_visual.gd" id="2_visual"]
-[ext_resource type="Script" path="res://scripts/vehicles/player_vehicle_controller.gd" id="3_controller"]
-[ext_resource type="Script" path="res://scripts/objects/interactable.gd" id="4_interact"]
+[ext_resource type="Script" uid="uid://cl6md5qpf0xpi" path="res://scripts/vehicles/vehicle.gd" id="1_vehicle"]
+[ext_resource type="Script" uid="uid://51elafhpsjlv" path="res://scripts/vehicles/vehicle_visual.gd" id="2_visual"]
+[ext_resource type="Script" uid="uid://bcvvtwl330iba" path="res://scripts/vehicles/player_vehicle_controller.gd" id="3_controller"]
+[ext_resource type="Script" uid="uid://c7ijgb8rj3kc3" path="res://scripts/objects/interactable.gd" id="4_interact"]
 
-[node name="Vehicle" type="CharacterBody2D"]
+[node name="Vehicle" type="CharacterBody2D" unique_id=1259797369]
 script = ExtResource("1_vehicle")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1081627440]
 
-[node name="Visual" type="Node2D" parent="."]
+[node name="Visual" type="Node2D" parent="." unique_id=876599998]
 script = ExtResource("2_visual")
 
-[node name="PlayerVehicleController" type="Node" parent="."]
+[node name="PlayerVehicleController" type="Node" parent="." unique_id=2141172603]
 script = ExtResource("3_controller")
 
-[node name="Interactable" type="Area2D" parent="."]
+[node name="Interactable" type="Area2D" parent="." unique_id=689912540]
 script = ExtResource("4_interact")

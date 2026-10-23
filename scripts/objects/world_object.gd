@@ -177,13 +177,17 @@ func _ready() -> void:
 	if _collision == null:
 		var col := ObjectCollision.new()
 		add_child(col)
-		col.set_data(data)
+		_collision = col
+	_collision.set_data(data)
+# ensure we have a valid visual setup
 	if _visual == null:
 		var vis := ObjectVisual.new()
 		add_child(vis)
-		vis.set_data(data)
+		_visual = vis
+	_visual.set_data(data)
+# ensure we have a valid interactable setup
 	if _interactable == null:
 		var inter := Interactable.new()
 		add_child(inter)
 		_interactable = inter
-		_update_interactable()
+	_update_interactable()

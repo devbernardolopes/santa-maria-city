@@ -16,7 +16,6 @@ id = "oriental_rug"
 display_name = "Oriental Rug"
 kind = "rug"
 sprite_texture = ExtResource("3_8p1ab")
-sprite_scale = 2.0
 properties = SubResource("Resource_djinj")
 obstacle = false
 movable = false

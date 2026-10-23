@@ -36,8 +36,7 @@ style = ExtResource("3_t5ptc")
 y_sort_enabled = true
 
 [node name="OrientalRug" parent="Objects" unique_id=190953490 instance=ExtResource("5_71ii3")]
-position = Vector2(38440, 63578)
-scale = Vector2(2, 2)
+position = Vector2(38195, 63956)
 data = ExtResource("6_71ii3")
 
 [node name="Interiors" type="Node2D" parent="." unique_id=1689666819]
