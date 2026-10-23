@@ -212,6 +212,8 @@ func _map_center_m() -> Vector2:
 
 
 func _wire_player_interaction(player: Entity) -> void:
+	if not player.push_rejected.is_connected(_on_player_push_rejected):
+		player.push_rejected.connect(_on_player_push_rejected)
 	var hud: Hud = get_node_or_null("Hud") as Hud
 	if hud == null:
 		return
@@ -236,6 +238,10 @@ func _on_player_target_changed(target: Interactable) -> void:
 	var tc: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
 	if tc != null:
 		tc.set_interact_available(not text.is_empty())
+
+
+func _on_player_push_rejected(_target: Node, required_strength: int) -> void:
+	_show_message("Too heavy · needs Strength %d" % required_strength)
 
 
 func _on_vehicle_spawned(vehicle: Vehicle) -> void:

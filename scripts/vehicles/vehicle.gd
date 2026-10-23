@@ -22,6 +22,14 @@ const WATER_SPEED_FACTOR: float = 0.15
 const WATER_GRIP_FACTOR: float = 0.2
 const INTERACT_RADIUS_PADDING_M: float = 0.5
 const MASS_DAMAGE_REFERENCE_KG: float = 1500.0
+## How long an external push stays applied after the last contact frame.
+const PUSH_HOLD_S: float = 0.12
+## Static friction: a parked car stops almost immediately once the push ends.
+const PUSH_DECELERATION_MPS2: float = 6.0
+const MIN_PARKED_SPEED_MPS: float = 0.05
+## The model only follows the realized motion when it is smaller than the request;
+## this margin keeps float noise from trimming free rolling.
+const COLLISION_SPEED_EPSILON_MPS: float = 0.02
 
 @export var data: VehicleData = null
 @export var controller: VehicleController = null
@@ -47,6 +55,14 @@ var _last_sample_pos_m: Vector2 = Vector2.ZERO
 var _impact_cooldown: float = 0.0
 ## Actual velocity before the last move_and_slide; used for impact damage.
 var _pre_move_velocity_mps: Vector2 = Vector2.ZERO
+## Bicycle-model velocity in m/s. This is the only speed source while driving:
+## collision displacement is never read back as speed, so blocked or parked cars
+## cannot creep or be nudged by a body resting against them.
+var _forward_speed_mps: float = 0.0
+var _lateral_speed_mps: float = 0.0
+## External push velocity in m/s; only used while the vehicle is unoccupied.
+var _push_velocity_mps: Vector2 = Vector2.ZERO
+var _push_hold_s: float = 0.0
 
 @onready var _visual: VehicleVisual = get_node_or_null("Visual") as VehicleVisual
 @onready var _interactable: Interactable = get_node_or_null("Interactable") as Interactable
@@ -85,16 +101,17 @@ func _physics_process(delta: float) -> void:
 	if data == null:
 		return
 	if locked:
-		velocity = Vector2.ZERO
-		speed_mps = 0.0
-		move_and_slide()
+		_stop_motion()
 		return
 	_update_terrain(delta)
 	_impact_cooldown = maxf(0.0, _impact_cooldown - delta)
+	if occupants.is_empty():
+		_process_parked(delta)
+		return
 	var throttle: float = 0.0
 	var steer: float = 0.0
 	var handbrake: bool = false
-	if not occupants.is_empty() and controller != null:
+	if controller != null:
 		throttle = controller.get_throttle()
 		steer = controller.get_steer()
 		handbrake = controller.wants_handbrake()
@@ -109,6 +126,7 @@ func enter(actor: Entity) -> bool:
 		entry_rejected.emit(actor, reason)
 		return false
 	occupants.append(actor)
+	_stop_motion()
 	actor.set_locked(true)
 	actor.set_riding(true)
 	actor.global_position = global_position
@@ -124,6 +142,9 @@ func exit(actor: Entity) -> bool:
 	if not occupants.has(actor):
 		return false
 	occupants.erase(actor)
+	# A parked car must be perfectly still: the displayed speed may round to 0 while
+	# the model still holds a small residual, and any leftover velocity would creep.
+	_stop_motion()
 	var point_m: Vector2 = _find_exit_point_m()
 	actor.global_position = Units.to_px(point_m)
 	actor.set_riding(false)
@@ -179,7 +200,7 @@ func set_controller(next_controller: VehicleController) -> void:
 func set_locked(value: bool) -> void:
 	locked = value
 	if locked:
-		velocity = Vector2.ZERO
+		_stop_motion()
 
 
 func set_lights_enabled(value: bool) -> void:
@@ -216,6 +237,38 @@ func get_speed_mps() -> float:
 
 func get_velocity_mps() -> Vector2:
 	return Units.to_m(velocity)
+
+
+## Effective load (kg) an actor must be able to push to move this vehicle.
+func get_push_load_kg() -> float:
+	return data.get_push_load_kg() if data != null else 0.0
+
+
+func is_pushable() -> bool:
+	return data != null and data.is_pushable()
+
+
+## Lowest Strength score that can move this vehicle; may exceed 30 for heavy bodies.
+func get_required_push_strength() -> int:
+	return PushRules.min_strength_for(get_push_load_kg())
+
+
+## Applies an external push while the vehicle is parked. Returns false when the actor
+## is not allowed to move it (occupied, fixed, locked, or too weak).
+func apply_push(actor: Entity, direction: Vector2) -> bool:
+	if not is_pushable() or is_occupied() or locked:
+		return false
+	if actor == null or not is_instance_valid(actor):
+		return false
+	var load_kg: float = get_push_load_kg()
+	if not PushRules.can_push(actor.get_strength(), load_kg):
+		return false
+	var push_dir: Vector2 = direction.normalized()
+	if push_dir.is_zero_approx():
+		return false
+	_push_velocity_mps = push_dir * PushRules.push_speed_mps(actor.get_strength(), load_kg)
+	_push_hold_s = PUSH_HOLD_S
+	return true
 
 
 func get_wheel_states() -> Array[WheelState]:
@@ -357,10 +410,7 @@ func load_state(state: Dictionary) -> void:
 
 func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> void:
 	var forward: Vector2 = Vector2.from_angle(rotation)
-	# Use the body's actual motion, not the requested velocity. When the vehicle is
-	# pressed against an obstacle, velocity keeps growing while the body does not move.
-	var realized_velocity_m: Vector2 = Units.to_m(get_real_velocity())
-	var speed_before: float = realized_velocity_m.dot(forward)
+	var speed_before: float = _forward_speed_mps
 	var steer_scale: float = lerpf(
 		1.0,
 		data.high_speed_steer_factor,
@@ -375,22 +425,72 @@ func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> voi
 		rotation = wrapf(rotation + yaw_rate * delta, -PI, PI)
 	forward = Vector2.from_angle(rotation)
 	var right: Vector2 = forward.orthogonal()
-	var forward_speed: float = realized_velocity_m.dot(forward)
-	var lateral_speed: float = realized_velocity_m.dot(right)
-	forward_speed = _integrate_forward_speed(forward_speed, throttle, delta)
+	# Re-project the model velocity onto the new heading, so turning never adds energy.
+	var carried: Vector2 = forward * _forward_speed_mps + right * _lateral_speed_mps
+	_forward_speed_mps = carried.dot(forward)
+	_lateral_speed_mps = carried.dot(right)
+	_forward_speed_mps = _integrate_forward_speed(_forward_speed_mps, throttle, delta)
 	var grip: float = data.lateral_grip * get_wheel_grip_factor() * _terrain_grip_factor
 	if handbrake:
 		grip *= data.handbrake_grip_factor
-	lateral_speed *= exp(-maxf(grip, 0.05) * delta)
-	velocity = (forward * forward_speed + right * lateral_speed) * Units.PX_PER_METER
-	_pre_move_velocity_mps = realized_velocity_m
+	_lateral_speed_mps *= exp(-maxf(grip, 0.05) * delta)
+	velocity = (forward * _forward_speed_mps + right * _lateral_speed_mps) * Units.PX_PER_METER
+	_pre_move_velocity_mps = Units.to_m(velocity)
 	move_and_slide()
-	# Keep the requested velocity in sync with the achieved motion, so a blocked
-	# vehicle neither accumulates speed nor keeps triggering impact damage.
-	velocity = get_real_velocity()
-	speed_mps = Units.to_m(velocity).dot(forward)
+	_absorb_realized_motion(forward, right)
+
+
+## Parked vehicles are inert unless an eligible actor pushes them. While fully stopped
+## move_and_slide() is not called at all, so collision recovery cannot nudge the body.
+func _process_parked(delta: float) -> void:
+	# Only an external push may move a parked body; zero push means zero physics work.
+	if _push_velocity_mps.is_zero_approx():
+		_stop_motion()
+		return
+	_push_hold_s = maxf(0.0, _push_hold_s - delta)
+	if _push_hold_s <= 0.0:
+		_push_velocity_mps = _push_velocity_mps.move_toward(
+			Vector2.ZERO, PUSH_DECELERATION_MPS2 * delta
+		)
+		if _push_velocity_mps.length() < MIN_PARKED_SPEED_MPS:
+			_stop_motion()
+			return
+	_pre_move_velocity_mps = _push_velocity_mps
+	velocity = _push_velocity_mps * Units.PX_PER_METER
+	move_and_slide()
+	var realized_m: Vector2 = Units.to_m(get_real_velocity())
+	_push_velocity_mps = realized_m
+	speed_mps = realized_m.dot(Vector2.from_angle(rotation))
 	if absf(speed_mps) < MIN_MOVING_SPEED_MPS:
 		speed_mps = 0.0
+	_apply_impact_damage()
+
+
+## The model follows the realized motion only when a collision made it smaller.
+## Depenetration, an external shove, or a future vehicle impact must never be read
+## back as new driving speed (that feedback loop is what made cars slide on ice).
+func _absorb_realized_motion(forward: Vector2, right: Vector2) -> void:
+	var realized_m: Vector2 = Units.to_m(get_real_velocity())
+	var realized_forward: float = realized_m.dot(forward)
+	var realized_lateral: float = realized_m.dot(right)
+	if absf(realized_forward) + COLLISION_SPEED_EPSILON_MPS < absf(_forward_speed_mps):
+		_forward_speed_mps = realized_forward
+	if absf(realized_lateral) + COLLISION_SPEED_EPSILON_MPS < absf(_lateral_speed_mps):
+		_lateral_speed_mps = realized_lateral
+	velocity = realized_m * Units.PX_PER_METER
+	speed_mps = realized_forward
+	if absf(speed_mps) < MIN_MOVING_SPEED_MPS:
+		speed_mps = 0.0
+
+
+func _stop_motion() -> void:
+	_forward_speed_mps = 0.0
+	_lateral_speed_mps = 0.0
+	_steer_angle = 0.0
+	_push_velocity_mps = Vector2.ZERO
+	_push_hold_s = 0.0
+	velocity = Vector2.ZERO
+	speed_mps = 0.0
 
 
 func _integrate_forward_speed(forward_speed: float, throttle: float, delta: float) -> float:

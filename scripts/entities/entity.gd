@@ -2,10 +2,16 @@ class_name Entity
 extends CharacterBody2D
 ## Shared body for the player and NPCs. Behavior lives in an EntityController.
 
+## Emitted when the entity walks into a body it is too weak to push.
+signal push_rejected(target: Node, required_strength: int)
+
 const COLLISION_RADIUS_M: float = 0.3
 const TURN_RATE: float = 12.0
 const TERRAIN_SAMPLE_INTERVAL_S: float = 0.25
 const TERRAIN_SAMPLE_DISTANCE_M: float = 1.0
+## How aligned the movement intent must be with the contact normal to push.
+const PUSH_INTENT_DOT: float = 0.25
+const PUSH_REJECT_INTERVAL_MS: int = 1500
 
 @export var data: EntityData = null
 @export var speed_multiplier: float = 1.0
@@ -24,6 +30,8 @@ var riding: bool = false
 var _terrain_timer: float = 0.0
 var _terrain_speed_factor: float = 1.0
 var _last_sample_pos_m: Vector2 = Vector2.ZERO
+var _last_push_reject_target: Node = null
+var _last_push_reject_msec: int = -PUSH_REJECT_INTERVAL_MS
 
 @onready var _visual: Node2D = $Visual
 @onready var _collision_shape: CollisionShape2D = $CollisionShape2D
@@ -84,6 +92,11 @@ func get_velocity_mps() -> Vector2:
 	return Units.to_m(velocity)
 
 
+## D&D ability score; average when the entity has no data resource.
+func get_strength() -> int:
+	return data.strength if data != null else 10
+
+
 func _physics_process(delta: float) -> void:
 	if locked:
 		velocity = Vector2.ZERO
@@ -112,6 +125,7 @@ func _resolve_omni(delta: float) -> void:
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
 	move_and_slide()
+	_push_contacts(move_vector)
 
 
 func _resolve_relative(delta: float) -> void:
@@ -141,6 +155,46 @@ func _resolve_relative(delta: float) -> void:
 		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
 	)
 	move_and_slide()
+	_push_contacts(move_vector)
+
+
+## Pushes vehicles the entity walks into, if its Strength covers their effective load.
+## Kinematic bodies never push each other, so this contact check is the only path that
+## lets an entity move a parked vehicle.
+func _push_contacts(intent: Vector2) -> void:
+	if data == null or intent.length_squared() <= 0.0001:
+		return
+	var intent_dir: Vector2 = intent.normalized()
+	for index: int in range(get_slide_collision_count()):
+		var collision: KinematicCollision2D = get_slide_collision(index)
+		if collision == null:
+			continue
+		var vehicle: Vehicle = collision.get_collider() as Vehicle
+		if vehicle == null:
+			continue
+		var into: Vector2 = -collision.get_normal()
+		if into.length_squared() <= 0.0001:
+			continue
+		into = into.normalized()
+		if intent_dir.dot(into) < PUSH_INTENT_DOT:
+			continue
+		if not vehicle.is_pushable() or vehicle.is_occupied() or vehicle.locked:
+			continue
+		var load_kg: float = vehicle.get_push_load_kg()
+		if not PushRules.can_push(data.strength, load_kg):
+			_report_push_rejected(vehicle, vehicle.get_required_push_strength())
+			continue
+		vehicle.apply_push(self, into)
+
+
+## Emits push_rejected at most once per target per interval.
+func _report_push_rejected(target: Node, required_strength: int) -> void:
+	var now: int = Time.get_ticks_msec()
+	if target == _last_push_reject_target and now - _last_push_reject_msec < PUSH_REJECT_INTERVAL_MS:
+		return
+	_last_push_reject_target = target
+	_last_push_reject_msec = now
+	push_rejected.emit(target, required_strength)
 
 
 ## Samples the terrain grid at most every TERRAIN_SAMPLE_INTERVAL_S, or once per meter moved.

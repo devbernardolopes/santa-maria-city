@@ -6,6 +6,10 @@ extends Resource
 @export var mass_kg: float = 1.0
 @export var movable: bool = true
 @export_range(0.0, 2.0, 0.01) var friction: float = 0.6
+## Effective mass multiplier when an entity pushes or drags this object.
+## 1.0 means dragging its full mass (the D&D push/drag/lift baseline); lower
+## values model wheels or casters. Gameplay dial, not the tire friction above.
+@export_range(0.0, 2.0, 0.01) var push_resistance: float = 1.0
 
 @export_group("Fire")
 @export var flammable: bool = false

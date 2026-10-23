@@ -35,3 +35,10 @@ extends Resource
 func init_sprite_frames() -> void:
 	# ensure sprite_frames are ready; called from WorldObject
 	pass
+
+
+## Effective load (kg) an entity must be able to push to move this object.
+func get_push_load_kg() -> float:
+	if properties == null:
+		return 0.0
+	return PushRules.push_load_kg(properties.mass_kg, properties.push_resistance)

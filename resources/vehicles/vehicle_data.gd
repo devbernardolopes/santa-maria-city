@@ -77,6 +77,19 @@ func get_mass_kg() -> float:
 	return maxf(0.1, properties.mass_kg)
 
 
+## Effective load (kg) an entity must be able to push to move this vehicle.
+func get_push_load_kg() -> float:
+	var resistance: float = 1.0
+	if properties != null:
+		resistance = properties.push_resistance
+	return PushRules.push_load_kg(get_mass_kg(), resistance)
+
+
+## False when the shared physical properties mark the vehicle as fixed.
+func is_pushable() -> bool:
+	return properties == null or properties.movable
+
+
 func get_wheelbase_m() -> float:
 	var value: float = wheelbase_m if wheelbase_m > 0.0 else length_m * 0.6
 	return maxf(0.5, value)

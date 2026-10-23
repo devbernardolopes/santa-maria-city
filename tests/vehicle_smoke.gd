@@ -30,6 +30,18 @@ class TestController:
 		return throttle_value
 
 
+class TestEntityController:
+	extends EntityController
+
+	var move_vector: Vector2 = Vector2.ZERO
+
+	func get_move_vector() -> Vector2:
+		return move_vector
+
+	func get_move_intent() -> Vector2:
+		return move_vector
+
+
 func _ready() -> void:
 	await _run()
 	if _failures.is_empty():
@@ -45,11 +57,15 @@ func _run() -> void:
 	_validate_resources()
 	_test_wheels()
 	_test_terrain_profile()
+	_test_push_rules()
 	_test_world_scene()
 	await _test_spawner()
 	await _test_drive_and_impact()
 	await _test_blocked_vehicle()
 	await _test_enter_exit()
+	await _test_parked_idle()
+	await _test_exit_does_not_slide()
+	await _test_push_strength()
 	_test_damage()
 
 
@@ -68,6 +84,53 @@ func _test_terrain_profile() -> void:
 		_fail("asphalt does not allow full vehicle speed")
 	if profile.get_grip_factor(sample) < 0.9:
 		_fail("asphalt does not provide full vehicle grip")
+
+
+func _test_push_rules() -> void:
+	var capacities: Dictionary = {
+		10: 136.08,
+		15: 272.16,
+		20: 544.31,
+		25: 1088.62,
+		30: 2177.24,
+	}
+	for strength: int in capacities:
+		var expected: float = capacities[strength]
+		var actual: float = PushRules.push_capacity_kg(strength)
+		if absf(actual - expected) > 0.1:
+			_fail(
+				"push capacity at Str %d is %.2f kg, expected %.2f kg"
+				% [strength, actual, expected]
+			)
+	var car := load(CAR_PATH) as VehicleData
+	if car == null:
+		_fail("car data missing for the push rules test")
+		return
+	var car_load: float = car.get_push_load_kg()
+	if PushRules.can_push(10, car_load):
+		_fail("Strength 10 can push a %.0f kg load" % car_load)
+	if PushRules.can_push(26, car_load):
+		_fail("Strength 26 can push a %.0f kg load" % car_load)
+	if not PushRules.can_push(27, car_load):
+		_fail("Strength 27 cannot push a %.0f kg load" % car_load)
+	if PushRules.min_strength_for(car_load) != 27:
+		_fail("car requires Strength %d instead of 27" % PushRules.min_strength_for(car_load))
+	var ambulance := load("res://resources/vehicles/ambulance.tres") as VehicleData
+	if ambulance == null:
+		_fail("ambulance data missing for the push rules test")
+	else:
+		var ambulance_required: int = PushRules.min_strength_for(ambulance.get_push_load_kg())
+		if ambulance_required <= 30:
+			_fail(
+				"the %.0f kg ambulance should require more than Strength 30, got %d"
+				% [ambulance.get_mass_kg(), ambulance_required]
+			)
+	var entity_data := EntityData.new()
+	entity_data.strength = 10
+	if absf(entity_data.get_push_capacity_kg() - 136.08) > 0.1:
+		_fail("EntityData does not follow the push capacity curve")
+	if entity_data.get_carry_capacity_kg() >= entity_data.get_push_capacity_kg():
+		_fail("carrying capacity should be lower than push capacity")
 
 
 func _test_world_scene() -> void:
@@ -107,6 +170,8 @@ func _validate_resources() -> void:
 			_fail("%s has no wheels" % name)
 		if data.get_mass_kg() <= 0.0:
 			_fail("%s has no mass" % name)
+		if data.get_push_load_kg() <= 0.0:
+			_fail("%s has no push load" % name)
 		if data.max_health <= 0.0:
 			_fail("%s has no health" % name)
 		if data.seat_count < 1:
@@ -301,6 +366,118 @@ func _test_enter_exit() -> void:
 	)
 	if distance_m < 0.5:
 		_fail("exit point is inside the vehicle")
+	actor.queue_free()
+	vehicle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_parked_idle() -> void:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, 120.0), 0.4)
+	if vehicle == null:
+		_fail("could not spawn the parked car")
+		return
+	await get_tree().physics_frame
+	var start_px: Vector2 = vehicle.global_position
+	for _step: int in range(300):
+		await get_tree().physics_frame
+	var drift_m: float = Units.px_to_m(vehicle.global_position.distance_to(start_px))
+	if drift_m > 0.001:
+		_fail("parked vehicle drifted %.4f m" % drift_m)
+	if vehicle.get_velocity_mps().length() > 0.0001:
+		_fail("parked vehicle kept a physics velocity")
+	if not is_zero_approx(vehicle.get_speed_mps()):
+		_fail("parked vehicle reports a non-zero speed")
+	vehicle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_exit_does_not_slide() -> void:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, 200.0), 0.0)
+	if vehicle == null:
+		_fail("could not spawn the exit-slide car")
+		return
+	var actor := _make_actor(Vector2(2.0, 200.0))
+	if actor == null:
+		_fail("could not create the exit-slide driver")
+		vehicle.queue_free()
+		return
+	if not vehicle.enter(actor):
+		_fail("could not seat the exit-slide driver")
+		return
+	var controller := TestController.new()
+	controller.throttle_value = 1.0
+	vehicle.set_controller(controller)
+	var start_px: Vector2 = vehicle.global_position
+	for _step: int in range(90):
+		await get_tree().physics_frame
+	controller.throttle_value = 0.0
+	for _step: int in range(300):
+		await get_tree().physics_frame
+	if Units.px_to_m(vehicle.global_position.distance_to(start_px)) < 1.0:
+		_fail("exit-slide car did not drive before stopping")
+	if vehicle.get_speed_mps() > 0.001:
+		_fail("exit-slide car did not stop before the driver left (%.3f m/s)" % vehicle.get_speed_mps())
+	if not vehicle.exit(actor):
+		_fail("exit() failed for the exit-slide car")
+		return
+	var parked_px: Vector2 = vehicle.global_position
+	for _step: int in range(300):
+		await get_tree().physics_frame
+	var drift_m: float = Units.px_to_m(vehicle.global_position.distance_to(parked_px))
+	if drift_m > 0.001:
+		_fail("car slid %.4f m after the driver exited" % drift_m)
+	actor.queue_free()
+	vehicle.queue_free()
+	await get_tree().process_frame
+
+
+func _test_push_strength() -> void:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, 280.0), 0.0)
+	if vehicle == null:
+		_fail("could not spawn the push-test car")
+		return
+	var actor := _make_actor(Vector2(-3.0, 280.0))
+	if actor == null:
+		_fail("could not create the push-test actor")
+		vehicle.queue_free()
+		return
+	actor.data.strength = 10
+	var mover := TestEntityController.new()
+	mover.move_vector = Vector2.RIGHT
+	actor.set_controller(mover)
+	await get_tree().physics_frame
+	var start_px: Vector2 = vehicle.global_position
+	for _step: int in range(180):
+		await get_tree().physics_frame
+	var weak_push_m: float = Units.px_to_m(vehicle.global_position.distance_to(start_px))
+	if weak_push_m > 0.001:
+		_fail("Strength 10 pushed the car %.3f m" % weak_push_m)
+	actor.data.strength = 30
+	for _step: int in range(180):
+		await get_tree().physics_frame
+	var strong_push_m: float = Units.px_to_m(vehicle.global_position.distance_to(start_px))
+	if strong_push_m < 0.2:
+		_fail("Strength 30 could not push the car (%.3f m)" % strong_push_m)
+	mover.move_vector = Vector2.ZERO
+	for _step: int in range(60):
+		await get_tree().physics_frame
+	var settled_px: Vector2 = vehicle.global_position
+	for _step: int in range(60):
+		await get_tree().physics_frame
+	var coast_m: float = Units.px_to_m(vehicle.global_position.distance_to(settled_px))
+	if coast_m > 0.001:
+		_fail("pushed car kept sliding %.4f m after the push ended" % coast_m)
+	# An occupied vehicle never accepts an external push, even from a strong actor.
+	var driver := _make_actor(Vector2(4.0, 280.0))
+	if driver == null:
+		_fail("could not create the push-test driver")
+	else:
+		if not vehicle.enter(driver):
+			_fail("could not seat the push-test driver")
+		elif vehicle.apply_push(actor, Vector2.RIGHT):
+			_fail("an occupied vehicle accepted an external push")
+		vehicle.exit(driver)
+		driver.queue_free()
 	actor.queue_free()
 	vehicle.queue_free()
 	await get_tree().process_frame

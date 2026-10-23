@@ -48,6 +48,8 @@ const INTEREST_TAGS: Array[StringName] = [
 	&"walking",
 ]
 const DAYS_IN_MONTH: Array[int] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+## Current ability cap (D&D 5.5e). Raise it here and the inspector range follows.
+const MAX_ABILITY_SCORE: int = 30
 
 @export var id: StringName = &""
 @export var full_name: String = ""
@@ -57,14 +59,24 @@ const DAYS_IN_MONTH: Array[int] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 @export var birth_day: int = 1
 @export var likes: Array[StringName] = []
 @export var dislikes: Array[StringName] = []
-@export_range(1, 30) var strength: int = 10
-@export_range(1, 30) var dexterity: int = 10
-@export_range(1, 30) var constitution: int = 10
-@export_range(1, 30) var intelligence: int = 10
-@export_range(1, 30) var wisdom: int = 10
-@export_range(1, 30) var charisma: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var strength: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var dexterity: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var constitution: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var intelligence: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var wisdom: int = 10
+@export_range(1, MAX_ABILITY_SCORE) var charisma: int = 10
 @export var walk_speed_mps: float = 1.5
 @export var run_speed_mps: float = 5.0
+
+
+## Weight the entity can carry without penalties, in kilograms (Strength x 15 lb).
+func get_carry_capacity_kg() -> float:
+	return PushRules.carry_capacity_kg(strength)
+
+
+## Push/drag/lift capacity in kilograms; see PushRules for the curve.
+func get_push_capacity_kg() -> float:
+	return PushRules.push_capacity_kg(strength)
 
 
 func get_ability(ability: Ability) -> int:
