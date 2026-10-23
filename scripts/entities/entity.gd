@@ -12,6 +12,11 @@ const TERRAIN_SAMPLE_DISTANCE_M: float = 1.0
 ## How aligned the movement intent must be with the contact normal to push.
 const PUSH_INTENT_DOT: float = 0.25
 const PUSH_REJECT_INTERVAL_MS: int = 1500
+## Ground friction that bleeds off momentum inherited from a moving vehicle, in m/s².
+const INERTIA_DECELERATION_MPS2: float = 8.0
+## Inherited speed above which the controller is ignored (the entity is staggered).
+const INERTIA_CONTROL_SPEED_MPS: float = 1.0
+const INERTIA_STOP_SPEED_MPS: float = 0.05
 
 @export var data: EntityData = null
 @export var speed_multiplier: float = 1.0
@@ -32,6 +37,8 @@ var _terrain_speed_factor: float = 1.0
 var _last_sample_pos_m: Vector2 = Vector2.ZERO
 var _last_push_reject_target: Node = null
 var _last_push_reject_msec: int = -PUSH_REJECT_INTERVAL_MS
+## Momentum inherited from a moving vehicle, in m/s; decays with ground friction.
+var _inertia_velocity_mps: Vector2 = Vector2.ZERO
 
 @onready var _visual: Node2D = $Visual
 @onready var _collision_shape: CollisionShape2D = $CollisionShape2D
@@ -71,6 +78,7 @@ func set_locked(value: bool) -> void:
 	locked = value
 	if locked:
 		velocity = Vector2.ZERO
+		_inertia_velocity_mps = Vector2.ZERO
 
 
 ## Seated in a vehicle: hidden, physics off, and no collision until released.
@@ -82,6 +90,7 @@ func set_riding(value: bool) -> void:
 	collision_mask = 0 if value else PhysicsLayers.WORLD | PhysicsLayers.VEHICLES
 	if value:
 		velocity = Vector2.ZERO
+		_inertia_velocity_mps = Vector2.ZERO
 
 
 func get_speed_mps() -> float:
@@ -97,14 +106,31 @@ func get_strength() -> int:
 	return data.strength if data != null else 10
 
 
+## Inherited momentum (world space, m/s) that decays with ground friction.
+func apply_inertia(velocity_mps: Vector2) -> void:
+	_inertia_velocity_mps = velocity_mps
+
+
+## Momentum still being bled off; zero once the entity is fully under control.
+func get_inertia_velocity_mps() -> Vector2:
+	return _inertia_velocity_mps
+
+
+## True while inherited momentum is high enough to override the controller.
+func is_staggered() -> bool:
+	return _inertia_velocity_mps.length() > INERTIA_CONTROL_SPEED_MPS
+
+
 func _physics_process(delta: float) -> void:
 	if locked:
 		velocity = Vector2.ZERO
+		_inertia_velocity_mps = Vector2.ZERO
 		move_and_slide()
 		return
 	if controller == null or data == null:
-		velocity = Vector2.ZERO
+		velocity = Units.to_px(_inertia_velocity_mps)
 		move_and_slide()
+		_decay_inertia(delta)
 		return
 	_update_terrain(delta)
 	var move_mode: EntityController.MovementMode = controller.movement_mode
@@ -112,10 +138,13 @@ func _physics_process(delta: float) -> void:
 		_resolve_relative(delta)
 	else:
 		_resolve_omni(delta)
+	_decay_inertia(delta)
 
 
 func _resolve_omni(delta: float) -> void:
-	var move_vector: Vector2 = controller.get_move_vector().limit_length(1.0)
+	var move_vector: Vector2 = Vector2.ZERO
+	if not is_staggered():
+		move_vector = controller.get_move_vector().limit_length(1.0)
 	if move_vector != Vector2.ZERO:
 		facing = move_vector.normalized()
 		if _visual != null:
@@ -123,13 +152,18 @@ func _resolve_omni(delta: float) -> void:
 				_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
 			)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
-	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
+	velocity = (
+		move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
+		+ Units.to_px(_inertia_velocity_mps)
+	)
 	move_and_slide()
 	_push_contacts(move_vector)
 
 
 func _resolve_relative(delta: float) -> void:
-	var intent: Vector2 = controller.get_move_intent().limit_length(1.0)
+	var intent: Vector2 = Vector2.ZERO
+	if not is_staggered():
+		intent = controller.get_move_intent().limit_length(1.0)
 	var turn_input: float = intent.x
 	var throttle_input: float = intent.y
 	if absf(turn_input) > 0.001:
@@ -153,9 +187,22 @@ func _resolve_relative(delta: float) -> void:
 	velocity = (
 		move_vector
 		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
+		+ Units.to_px(_inertia_velocity_mps)
 	)
 	move_and_slide()
 	_push_contacts(move_vector)
+
+
+## Bleeds off inherited momentum at ground-friction rate, so a body thrown from a
+## moving vehicle is displaced by v²/(2a) before it comes to rest.
+func _decay_inertia(delta: float) -> void:
+	if _inertia_velocity_mps.is_zero_approx():
+		return
+	_inertia_velocity_mps = _inertia_velocity_mps.move_toward(
+		Vector2.ZERO, INERTIA_DECELERATION_MPS2 * delta
+	)
+	if _inertia_velocity_mps.length() < INERTIA_STOP_SPEED_MPS:
+		_inertia_velocity_mps = Vector2.ZERO
 
 
 ## Pushes vehicles the entity walks into, if its Strength covers their effective load.

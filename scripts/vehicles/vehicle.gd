@@ -149,11 +149,14 @@ func exit(actor: Entity) -> bool:
 	occupants.erase(actor)
 	# A moving car keeps its momentum when the driver leaves; it coasts and loses
 	# energy to rolling resistance until it stops or hits something.
+	var momentum_mps: Vector2 = Units.to_m(velocity)
 	_leave_coast_motion()
 	var point_m: Vector2 = _find_exit_point_m()
 	actor.global_position = Units.to_px(point_m)
 	actor.set_riding(false)
 	actor.set_locked(false)
+	# The rider inherits the body's velocity and is dragged along until friction wins.
+	actor.apply_inertia(momentum_mps)
 	_set_player_interaction_active(actor, true)
 	_refresh_interactable()
 	exited.emit(actor)

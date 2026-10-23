@@ -66,6 +66,7 @@ func _run() -> void:
 	await _test_parked_idle()
 	await _test_exit_does_not_slide()
 	await _test_exit_keeps_momentum()
+	await _test_exit_inertia()
 	await _test_push_strength()
 	_test_damage()
 
@@ -485,6 +486,70 @@ func _test_exit_keeps_momentum() -> void:
 	actor.queue_free()
 	vehicle.queue_free()
 	await get_tree().process_frame
+
+
+func _test_exit_inertia() -> void:
+	var slow_slide_m: float = await _measure_exit_slide(5.0, 480.0)
+	var fast_slide_m: float = await _measure_exit_slide(9.0, 560.0)
+	if slow_slide_m < 0.8:
+		_fail("exiting at ~20 km/h did not displace the entity (%.2f m)" % slow_slide_m)
+	if fast_slide_m <= slow_slide_m:
+		_fail(
+			"a faster exit should displace farther (%.2f m vs %.2f m)"
+			% [fast_slide_m, slow_slide_m]
+		)
+	if fast_slide_m < slow_slide_m * 2.0:
+		_fail(
+			"exit displacement does not scale with momentum (%.2f m vs %.2f m)"
+			% [fast_slide_m, slow_slide_m]
+		)
+
+
+## Drives a car to target_speed_mps, exits, and returns how far the rider slid.
+func _measure_exit_slide(target_speed_mps: float, y_m: float) -> float:
+	var vehicle := _spawn_vehicle(CAR_PATH, Vector2(0.0, y_m), 0.0)
+	if vehicle == null:
+		_fail("could not spawn the inertia car")
+		return 0.0
+	var actor := _make_actor(Vector2(2.0, y_m))
+	if actor == null:
+		_fail("could not create the inertia driver")
+		vehicle.queue_free()
+		return 0.0
+	if not vehicle.enter(actor):
+		_fail("could not seat the inertia driver")
+		return 0.0
+	var controller := TestController.new()
+	controller.throttle_value = 1.0
+	vehicle.set_controller(controller)
+	for _step: int in range(240):
+		await get_tree().physics_frame
+		if vehicle.get_speed_mps() >= target_speed_mps:
+			break
+	var exit_speed: float = vehicle.get_speed_mps()
+	if exit_speed < target_speed_mps:
+		_fail("inertia car did not reach %.1f m/s (%.2f m/s)" % [target_speed_mps, exit_speed])
+	if not vehicle.exit(actor):
+		_fail("exit() failed for the inertia car")
+		return 0.0
+	var inherited: float = actor.get_inertia_velocity_mps().length()
+	if inherited < exit_speed * 0.9:
+		_fail("entity inherited %.2f m/s instead of %.2f m/s" % [inherited, exit_speed])
+	var start_px: Vector2 = actor.global_position
+	for _step: int in range(240):
+		await get_tree().physics_frame
+	var slide_m: float = Units.px_to_m(actor.global_position.distance_to(start_px))
+	if actor.global_position.x < start_px.x:
+		_fail("entity slid against the vehicle heading")
+	var settled_px: Vector2 = actor.global_position
+	for _step: int in range(60):
+		await get_tree().physics_frame
+	if Units.px_to_m(actor.global_position.distance_to(settled_px)) > 0.001:
+		_fail("entity kept sliding after it stopped")
+	actor.queue_free()
+	vehicle.queue_free()
+	await get_tree().process_frame
+	return slide_m
 
 
 func _test_push_strength() -> void:
