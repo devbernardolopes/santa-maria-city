@@ -110,7 +110,7 @@ func _resolve_omni(delta: float) -> void:
 				_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
 			)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
-	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * _get_strength_speed_factor())
+	velocity = move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
 	move_and_slide()
 
 
@@ -138,18 +138,9 @@ func _resolve_relative(delta: float) -> void:
 	var move_vector: Vector2 = facing * throttle_input
 	velocity = (
 		move_vector
-		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor * _get_strength_speed_factor())
+		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
 	)
 	move_and_slide()
-
-
-
-func _get_strength_speed_factor() -> float:
-	## Return a speed factor based on entity strength (D&D 5.5e inspired).
-	## Strength modifier = floor((strength - 10) / 2).
-	## Factor ranges from 1.0 (Str 10) to 1.5 (Str 20+).
-	var modifier: int = data.get_strength_modifier()
-	return 1.0 + (modifier * 0.1)
 
 
 ## Samples the terrain grid at most every TERRAIN_SAMPLE_INTERVAL_S, or once per meter moved.
