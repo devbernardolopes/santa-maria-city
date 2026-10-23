@@ -9,6 +9,9 @@ signal map_loaded(counts: Dictionary)
 const OVERRIDES_PATH: String = "res://data/overlays/style_overrides.json"
 const OVERRIDES_VERSION: int = 1
 const EDITOR_FRAME_MARGIN: float = 0.9
+## Coarse index used by the HUD mini map. It deliberately references the generated polygons
+## instead of creating a second copy of the city geometry.
+const MINI_MAP_CELL_SIZE_M: float = 128.0
 
 @export var style: MapStyle = null:
 	set(value):
@@ -59,6 +62,8 @@ var _water_collision: StaticBody2D = null
 var _collision_skip_count: int = 0
 var _polygon_count: int = 0
 var _collision_shape_count: int = 0
+var _mini_map_entries: Array[Dictionary] = []
+var _mini_map_cells: Dictionary = {}
 static var _editor_auto_frame_attempted: bool = false
 
 
@@ -116,6 +121,41 @@ func get_polygons(osm_id: String) -> Array[Polygon2D]:
 	if _polygons_by_osm_id.has(osm_id):
 		polygons.assign(_polygons_by_osm_id[osm_id])
 	return polygons
+
+
+## Returns generated polygons intersecting bounds_m in normal map draw order. Each entry has
+## `polygon` (Polygon2D) and `color` (the TerrainStyle base color, never its texture tint).
+func get_mini_map_polygons(bounds_m: Rect2) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	if bounds_m.size.x <= 0.0 or bounds_m.size.y <= 0.0:
+		return result
+	var seen: Dictionary = {}
+	var min_cell := Vector2i(
+		floori(bounds_m.position.x / MINI_MAP_CELL_SIZE_M),
+		floori(bounds_m.position.y / MINI_MAP_CELL_SIZE_M)
+	)
+	var max_cell := Vector2i(
+		floori(bounds_m.end.x / MINI_MAP_CELL_SIZE_M),
+		floori(bounds_m.end.y / MINI_MAP_CELL_SIZE_M)
+	)
+	for cell_y: int in range(min_cell.y, max_cell.y + 1):
+		for cell_x: int in range(min_cell.x, max_cell.x + 1):
+			var indices_value: Variant = _mini_map_cells.get(Vector2i(cell_x, cell_y), [])
+			if not (indices_value is Array):
+				continue
+			for index_value: Variant in indices_value:
+				var index: int = int(index_value)
+				if seen.has(index) or index < 0 or index >= _mini_map_entries.size():
+					continue
+				seen[index] = true
+				var entry: Dictionary = _mini_map_entries[index]
+				var entry_bounds_value: Variant = entry.get("bounds_m")
+				if entry_bounds_value is Rect2 and bounds_m.intersects(entry_bounds_value):
+					result.append(entry)
+	result.sort_custom(func(left: Dictionary, right: Dictionary) -> bool:
+		return int(left.get("order", 0)) < int(right.get("order", 0))
+	)
+	return result
 
 
 func pick(world_point_px: Vector2) -> Dictionary:
@@ -432,12 +472,14 @@ func _build_layer(features: Array, layer_name: String, category: StringName) -> 
 			polygon.set_meta("kind", kind)
 			polygon.set_meta("surface", surface)
 			polygon.set_meta("style_id", style_id)
+			polygon.set_meta("mini_map_color", terrain_style.color)
 			if runtime:
 				polygon.set_meta("tags", tags)
 				polygon.set_meta("bounds_px", _bounds_of(points))
 			layer.add_child(polygon)
 			_polygon_count += 1
 			if runtime:
+				_register_mini_map_polygon(polygon, terrain_style.color, _bounds_of(points))
 				_index_polygon(osm_id, polygon)
 			_expand_computed_bounds(points)
 			if terrain != null:
@@ -521,6 +563,35 @@ func _index_polygon(osm_id: String, polygon: Polygon2D) -> void:
 		polygons.assign(_polygons_by_osm_id[osm_id])
 	polygons.append(polygon)
 	_polygons_by_osm_id[osm_id] = polygons
+
+
+func _register_mini_map_polygon(polygon: Polygon2D, color: Color, bounds_px: Rect2) -> void:
+	var bounds_m := Rect2(Units.to_m(bounds_px.position), Units.to_m(bounds_px.size))
+	var entry: Dictionary = {
+		"polygon": polygon,
+		"color": color,
+		"bounds_m": bounds_m,
+		"order": _mini_map_entries.size(),
+	}
+	var index: int = _mini_map_entries.size()
+	_mini_map_entries.append(entry)
+	var min_cell := Vector2i(
+		floori(bounds_m.position.x / MINI_MAP_CELL_SIZE_M),
+		floori(bounds_m.position.y / MINI_MAP_CELL_SIZE_M)
+	)
+	var max_cell := Vector2i(
+		floori(bounds_m.end.x / MINI_MAP_CELL_SIZE_M),
+		floori(bounds_m.end.y / MINI_MAP_CELL_SIZE_M)
+	)
+	for cell_y: int in range(min_cell.y, max_cell.y + 1):
+		for cell_x: int in range(min_cell.x, max_cell.x + 1):
+			var key := Vector2i(cell_x, cell_y)
+			var indices: Array[int] = []
+			var existing_value: Variant = _mini_map_cells.get(key)
+			if existing_value is Array:
+				indices.assign(existing_value)
+			indices.append(index)
+			_mini_map_cells[key] = indices
 
 
 func _picked_info(polygon: Polygon2D) -> Dictionary:
@@ -735,6 +806,8 @@ func _clear_generated() -> void:
 	_collision_skip_count = 0
 	_polygon_count = 0
 	_collision_shape_count = 0
+	_mini_map_entries.clear()
+	_mini_map_cells.clear()
 	if is_instance_valid(_building_collision):
 		_building_collision.free()
 	_building_collision = null

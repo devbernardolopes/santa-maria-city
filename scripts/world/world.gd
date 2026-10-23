@@ -15,6 +15,7 @@ const DRIVE_EXIT_COOLDOWN_MS: int = 300
 @onready var _debug_camera: DebugCamera = $DebugCamera
 @onready var _debug_spawner: DebugSpawner = $DebugSpawner
 @onready var _picker: MapPicker = $MapPicker
+@onready var _mini_map: MiniMap = $Hud/MiniMap
 @warning_ignore("unused_private_class_variable")
 @onready var _touch_controls: TouchControls = $Hud/TouchControls
 @onready var _entrance_spawner: EntranceSpawner = $EntranceSpawner
@@ -78,6 +79,8 @@ func _physics_process(_delta: float) -> void:
 
 func _on_map_loaded(counts: Dictionary) -> void:
 	_debug_camera.on_map_loaded()
+	if _mini_map != null:
+		_mini_map.set_map(_map)
 	var hud: Hud = get_node_or_null("Hud") as Hud
 	if hud != null:
 		hud.on_map_loaded(counts)
@@ -129,6 +132,8 @@ func _set_focus_entity(node: Node2D) -> void:
 	_follow_camera.target = node
 	_follow_camera.snap_to_target()
 	_follow_camera.make_current()
+	if _mini_map != null:
+		_mini_map.set_focus(node)
 	if _vegetation != null:
 		_vegetation.set_collision_anchor(node)
 
