@@ -1,18 +1,17 @@
-[gd_resource type="Resource" script_class="VehicleData" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="VehicleData" format=3 uid="uid://ci48i7p7phxf6"]
 
-[ext_resource type="Script" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
-[ext_resource type="Script" path="res://resources/objects/object_properties.gd" id="2_props"]
-[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/ambulance/1.png" id="3_a"]
-[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/ambulance/2.png" id="3_b"]
-[ext_resource type="Texture2D" path="res://assets/images/sprites/vehicles/cars/ambulance/3.png" id="3_c"]
+[ext_resource type="Script" uid="uid://bf2qg6fnyx75w" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
+[ext_resource type="Script" uid="uid://bd2jtxovkj3n" path="res://resources/objects/object_properties.gd" id="2_props"]
+[ext_resource type="Texture2D" uid="uid://tgqxjvhpdu63" path="res://assets/images/sprites/vehicles/cars/ambulance/1.png" id="3_a"]
+[ext_resource type="Texture2D" uid="uid://b513bjt3q85w2" path="res://assets/images/sprites/vehicles/cars/ambulance/2.png" id="3_b"]
+[ext_resource type="Texture2D" uid="uid://cej5vpc27g5tv" path="res://assets/images/sprites/vehicles/cars/ambulance/3.png" id="3_c"]
+[ext_resource type="Script" uid="uid://bau6xk7wql5ja" path="res://resources/vehicles/wheel_spec.gd" id="6_ilmxd"]
 
 [sub_resource type="Resource" id="ObjectProperties_ambulance"]
 script = ExtResource("2_props")
 mass_kg = 4200.0
-movable = true
 friction = 0.7
 flammable = true
-ignition_temperature_c = 300.0
 
 [resource]
 script = ExtResource("1_data")
@@ -40,7 +39,6 @@ steer_rate_deg_s = 110.0
 high_speed_steer_factor = 0.38
 lateral_grip = 8.0
 wheelbase_m = 3.36
-wheel_count = 4
 seat_count = 6
 can_store_items = true
 storage_slots = 16

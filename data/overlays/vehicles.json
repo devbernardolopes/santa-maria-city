@@ -1,4 +1,17 @@
 {
 	"version": 1,
-	"vehicles": []
+	"vehicles": [
+		{
+		  "data": "res://resources/vehicles/car.tres",
+		  "position": [2375.18, 4071.47],
+		  "heading_deg": 0.0,
+		  "lights": false
+		},
+		{
+		  "data": "res://resources/vehicles/ambulance.tres",
+		  "position": [2335.18, 4071.47],
+		  "heading_deg": 0.0,
+		  "lights": true
+		},
+	]
 }
