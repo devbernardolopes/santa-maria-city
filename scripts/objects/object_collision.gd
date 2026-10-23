@@ -18,11 +18,11 @@ func set_data(new_data: ObjectData) -> void:
 		var circle := CircleShape2D.new()
 		circle.radius = Units.m_to_px(radius)
 		var shape := CollisionShape2D.new()
-		shape.shape = circle
-		# convert offset vector components separately
+		# set offset before shape, as Godot may validate differently
 		shape.offset = Vector2(
 			Units.m_to_px(data.collision_offset_m.x), Units.m_to_px(data.collision_offset_m.y)
 		)
+		shape.shape = circle
 		add_child(shape)
 	else:
 		# no collision when size is zero

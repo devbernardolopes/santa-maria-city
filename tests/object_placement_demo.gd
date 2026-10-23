@@ -8,7 +8,7 @@ extends Node2D
 @onready var _objects_node: Node2D = $Objects
 
 # The rug resource to place (assign oriental_rug.tres in inspector)
-@export var rug_resource: String = "res://oriental_rug.tres"
+@export var rug_resource: String = "res://resources/objects/oriental_rug.tres"
 
 # Position to place the object (meters, local to interior)
 @export var place_position_m: Vector2 = Vector2(3.0, 2.0)

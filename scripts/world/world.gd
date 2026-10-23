@@ -42,6 +42,8 @@ func _ready() -> void:
 		if counts_value is Dictionary:
 			counts = counts_value
 		_on_map_loaded(counts)
+		
+
 
 
 func _unhandled_input(event: InputEvent) -> void:

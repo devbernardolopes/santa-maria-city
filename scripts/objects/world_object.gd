@@ -12,7 +12,7 @@ extends Node2D
 @onready var _collision: ObjectCollision = $Collision
 @onready var _interactable: Interactable = $Interactable
 
-var data: ObjectData = null
+@export var data: ObjectData = null
 var mutable_state: Dictionary = {}  # health, stack_count, etc.
 
 ## Inventory system
@@ -25,7 +25,7 @@ var container_title: String = ""
 
 static func new_from_data(new_data: ObjectData) -> WorldObject:
 	# scene already has script assigned via ext_resource
-	var scene = load("res://scenes/objects/world_object.tscn") as PackedScene
+	var scene = load("res://scripts/objects/world_object.tscn") as PackedScene
 	if scene == null:
 		return null
 	var instance := scene.instantiate() as WorldObject
@@ -35,7 +35,7 @@ static func new_from_data(new_data: ObjectData) -> WorldObject:
 
 func new_from_item_data(new_data: ItemData) -> WorldObject:
 	# scene already has script assigned via ext_resource
-	var scene = load("res://scenes/objects/world_object.tscn") as PackedScene
+	var scene = load("res://scripts/objects/world_object.tscn") as PackedScene
 	if scene == null:
 		return null
 	var instance := scene.instantiate() as WorldObject
