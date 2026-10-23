@@ -1,7 +1,6 @@
 extends Node2D
 ## Headless vegetation smoke test: map load, streaming, pools, and inspection.
 
-const PLAYER_SCENE: PackedScene = preload("res://scenes/entities/player.tscn")
 const MAP_WAIT_MS: int = 15000
 const STREAM_WAIT_MS: int = 5000
 const POOL_WAIT_MS: int = 5000
@@ -54,9 +53,9 @@ func _run() -> void:
 	if focus_px.x == INF:
 		focus_px = _map.map_bounds_px.get_center()
 
-	_player = PLAYER_SCENE.instantiate() as Entity
+	_player = preload("res://scenes/entities/entity.tscn").instantiate() as Entity
 	if _player == null:
-		_fail("could not instantiate the player scene")
+		_fail("could not instantiate the entity scene")
 		return
 	_player.name = "Focus"
 	_player.position = focus_px

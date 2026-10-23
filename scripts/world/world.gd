@@ -1,12 +1,12 @@
 extends Node2D
 ## Root of the playable world. Child layers are kept in fixed draw order.
 
-const PLAYER_SCENE: PackedScene = preload("res://scenes/entities/player.tscn")
 const SPAWNS_PATH: String = "res://data/overlays/spawns.json"
 const SPAWNS_VERSION: int = 1
 ## Ignore the interact action for this long after entering, so the same press does not exit.
 const DRIVE_EXIT_COOLDOWN_MS: int = 300
 
+@export var player: Entity = null
 @export var debug_seed: int = 1
 
 @onready var _map: MapLoader = $Map
@@ -44,8 +44,6 @@ func _ready() -> void:
 		if counts_value is Dictionary:
 			counts = counts_value
 		_on_map_loaded(counts)
-		
-
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -96,32 +94,25 @@ func _on_map_loaded(counts: Dictionary) -> void:
 
 
 func _spawn_player() -> void:
+	if player == null or not is_instance_valid(player):
+		push_error("World: no Player node assigned; the world is unplayable.")
+		return
 	var hud_r: Hud = get_node_or_null("Hud") as Hud
 	if hud_r != null:
-		hud_r.set_player(null)
+		hud_r.set_player(player)
 		hud_r.set_interaction_prompt("")
 	var tc_r: TouchControls = get_node_or_null("Hud/TouchControls") as TouchControls
 	if tc_r != null:
 		tc_r.set_interact_available(false)
-	var player_ref: Entity = _player
+	var player_ref: Entity = player
 	if player_ref != null and is_instance_valid(player_ref):
 		if _vegetation != null:
 			_vegetation.set_collision_anchor(null)
-		player_ref.free()
-	_player = null
-	var rng := RandomNumberGenerator.new()
-	rng.seed = debug_seed
-	var data: EntityData = EntityData.create_random(rng)
-	var player := PLAYER_SCENE.instantiate() as Entity
-	if player == null:
-		push_error("World: could not instantiate the player scene.")
-		return
-	player.data = data
-	_spawn_point_m = _player_spawn_point_m()
-	player.position = Units.to_px(_spawn_point_m)
-	_objects.add_child(player)
-	_player = player
-	_set_focus_entity(player)
+		_spawn_point_m = _player_spawn_point_m()
+		player_ref.global_position = Units.to_px(_spawn_point_m)
+		player_ref.velocity = Vector2.ZERO
+		player_ref.set_locked(false)
+		_set_focus_entity(player_ref)
 	var hud_p: Hud = get_node_or_null("Hud") as Hud
 	if hud_p != null:
 		hud_p.set_player(player)
@@ -251,7 +242,7 @@ func _on_vehicle_spawned(vehicle: Vehicle) -> void:
 
 
 func _on_vehicle_entered(actor: Entity, vehicle: Vehicle) -> void:
-	if actor != _player or _driving_vehicle != null:
+	if actor != player or _driving_vehicle != null:
 		return
 	_driving_vehicle = vehicle
 	_driving_actor = actor
@@ -275,7 +266,7 @@ func _on_vehicle_exited(actor: Entity, vehicle: Vehicle) -> void:
 	_driving_vehicle = null
 	_driving_actor = null
 	var hud: Hud = get_node_or_null("Hud") as Hud
-	if actor == _player and is_instance_valid(actor):
+	if actor == player and is_instance_valid(actor):
 		_set_focus_entity(actor)
 		_follow_camera.set_mode(_previous_camera_mode)
 		if hud != null:
@@ -290,7 +281,7 @@ func _on_vehicle_exited(actor: Entity, vehicle: Vehicle) -> void:
 
 
 func _on_vehicle_entry_rejected(actor: Entity, reason: String, vehicle: Vehicle) -> void:
-	if actor != _player:
+	if actor != player:
 		return
 	_show_message("%s: %s" % [_vehicle_name(vehicle), reason])
 
@@ -306,9 +297,9 @@ func _cycle_camera_mode() -> void:
 func _spawn_debug_vehicle() -> void:
 	if _driving_vehicle != null or _vehicle_spawner == null:
 		return
-	if _player == null or not is_instance_valid(_player):
+	if player == null or not is_instance_valid(player):
 		return
-	var vehicle: Vehicle = _vehicle_spawner.spawn_in_front_of(_player)
+	var vehicle: Vehicle = _vehicle_spawner.spawn_in_front_of(player)
 	if vehicle == null:
 		_show_message("No room to spawn a vehicle.")
 
@@ -327,6 +318,3 @@ func _show_message(text: String) -> void:
 
 func _is_number(value: Variant) -> bool:
 	return typeof(value) == TYPE_INT or typeof(value) == TYPE_FLOAT
-
-
-var _player: Entity = null

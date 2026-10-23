@@ -33,10 +33,7 @@ static func carry_capacity_kg(strength: int) -> float:
 ## Push/drag/lift capacity in kilograms; doubles every 5 Strength points from the
 ## D&D baseline at Strength 10 (about 136 kg).
 static func push_capacity_kg(strength: int) -> float:
-	return (
-		dnd_push_capacity_kg(10)
-		* pow(2.0, (float(strength) - 10.0) / DOUBLING_STRENGTH_STEP)
-	)
+	return dnd_push_capacity_kg(10) * pow(2.0, (float(strength) - 10.0) / DOUBLING_STRENGTH_STEP)
 
 
 ## Effective load of an object: its mass scaled by the authored push resistance.

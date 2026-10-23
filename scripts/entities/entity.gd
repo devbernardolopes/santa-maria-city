@@ -54,7 +54,7 @@ func _ready() -> void:
 		controller = _find_controller()
 	if data == null:
 		push_warning("Entity: no EntityData assigned; movement is disabled.")
-	elif data.id.is_empty():
+	elif EntityRegistry.get_data(data.id) == null:
 		EntityRegistry.register(data)
 	if _visual != null:
 		_visual.rotation = facing.angle()
@@ -185,8 +185,12 @@ func _resolve_relative(delta: float) -> void:
 	var throttle_magnitude: float = absf(throttle_input)
 	var move_vector: Vector2 = facing * throttle_input
 	velocity = (
-		move_vector
-		* Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor)
+		(
+			move_vector
+			* Units.m_to_px(
+				speed_mps * speed_multiplier * _terrain_speed_factor * move_speed_factor
+			)
+		)
 		+ Units.to_px(_inertia_velocity_mps)
 	)
 	move_and_slide()
@@ -237,7 +241,10 @@ func _push_contacts(intent: Vector2) -> void:
 ## Emits push_rejected at most once per target per interval.
 func _report_push_rejected(target: Node, required_strength: int) -> void:
 	var now: int = Time.get_ticks_msec()
-	if target == _last_push_reject_target and now - _last_push_reject_msec < PUSH_REJECT_INTERVAL_MS:
+	if (
+		target == _last_push_reject_target
+		and now - _last_push_reject_msec < PUSH_REJECT_INTERVAL_MS
+	):
 		return
 	_last_push_reject_target = target
 	_last_push_reject_msec = now

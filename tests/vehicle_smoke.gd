@@ -101,8 +101,10 @@ func _test_push_rules() -> void:
 		var actual: float = PushRules.push_capacity_kg(strength)
 		if absf(actual - expected) > 0.1:
 			_fail(
-				"push capacity at Str %d is %.2f kg, expected %.2f kg"
-				% [strength, actual, expected]
+				(
+					"push capacity at Str %d is %.2f kg, expected %.2f kg"
+					% [strength, actual, expected]
+				)
 			)
 	var car := load(CAR_PATH) as VehicleData
 	if car == null:
@@ -124,8 +126,10 @@ func _test_push_rules() -> void:
 		var ambulance_required: int = PushRules.min_strength_for(ambulance.get_push_load_kg())
 		if ambulance_required <= 30:
 			_fail(
-				"the %.0f kg ambulance should require more than Strength 30, got %d"
-				% [ambulance.get_mass_kg(), ambulance_required]
+				(
+					"the %.0f kg ambulance should require more than Strength 30, got %d"
+					% [ambulance.get_mass_kg(), ambulance_required]
+				)
 			)
 	var entity_data := EntityData.new()
 	entity_data.strength = 10
@@ -418,7 +422,12 @@ func _test_exit_does_not_slide() -> void:
 	if Units.px_to_m(vehicle.global_position.distance_to(start_px)) < 1.0:
 		_fail("exit-slide car did not drive before stopping")
 	if vehicle.get_speed_mps() > 0.001:
-		_fail("exit-slide car did not stop before the driver left (%.3f m/s)" % vehicle.get_speed_mps())
+		_fail(
+			(
+				"exit-slide car did not stop before the driver left (%.3f m/s)"
+				% vehicle.get_speed_mps()
+			)
+		)
 	if not vehicle.exit(actor):
 		_fail("exit() failed for the exit-slide car")
 		return
@@ -495,13 +504,17 @@ func _test_exit_inertia() -> void:
 		_fail("exiting at ~20 km/h did not displace the entity (%.2f m)" % slow_slide_m)
 	if fast_slide_m <= slow_slide_m:
 		_fail(
-			"a faster exit should displace farther (%.2f m vs %.2f m)"
-			% [fast_slide_m, slow_slide_m]
+			(
+				"a faster exit should displace farther (%.2f m vs %.2f m)"
+				% [fast_slide_m, slow_slide_m]
+			)
 		)
 	if fast_slide_m < slow_slide_m * 2.0:
 		_fail(
-			"exit displacement does not scale with momentum (%.2f m vs %.2f m)"
-			% [fast_slide_m, slow_slide_m]
+			(
+				"exit displacement does not scale with momentum (%.2f m vs %.2f m)"
+				% [fast_slide_m, slow_slide_m]
+			)
 		)
 
 
