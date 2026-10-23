@@ -18,7 +18,6 @@
 [ext_resource type="Script" uid="uid://b7khg7p18e3w1" path="res://scripts/vegetation/vegetation_manager.gd" id="13_vegetation"]
 [ext_resource type="Script" uid="uid://cxws2svhp3mpo" path="res://scripts/vehicles/vehicle_spawner.gd" id="14_vehicles"]
 [ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
-[ext_resource type="Script" uid="uid://8cf3r7xb3l86" path="res://scripts/minimap.gd" id="18_wbwoo"]
 
 [node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
 script = ExtResource("1_world")
@@ -168,14 +167,6 @@ one_shot = true
 
 [node name="TouchControls" parent="Hud" unique_id=603870859 instance=ExtResource("8_touch")]
 layout_mode = 3
-
-[node name="MiniMap" type="Control" parent="Hud" unique_id=1510724548]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-script = ExtResource("18_wbwoo")
-metadata/_custom_type_script = "uid://8cf3r7xb3l86"
 
 [node name="PlayerEntity" parent="." unique_id=90653120 instance=ExtResource("18_bt7bg")]
 
