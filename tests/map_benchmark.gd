@@ -8,6 +8,7 @@ var _map: MapLoader = null
 
 func _ready() -> void:
 	_map = MapLoader.new()
+	_map.map_path = "res://data/map_test.json"
 	_map.name = "Map"
 	add_child(_map)
 	var deadline: int = Time.get_ticks_msec() + WAIT_MS

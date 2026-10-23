@@ -28,6 +28,7 @@ func _ready() -> void:
 
 func _run() -> void:
 	_map = MapLoader.new()
+	_map.map_path = "res://data/map_test.json"
 	_map.name = "Map"
 	add_child(_map)
 	if not await _wait_for_map():

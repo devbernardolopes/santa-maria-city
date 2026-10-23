@@ -5,7 +5,7 @@ extends Node2D
 
 signal map_loaded(counts: Dictionary)
 
-const MAP_PATH: String = "res://data/map.json"
+@export var map_path: String = "res://data/map.json"
 const OVERRIDES_PATH: String = "res://data/overlays/style_overrides.json"
 const OVERRIDES_VERSION: int = 1
 const EDITOR_FRAME_MARGIN: float = 0.9
@@ -188,12 +188,12 @@ func get_building_ids() -> Array[String]:
 
 func _load_map() -> bool:
 	var build_start_usec: int = Time.get_ticks_usec()
-	var file: FileAccess = FileAccess.open(MAP_PATH, FileAccess.READ)
+	var file: FileAccess = FileAccess.open(map_path, FileAccess.READ)
 	if file == null:
 		push_error(
 			(
 				"MapLoader: could not open %s (error %s)."
-				% [MAP_PATH, error_string(FileAccess.get_open_error())]
+				% [map_path, error_string(FileAccess.get_open_error())]
 			)
 		)
 		return false
@@ -206,7 +206,7 @@ func _load_map() -> bool:
 			(
 				"MapLoader: invalid JSON in %s at line %d: %s"
 				% [
-					MAP_PATH,
+					map_path,
 					json.get_error_line(),
 					json.get_error_message(),
 				]
@@ -215,22 +215,22 @@ func _load_map() -> bool:
 		return false
 	var parsed: Variant = json.data
 	if not (parsed is Dictionary):
-		push_error("MapLoader: %s must contain a JSON object." % MAP_PATH)
+		push_error("MapLoader: %s must contain a JSON object." % map_path)
 		return false
 	var data: Dictionary = parsed
 	var required_keys: Array[String] = ["landuse", "waterways", "roads", "buildings", "meta"]
 	for key: String in required_keys:
 		if not data.has(key):
-			push_error("MapLoader: %s is missing the '%s' key." % [MAP_PATH, key])
+			push_error("MapLoader: %s is missing the '%s' key." % [map_path, key])
 			return false
 	var layer_keys: Array[String] = ["landuse", "waterways", "roads", "buildings"]
 	for key: String in layer_keys:
 		if not (data[key] is Array):
-			push_error("MapLoader: '%s' in %s must be an array." % [key, MAP_PATH])
+			push_error("MapLoader: '%s' in %s must be an array." % [key, map_path])
 			return false
 	var meta_value: Variant = data["meta"]
 	if not (meta_value is Dictionary):
-		push_error("MapLoader: 'meta' in %s must be an object." % MAP_PATH)
+		push_error("MapLoader: 'meta' in %s must be an object." % map_path)
 		return false
 	var meta_data: Dictionary = meta_value
 	if not _read_meta(meta_data):
@@ -314,31 +314,31 @@ func _read_meta(meta_data: Dictionary) -> bool:
 	var required_keys: Array[String] = ["size_m", "counts", "attribution"]
 	for key: String in required_keys:
 		if not meta_data.has(key):
-			push_error("MapLoader: %s is missing 'meta.%s'." % [MAP_PATH, key])
+			push_error("MapLoader: %s is missing 'meta.%s'." % [map_path, key])
 			return false
 	var size_value: Variant = meta_data["size_m"]
 	if not (size_value is Array):
-		push_error("MapLoader: 'meta.size_m' in %s must be an array." % MAP_PATH)
+		push_error("MapLoader: 'meta.size_m' in %s must be an array." % map_path)
 		return false
 	var size_array: Array = size_value
 	if size_array.size() < 2:
-		push_error("MapLoader: 'meta.size_m' in %s must contain two numbers." % MAP_PATH)
+		push_error("MapLoader: 'meta.size_m' in %s must contain two numbers." % map_path)
 		return false
 	map_size_m = Vector2(float(size_array[0]), float(size_array[1]))
 	var counts_value: Variant = meta_data["counts"]
 	if not (counts_value is Dictionary):
-		push_error("MapLoader: 'meta.counts' in %s must be an object." % MAP_PATH)
+		push_error("MapLoader: 'meta.counts' in %s must be an object." % map_path)
 		return false
 	var attribution_value: Variant = meta_data["attribution"]
 	if not (attribution_value is String) or String(attribution_value).is_empty():
-		push_error("MapLoader: 'meta.attribution' in %s must be a non-empty string." % MAP_PATH)
+		push_error("MapLoader: 'meta.attribution' in %s must be a non-empty string." % map_path)
 		return false
 	meta = meta_data
 	map_bounds_px = Rect2()
 	var bounds_value: Variant = meta_data.get("bounds_m")
 	if bounds_value != null:
 		if not _parse_bounds(bounds_value):
-			push_warning("MapLoader: ignoring invalid 'meta.bounds_m' in %s." % MAP_PATH)
+			push_warning("MapLoader: ignoring invalid 'meta.bounds_m' in %s." % map_path)
 	return true
 
 
