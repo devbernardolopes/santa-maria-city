@@ -17,9 +17,11 @@
 [ext_resource type="Script" uid="uid://clgnsatsjxo3a" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
 [ext_resource type="Script" uid="uid://b7khg7p18e3w1" path="res://scripts/vegetation/vegetation_manager.gd" id="13_vegetation"]
 [ext_resource type="Script" uid="uid://cxws2svhp3mpo" path="res://scripts/vehicles/vehicle_spawner.gd" id="14_vehicles"]
+[ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
 
-[node name="World" type="Node2D" unique_id=1946698986]
+[node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
 script = ExtResource("1_world")
+player = NodePath("PlayerEntity")
 
 [node name="DayNight" type="CanvasModulate" parent="." unique_id=662209373]
 script = ExtResource("9_daynight")
@@ -165,3 +167,7 @@ one_shot = true
 
 [node name="TouchControls" parent="Hud" unique_id=603870859 instance=ExtResource("8_touch")]
 layout_mode = 3
+
+[node name="PlayerEntity" parent="." unique_id=90653120 instance=ExtResource("18_bt7bg")]
+
+[editable path="Objects/OrientalRug"]
