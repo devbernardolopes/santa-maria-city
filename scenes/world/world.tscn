@@ -57,6 +57,8 @@ script = ExtResource("3_camera")
 
 [node name="FollowCamera" type="Camera2D" parent="." unique_id=1160093374]
 script = ExtResource("6_follow")
+auto_idle_zoom = 1.5
+auto_speed_zoom = 0.75
 
 [node name="DebugSpawner" type="Node" parent="." unique_id=79334371]
 script = ExtResource("7_spawner")
@@ -73,6 +75,7 @@ script = ExtResource("11_interior_manager")
 
 [node name="VegetationManager" type="Node" parent="." unique_id=1791694108]
 script = ExtResource("13_vegetation")
+max_view_radius_m = 128.0
 
 [node name="ScreenFader" type="CanvasLayer" parent="." unique_id=250914884]
 layer = 100
