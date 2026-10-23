@@ -1,94 +1,103 @@
-# Loading screen scene script
-# Shows a progress bar during game/level loading
-
 extends Control
+## Loads the World scene in the background while keeping a visible progress surface.
 
-# UI components (set in editor)
+const WORLD_SCENE_PATH: String = "res://scenes/world/world.tscn"
+const WORLD_SCENE_PROGRESS_MAX: float = 0.85
+const MAP_PROGRESS: float = 0.95
+const COMPLETE_PROGRESS: float = 1.0
+const MAX_WAIT_S: float = 120.0
+
 @onready var progress_bar: ProgressBar = $ProgressBar
 @onready var progress_label: Label = $ProgressLabel
 @onready var loading_text: Label = $LoadingText
 
-# Loading state
 var _is_loading: bool = false
+var _world: Node = null
+var _elapsed_s: float = 0.0
+var _world_load_started: bool = false
 
 
 func _ready() -> void:
-	# Initially hide until start_loading is called
-	hide()
 	progress_bar.value = 0.0
-	progress_bar.visible = false
-	progress_label.visible = false
-	loading_text.visible = false
-
-	# Start loading the map
-	start_loading()
+	progress_label.text = "0%"
+	loading_text.text = "Initializing game..."
+	start_loading.call_deferred()
 
 
-func start_loading() -> void:
-	_is_loading = true
-	show()
-	progress_bar.value = 0.0
-	progress_bar.visible = true
-	progress_label.visible = true
-	loading_text.visible = true
-	progress_label.text = "Loading..."
-
-	# Load the map resource asynchronously
-	load_map_async()
-
-
-func load_map_async() -> void:
-	var map_path: String = "res://data/map.json"
-
-	# Load the map resource
-	var map_resource = ResourceLoader.load(map_path)
-
-	if map_resource == null:
-		print("Failed to load map: " + map_path)
-		_load_complete()
+func _process(delta: float) -> void:
+	if not _is_loading:
+		return
+	_elapsed_s += delta
+	if _elapsed_s > MAX_WAIT_S:
+		_fail_loading("Loading timed out. Check the map data and project output for errors.")
 		return
 
-	# Simulate progress update - in a real async implementation
-	# this would use ResourceInteractiveLoader for true incremental progress
-	# For now, set progress after a short delay
-	get_tree().create_timer(0.5).timeout.connect(_on_timer_05)
+func start_loading() -> void:
+	if _is_loading:
+		return
+	_is_loading = true
+	_elapsed_s = 0.0
+	_set_progress(0.0, "Loading world scene...")
+	call_deferred("_load_world_scene")
 
 
-func _on_timer_05() -> void:
-	progress_bar.value = 1.0
-	progress_label.text = "100%"
-	_load_complete()
+func _load_world_scene() -> void:
+	if not _is_loading or _world_load_started:
+		return
+	_world_load_started = true
+	_set_progress(0.1, "Loading world scene...")
+	await get_tree().process_frame
+	var world_scene: PackedScene = ResourceLoader.load(WORLD_SCENE_PATH, "PackedScene") as PackedScene
+	if world_scene == null:
+		_fail_loading("Could not load the world scene.")
+		return
+	if _world != null:
+		return
+	_world = world_scene.instantiate()
+	if _world == null:
+		_fail_loading("The world scene could not be instantiated.")
+		return
+	_set_progress(WORLD_SCENE_PROGRESS_MAX, "Building map...")
+	await get_tree().process_frame
+	get_tree().root.add_child(_world)
+	var map: MapLoader = _world.get_node_or_null("Map") as MapLoader
+	if map == null:
+		_fail_loading("The world scene has no Map node.")
+		return
+	if not map.map_loaded.is_connected(_on_map_loaded):
+		map.map_loaded.connect(_on_map_loaded, CONNECT_ONE_SHOT)
+	if map.has_signal("map_load_failed") and not map.map_load_failed.is_connected(_on_map_load_failed):
+		map.map_load_failed.connect(_on_map_load_failed, CONNECT_ONE_SHOT)
+	if map.is_loaded:
+		_on_map_loaded({})
 
 
-func _load_complete() -> void:
+func _on_map_loaded(_counts: Dictionary) -> void:
+	if not _is_loading:
+		return
+	_set_progress(MAP_PROGRESS, "Finalizing world...")
+	await get_tree().process_frame
+	_set_progress(COMPLETE_PROGRESS, "Ready")
 	_is_loading = false
-	progress_bar.visible = false
-	progress_label.visible = false
-	loading_text.visible = false
-
-	# Load the world scene after a short delay
-	get_tree().create_timer(0.5).timeout.connect(_switch_to_world)
+	await get_tree().process_frame
+	queue_free()
 
 
-func _switch_to_world() -> void:
-	var world_scene_path: String = "res://scenes/world/world.tscn"
-
-	if ResourceLoader.exists(world_scene_path):
-		var world_scene = ResourceLoader.load(world_scene_path)
-		if world_scene != null:
-			var world_instance = world_scene.instantiate()
-			if world_instance != null:
-				get_tree().root.add_child(world_instance)
-
-	hide()
-	progress_bar.value = 1.0
-	progress_label.text = "100%"
+func _on_map_load_failed(message: String) -> void:
+	_fail_loading(message)
 
 
-func stop_loading() -> void:
+func _fail_loading(message: String) -> void:
 	_is_loading = false
-	hide()
-	progress_bar.visible = false
-	progress_label.visible = false
-	loading_text.visible = false
+	_world_load_started = false
+	loading_text.text = message
+	progress_label.text = "Unable to load"
 	progress_bar.value = 0.0
+	push_error("LoadingScreen: %s" % message)
+
+
+func _set_progress(value: float, message: String) -> void:
+	var clamped_value: float = clampf(value, 0.0, COMPLETE_PROGRESS)
+	progress_bar.value = clamped_value * 100.0
+	progress_label.text = "%d%%" % roundi(clamped_value * 100.0)
+	loading_text.text = message

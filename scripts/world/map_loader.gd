@@ -4,6 +4,7 @@ extends Node2D
 ## Loads res://data/map.json and draws every feature as a styled Polygon2D.
 
 signal map_loaded(counts: Dictionary)
+signal map_load_failed(message: String)
 
 @export var map_path: String = "res://data/map.json"
 const OVERRIDES_PATH: String = "res://data/overlays/style_overrides.json"
@@ -104,6 +105,7 @@ func rebuild() -> void:
 	_overrides = _read_overrides()
 	if not _load_map():
 		terrain = null
+		map_load_failed.emit("The map could not be loaded.")
 		return
 	is_loaded = true
 	if not Engine.is_editor_hint():
