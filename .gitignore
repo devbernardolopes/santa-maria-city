@@ -8,3 +8,4 @@
 
 # Raw OSM exports are large and regenerated offline; data/map.json is the runtime data.
 /data/export*.geojson
+.vscode/settings.json
