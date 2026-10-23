@@ -66,6 +66,17 @@ const DAYS_IN_MONTH: Array[int] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 @export var walk_speed_mps: float = 1.5
 @export var run_speed_mps: float = 5.0
 
+## D&D 5.5e-inspired mass-movement formula.
+## Strength modifier = floor((strength - 10) / 2)  +0 at Str 10, +5 at Str 20, +10 at Str 30.
+## Maximum mass the entity can push/drag (kg) = 50 + (modifier * 10).
+## Str 10 -> 50 kg, Str 15 -> 70 kg, Str 20 -> 100 kg, Str 30 -> 150 kg.
+func get_strength_modifier() -> int:
+	return floor((float(strength) - 10.0) / 2.0)
+
+func get_max_pushable_mass_kg() -> float:
+	var modifier = get_strength_modifier()
+	return 50.0 + (modifier * 10.0)
+
 
 func get_ability(ability: Ability) -> int:
 	match ability:

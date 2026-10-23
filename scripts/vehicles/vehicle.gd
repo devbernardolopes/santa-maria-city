@@ -124,6 +124,10 @@ func exit(actor: Entity) -> bool:
 	if not occupants.has(actor):
 		return false
 	occupants.erase(actor)
+	# Reset vehicle velocity to prevent sliding after exit.
+	# The displayed speed may round to 0 while the physics velocity persists.
+	speed_mps = 0.0
+	velocity = Vector2.ZERO
 	var point_m: Vector2 = _find_exit_point_m()
 	actor.global_position = Units.to_px(point_m)
 	actor.set_riding(false)
