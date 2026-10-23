@@ -5,7 +5,9 @@
 [ext_resource type="Script" uid="uid://b78jeffoiffbn" path="res://scripts/world/debug_camera.gd" id="3_camera"]
 [ext_resource type="Resource" uid="uid://yk6r1f5gcvvx" path="res://resources/style_002.tres" id="3_t5ptc"]
 [ext_resource type="Script" uid="uid://l1t1fxwtwqt1" path="res://scripts/ui/hud.gd" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://coxlrn2f1psbt" path="res://scenes/objects/world_object.tscn" id="5_71ii3"]
 [ext_resource type="Script" uid="uid://bpmjjc3el8ayn" path="res://scripts/world/map_picker.gd" id="5_picker"]
+[ext_resource type="Resource" uid="uid://cip0sua3aknxm" path="res://resources/objects/oriental_rug.tres" id="6_71ii3"]
 [ext_resource type="Script" uid="uid://dj58ki6r2sw3x" path="res://scripts/world/follow_camera.gd" id="6_follow"]
 [ext_resource type="Script" uid="uid://bebsb5h3e7jm2" path="res://scripts/world/debug_spawner.gd" id="7_spawner"]
 [ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="8_touch"]
@@ -32,6 +34,11 @@ style = ExtResource("3_t5ptc")
 
 [node name="Objects" type="Node2D" parent="." unique_id=1436374420]
 y_sort_enabled = true
+
+[node name="OrientalRug" parent="Objects" unique_id=190953490 instance=ExtResource("5_71ii3")]
+position = Vector2(38440, 63578)
+scale = Vector2(2, 2)
+data = ExtResource("6_71ii3")
 
 [node name="Interiors" type="Node2D" parent="." unique_id=1689666819]
 

@@ -6,7 +6,7 @@ signal vehicle_spawned(vehicle: Vehicle)
 
 const VEHICLE_SCENE: PackedScene = preload("res://scenes/vehicles/vehicle.tscn")
 const DEFAULT_OVERLAY_PATH: String = "res://data/overlays/vehicles.json"
-const DEFAULT_DEBUG_DATA_PATH: String = "res://resources/vehicles/car.tres"
+const DEFAULT_DEBUG_DATA_PATH: String = "res://resources/vehicles/police.tres"
 const OVERLAY_VERSION: int = 1
 
 @export var overlay_path: String = DEFAULT_OVERLAY_PATH

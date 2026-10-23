@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://coxlrn2f1psbt"]
+
+[ext_resource type="Script" uid="uid://dhkfsg3v3hoaa" path="res://scripts/objects/world_object.gd" id="1_mcyc5"]
+[ext_resource type="Script" uid="uid://hghiapr2mnyh" path="res://scripts/objects/object_collision.gd" id="2_slwlq"]
+[ext_resource type="Script" uid="uid://blfa25eotauic" path="res://scripts/objects/object_visual.gd" id="3_j2qhw"]
+[ext_resource type="Script" uid="uid://c7ijgb8rj3kc3" path="res://scripts/objects/interactable.gd" id="4_7o2d8"]
+
+[node name="WorldObject" type="Node2D" unique_id=190953490]
+script = ExtResource("1_mcyc5")
+metadata/_custom_type_script = "uid://dhkfsg3v3hoaa"
+
+[node name="Collision" type="Area2D" parent="." unique_id=282270734]
+script = ExtResource("2_slwlq")
+metadata/_custom_type_script = "uid://hghiapr2mnyh"
+
+[node name="Visual" type="Sprite2D" parent="." unique_id=1064994791]
+script = ExtResource("3_j2qhw")
+metadata/_custom_type_script = "uid://blfa25eotauic"
+
+[node name="Interactable" type="Area2D" parent="." unique_id=1899549951]
+script = ExtResource("4_7o2d8")
+metadata/_custom_type_script = "uid://c7ijgb8rj3kc3"
