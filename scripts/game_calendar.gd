@@ -45,6 +45,7 @@ static func days_from_civil(year: int, month: int, day: int) -> int:
 	var era: int = _floor_div(shifted_year, 400)
 	var year_of_era: int = shifted_year - era * 400
 	var day_of_year: int = _floor_div(153 * (month + (9 if month > 2 else -3)) + 2, 5) + day - 1
+	@warning_ignore("integer_division")
 	var day_of_era: int = year_of_era * 365 + year_of_era / 4 - year_of_era / 100 + day_of_year
 	return era * DAYS_PER_ERA + day_of_era - EPOCH_SHIFT_DAYS
 
@@ -58,6 +59,7 @@ static func civil_from_days(days: int) -> Vector3i:
 		(day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365
 	)
 	var year: int = year_of_era + era * 400
+	@warning_ignore("integer_division")
 	var day_of_year: int = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100)
 	var month_prime: int = _floor_div(5 * day_of_year + 2, 153)
 	var day: int = day_of_year - _floor_div(153 * month_prime + 2, 5) + 1
@@ -104,6 +106,7 @@ static func day_length_hours(day_of_year: int) -> float:
 
 ## Floor division; GDScript integer division truncates toward zero.
 static func _floor_div(dividend: int, divisor: int) -> int:
+	@warning_ignore("integer_division")
 	var quotient: int = dividend / divisor
 	if dividend % divisor != 0 and (dividend < 0) != (divisor < 0):
 		quotient -= 1

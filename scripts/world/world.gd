@@ -15,8 +15,10 @@ const DRIVE_EXIT_COOLDOWN_MS: int = 300
 @onready var _debug_camera: DebugCamera = $DebugCamera
 @onready var _debug_spawner: DebugSpawner = $DebugSpawner
 @onready var _picker: MapPicker = $MapPicker
+@warning_ignore("unused_private_class_variable")
 @onready var _touch_controls: TouchControls = $Hud/TouchControls
 @onready var _entrance_spawner: EntranceSpawner = $EntranceSpawner
+@warning_ignore("unused_private_class_variable")
 @onready var _interior_manager: InteriorManager = $InteriorManager
 @onready var _vegetation: VegetationManager = $VegetationManager
 @onready var _vehicle_spawner: VehicleSpawner = $VehicleSpawner

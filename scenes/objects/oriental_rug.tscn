@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://clx4hm3pruqb7"]
+
+[ext_resource type="Script" uid="uid://dhkfsg3v3hoaa" path="res://scripts/objects/world_object.gd" id="1_lwp31"]
+[ext_resource type="Resource" uid="uid://cip0sua3aknxm" path="res://resources/objects/oriental_rug.tres" id="2_3ppjp"]
+
+[node name="OrientalRug" type="Node2D" unique_id=815267774]
+script = ExtResource("1_lwp31")
+data = ExtResource("2_3ppjp")
+metadata/_custom_type_script = "uid://dhkfsg3v3hoaa"
