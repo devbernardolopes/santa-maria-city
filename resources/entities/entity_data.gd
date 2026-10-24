@@ -69,6 +69,8 @@ const MAX_ABILITY_SCORE: int = 30
 @export var run_speed_mps: float = 5.0
 ## Optional sprite animation set; null keeps the flat placeholder body.
 @export var animation_set: EntityAnimationSet = null
+## Optional sound definitions; null = silent.
+@export var sound_set: EntitySoundSet = null
 
 
 ## Weight the entity can carry without penalties, in kilograms (Strength x 15 lb).

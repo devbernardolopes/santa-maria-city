@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 EntityRegistry="*res://autoloaders/entity_registry.gd"
 GameClock="*res://autoloaders/game_clock.gd"
+AudioManager="*res://autoloaders/audio_manager.gd"
 GameWeather="*res://autoloaders/game_weather.gd"
 
 [display]

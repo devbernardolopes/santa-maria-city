@@ -1,4 +1,4 @@
-class_name AudioManager
+class_name AudioPool
 extends Node
 ## Spatial audio manager: sets listener at player, pools AudioStreamPlayer2D nodes,
 ## and plays events near the listener only. Uses Godot's 2D spatialization (position,

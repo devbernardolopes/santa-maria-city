@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="VehicleSoundSet" format=3 uid="uid://clunggnjhhwwx"]
+
+[ext_resource type="Script" uid="uid://d3od5cteybprd" path="res://resources/vehicles/vehicle_sounds.gd" id="1_ql07s"]
+[ext_resource type="AudioStream" uid="uid://o128xij0snr0" path="res://assets/sounds/vehicles/skid-loop.wav" id="1_uj4aq"]
+[ext_resource type="AudioStream" uid="uid://dcope2br7ue43" path="res://assets/sounds/vehicles/generic_car_startengine.wav" id="2_rx02g"]
+
+[resource]
+script = ExtResource("1_ql07s")
+engine_start_stream = ExtResource("2_rx02g")
+drive_slow_stream = ExtResource("1_uj4aq")
+metadata/_custom_type_script = "uid://d3od5cteybprd"

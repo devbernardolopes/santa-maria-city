@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bf2qg6fnyx75w" path="res://resources/vehicles/vehicle_data.gd" id="1_data"]
 [ext_resource type="Script" uid="uid://bd2jtxovkj3n" path="res://resources/objects/object_properties.gd" id="2_props"]
 [ext_resource type="Texture2D" uid="uid://d0kq16b3f1ibp" path="res://assets/images/sprites/vehicles/cars/Car.png" id="3_tex"]
+[ext_resource type="Resource" uid="uid://clunggnjhhwwx" path="res://resources/vehicles/vehicle_sound_set_001.tres" id="4_m2qd4"]
 [ext_resource type="Script" uid="uid://bau6xk7wql5ja" path="res://resources/vehicles/wheel_spec.gd" id="4_vls1a"]
 
 [sub_resource type="Resource" id="ObjectProperties_car"]
@@ -18,6 +19,7 @@ id = &"car"
 properties = SubResource("ObjectProperties_car")
 frames = Array[Texture2D]([ExtResource("3_tex")])
 wheelbase_m = 2.7
+sound_set = ExtResource("4_m2qd4")
 can_store_items = true
 storage_slots = 6
 storage_capacity_kg = 120.0

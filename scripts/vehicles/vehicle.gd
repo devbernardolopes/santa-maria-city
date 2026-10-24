@@ -55,6 +55,7 @@ var _terrain_speed_factor: float = 1.0
 var _terrain_grip_factor: float = 1.0
 var _last_sample_pos_m: Vector2 = Vector2.ZERO
 var _impact_cooldown: float = 0.0
+var _drive_player: AudioStreamPlayer2D = null
 ## Actual velocity before the last move_and_slide; used for impact damage.
 var _pre_move_velocity_mps: Vector2 = Vector2.ZERO
 ## Bicycle-model velocity in m/s. This is the only speed source while driving:
@@ -439,6 +440,7 @@ func _drive(delta: float, throttle: float, steer: float, handbrake: bool) -> voi
 	_forward_speed_mps = carried.dot(forward)
 	_lateral_speed_mps = carried.dot(right)
 	_forward_speed_mps = _integrate_forward_speed(_forward_speed_mps, throttle, delta)
+	_update_drive_sound()
 	var grip: float = data.lateral_grip * get_wheel_grip_factor() * _terrain_grip_factor
 	if handbrake:
 		grip *= data.handbrake_grip_factor
@@ -539,6 +541,31 @@ func _rolling_deceleration_mps2() -> float:
 		MIN_COAST_DECELERATION_MPS2, data.engine_braking_mps2 + data.rolling_resistance_mps2
 	)
 
+
+func _update_drive_sound() -> void:
+	if data == null or data.sound_set == null:
+		if _drive_player != null:
+			_drive_player.stop()
+		return
+	var abs_speed: float = absf(_forward_speed_mps)
+	var stream: AudioStream = null
+	if abs_speed < 2.0:
+		stream = data.sound_set.drive_idle_stream
+	elif abs_speed < 12.0:
+		stream = data.sound_set.drive_slow_stream
+	else:
+		stream = data.sound_set.drive_fast_stream
+	if _drive_player == null:
+		_drive_player = AudioStreamPlayer2D.new()
+		add_child(_drive_player)
+		_drive_player.position = Vector2.ZERO
+	if stream != null:
+		if _drive_player.stream != stream:
+			_drive_player.stream = stream
+			_drive_player.play()
+	else:
+		_drive_player.stop()
+	_drive_player.stream = null
 
 func _integrate_forward_speed(forward_speed: float, throttle: float, delta: float) -> float:
 	var drive_factor: float = get_wheel_drive_factor()

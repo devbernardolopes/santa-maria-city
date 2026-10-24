@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EntitySoundSet" format=3 uid="uid://l737217jm60e"]
+
+[ext_resource type="Script" uid="uid://dvogjw400hksv" path="res://resources/entities/entity_sounds.gd" id="1_1stkp"]
+[ext_resource type="AudioStream" uid="uid://beh432kk067b4" path="res://assets/sounds/footsteps/Fantozzi-SandL1.ogg" id="1_am1a8"]
+[ext_resource type="AudioStream" uid="uid://cln25kuj7ty0n" path="res://assets/sounds/footsteps/Fantozzi-StoneR1.ogg" id="1_ygp0r"]
+[ext_resource type="AudioStream" uid="uid://ea0chs3k4jd7" path="res://assets/sounds/footsteps/Fantozzi-StoneR2.ogg" id="3_w02u8"]
+
+[resource]
+script = ExtResource("1_1stkp")
+footstep_stream = ExtResource("1_am1a8")
+idle_stream = ExtResource("3_w02u8")
+action_stream = ExtResource("1_ygp0r")
+metadata/_custom_type_script = "uid://dvogjw400hksv"

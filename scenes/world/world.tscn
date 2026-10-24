@@ -245,6 +245,9 @@ layout_mode = 3
 [node name="PlayerEntity" parent="." unique_id=90653120 instance=ExtResource("18_bt7bg")]
 speed_multiplier = 1.0
 
+[node name="AudioListener2D" type="AudioListener2D" parent="PlayerEntity" unique_id=671390876]
+current = true
+
 [node name="PlayerStartPosition" type="Marker2D" parent="." unique_id=616533610]
 position = Vector2(36758.59, 59407.805)
 

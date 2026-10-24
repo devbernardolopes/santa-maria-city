@@ -32,6 +32,8 @@ var locked: bool = false
 var riding: bool = false
 
 var _terrain_timer: float = 0.0
+var _footstep_accumulated_m: float = 0.0
+var _footstep_interval_m: float = 0.7
 var _terrain_speed_factor: float = 1.0
 var _last_sample_pos_m: Vector2 = Vector2.ZERO
 var _last_push_reject_target: Node = null
@@ -138,6 +140,7 @@ func _physics_process(delta: float) -> void:
 		_decay_inertia(delta)
 		return
 	_update_terrain(delta)
+	_update_footstep(delta)
 	var move_mode: EntityController.MovementMode = controller.movement_mode
 	if move_mode == EntityController.MovementMode.RELATIVE:
 		_resolve_relative(delta)
@@ -274,6 +277,18 @@ func _update_terrain(delta: float) -> void:
 	_terrain_speed_factor = rules.get_speed_factor(sample)
 
 
+## Tracks movement meters accumulated per frame for rhythmic footstep playback.
+func _update_footstep(delta: float) -> void:
+	var is_moving: bool = not velocity.is_zero_approx() and not riding
+	if not is_moving:
+		return
+	var speed_mps: float = get_speed_mps()
+	if speed_mps > 0.001:
+		_footstep_accumulated_m += speed_mps * delta
+		if _footstep_accumulated_m >= _footstep_interval_m:
+			_footstep_accumulated_m -= _footstep_interval_m
+			if data != null and data.sound_set != null and data.sound_set.footstep_stream != null:
+				AudioManager.play_at(global_position / Units.PX_PER_METER, data.sound_set.footstep_stream)
 func _configure_collision_shape() -> void:
 	if _collision_shape == null:
 		return

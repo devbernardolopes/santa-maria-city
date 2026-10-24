@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://chmlq44l61w64"]
 
-[ext_resource type="PackedScene" path="res://scenes/entities/entity.tscn" id="1_47lna"]
+[ext_resource type="PackedScene" uid="uid://bhwxse6s7xrax" path="res://scenes/entities/entity.tscn" id="1_47lna"]
 [ext_resource type="Resource" uid="uid://e3antq8lh850" path="res://resources/entities/entity_bernardo.tres" id="2_x0tgy"]
+[ext_resource type="Resource" uid="uid://doyvr40r3purs" path="res://resources/entities/entity_00001.tres" id="3_crrie"]
 [ext_resource type="Script" uid="uid://cnrqrkobj0wpp" path="res://scripts/entities/player_controller.gd" id="3_x0tgy"]
 [ext_resource type="Script" uid="uid://blxsap5oc1kuv" path="res://scripts/entities/player_interaction.gd" id="4_4squj"]
 
@@ -9,8 +10,9 @@
 data = ExtResource("2_x0tgy")
 speed_multiplier = 3.0
 
-[node name="Visual" parent="." index="1"]
+[node name="Visual" parent="." index="1" unique_id=1494021125]
 body_color = Color(0.33191842, 0.6159646, 0.93789816, 1)
+animation_set = ExtResource("3_crrie")
 
 [node name="PlayerController" type="Node" parent="." index="2" unique_id=1811916659]
 script = ExtResource("3_x0tgy")

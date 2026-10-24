@@ -45,6 +45,8 @@ extends Resource
 ## 0 derives it from length_m.
 @export var wheelbase_m: float = 0.0
 @export var terrain_profile: VehicleTerrainProfile = null
+## Optional sound definitions; null = silent.
+@export var sound_set: VehicleSoundSet = null
 
 @export_group("Wheels")
 ## Number of wheels used when no explicit WheelSpec list is authored.
