@@ -1,18 +1,18 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://bhwxse6s7xrax"]
 
-[ext_resource type="Script" path="res://scripts/entities/entity.gd" id="1_entity"]
-[ext_resource type="Script" path="res://scripts/entities/entity_visual.gd" id="2_visual"]
+[ext_resource type="Script" uid="uid://cyrep8bq486ld" path="res://scripts/entities/entity.gd" id="1_entity"]
+[ext_resource type="Script" uid="uid://diafychuej66s" path="res://scripts/entities/entity_visual.gd" id="2_visual"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_entity"]
 radius = 1.0
 
-[node name="Entity" type="CharacterBody2D"]
+[node name="Entity" type="CharacterBody2D" unique_id=228501587]
 motion_mode = 1
 script = ExtResource("1_entity")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=108635258]
 shape = SubResource("CircleShape2D_entity")
 
-[node name="Visual" type="Node2D" parent="."]
+[node name="Visual" type="Node2D" parent="." unique_id=1494021125]
 script = ExtResource("2_visual")
 body_color = Color(0.85098, 0.509804, 0.168627, 1)

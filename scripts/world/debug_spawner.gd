@@ -5,6 +5,8 @@ extends Node
 const NPC_SCENE: PackedScene = preload("res://scenes/entities/entity.tscn")
 
 @export var npc_count: int = 8
+## Shared look for the debug NPCs; null leaves them as placeholder bodies.
+@export var npc_animation_set: EntityAnimationSet = null
 
 var _map: MapLoader = null
 var _objects: Node2D = null
@@ -38,6 +40,7 @@ func spawn_npcs(seed_value: int) -> void:
 		if npc == null:
 			continue
 		npc.data = EntityData.create_random(rng)
+		npc.data.animation_set = npc_animation_set
 		var controller := WanderController.new()
 		controller.random_seed = rng.randi()
 		npc.set_controller(controller)

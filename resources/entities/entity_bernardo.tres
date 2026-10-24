@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="EntityData" format=3 uid="uid://e3antq8lh850"]
 
 [ext_resource type="Script" uid="uid://b6goqov3vliud" path="res://resources/entities/entity_data.gd" id="1_h4k7n"]
+[ext_resource type="Resource" path="res://resources/entities/entity_00001.tres" id="2_anim"]
 
 [resource]
 script = ExtResource("1_h4k7n")
@@ -13,4 +14,5 @@ likes = Array[StringName]([&"basketball"])
 dislikes = Array[StringName]([&"soccer"])
 walk_speed_mps = 3.0
 run_speed_mps = 10.0
+animation_set = ExtResource("2_anim")
 metadata/_custom_type_script = "uid://b6goqov3vliud"

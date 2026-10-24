@@ -67,6 +67,8 @@ const MAX_ABILITY_SCORE: int = 30
 @export_range(1, MAX_ABILITY_SCORE) var charisma: int = 10
 @export var walk_speed_mps: float = 1.5
 @export var run_speed_mps: float = 5.0
+## Optional sprite animation set; null keeps the flat placeholder body.
+@export var animation_set: EntityAnimationSet = null
 
 
 ## Weight the entity can carry without penalties, in kilograms (Strength x 15 lb).

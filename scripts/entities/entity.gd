@@ -6,7 +6,6 @@ extends CharacterBody2D
 signal push_rejected(target: Node, required_strength: int)
 
 const COLLISION_RADIUS_M: float = 0.3
-const TURN_RATE: float = 12.0
 const TERRAIN_SAMPLE_INTERVAL_S: float = 0.25
 const TERRAIN_SAMPLE_DISTANCE_M: float = 1.0
 ## How aligned the movement intent must be with the contact normal to push.
@@ -40,7 +39,7 @@ var _last_push_reject_msec: int = -PUSH_REJECT_INTERVAL_MS
 ## Momentum inherited from a moving vehicle, in m/s; decays with ground friction.
 var _inertia_velocity_mps: Vector2 = Vector2.ZERO
 
-@onready var _visual: Node2D = $Visual
+@onready var _visual: EntityVisual = $Visual
 @onready var _collision_shape: CollisionShape2D = $CollisionShape2D
 
 
@@ -57,7 +56,8 @@ func _ready() -> void:
 	elif EntityRegistry.get_data(data.id) == null:
 		EntityRegistry.register(data)
 	if _visual != null:
-		_visual.rotation = facing.angle()
+		_visual.bind(self)
+		_visual.set_facing(facing)
 
 
 func set_controller(next_controller: EntityController) -> void:
@@ -99,6 +99,11 @@ func get_speed_mps() -> float:
 
 func get_velocity_mps() -> Vector2:
 	return Units.to_m(velocity)
+
+
+## Whether the controller is asking to run and the body is still under control.
+func wants_run() -> bool:
+	return controller != null and controller.wants_run() and not is_staggered()
 
 
 ## D&D ability score; average when the entity has no data resource.
@@ -148,9 +153,7 @@ func _resolve_omni(delta: float) -> void:
 	if move_vector != Vector2.ZERO:
 		facing = move_vector.normalized()
 		if _visual != null:
-			_visual.rotation = lerp_angle(
-				_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
-			)
+			_visual.look_toward(facing, delta)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	velocity = (
 		move_vector * Units.m_to_px(speed_mps * speed_multiplier * _terrain_speed_factor)
@@ -172,9 +175,7 @@ func _resolve_relative(delta: float) -> void:
 			turn_rate = 0.0
 		facing = facing.rotated(turn_input * turn_rate * delta)
 	if _visual != null and (absf(turn_input) > 0.001 or absf(throttle_input) > 0.001):
-		_visual.rotation = lerp_angle(
-			_visual.rotation, facing.angle(), minf(1.0, delta * TURN_RATE)
-		)
+		_visual.look_toward(facing, delta)
 	var speed_mps: float = data.run_speed_mps if controller.wants_run() else data.walk_speed_mps
 	var move_speed_factor: float = 1.0
 	if throttle_input < 0.0:

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EntityAnimationSet" format=3]
+
+[ext_resource type="Script" path="res://resources/entities/entity_animation_set.gd" id="1_d1j3d"]
+[ext_resource type="SpriteFrames" path="res://resources/entities/entity_00001_frames.tres" id="2_isc44"]
+[ext_resource type="Script" path="res://resources/entities/entity_animation_state.gd" id="3_tf4ot"]
+
+[sub_resource type="Resource" id="Resource_3vg43"]
+script = ExtResource("3_tf4ot")
+clip = &"idle"
+
+[sub_resource type="Resource" id="Resource_75d0r"]
+script = ExtResource("3_tf4ot")
+state = 1
+clip = &"walk"
+meters_per_cycle = 1.3
+
+[sub_resource type="Resource" id="Resource_18cym"]
+script = ExtResource("3_tf4ot")
+state = 2
+clip = &"run"
+meters_per_cycle = 2.6
+
+[resource]
+script = ExtResource("1_d1j3d")
+sprite_frames = ExtResource("2_isc44")
+states = Array[ExtResource("3_tf4ot")]([SubResource("Resource_3vg43"), SubResource("Resource_75d0r"), SubResource("Resource_18cym")])
