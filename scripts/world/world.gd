@@ -207,6 +207,7 @@ func _map_center_m() -> Vector2:
 	return Vector2(Units.px_to_m(center_px.x), Units.px_to_m(center_px.y))
 
 
+@warning_ignore("shadowed_variable")
 func _wire_player_interaction(player: Entity) -> void:
 	if not player.push_rejected.is_connected(_on_player_push_rejected):
 		player.push_rejected.connect(_on_player_push_rejected)

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cu08a0gnx8bie"]
+
+[ext_resource type="Script" uid="uid://csjinpxpt01xv" path="res://scripts/decals/world_decal.gd" id="1_hjs6l"]
+
+[node name="WorldDecal" type="Node2D" unique_id=1760148335]
+script = ExtResource("1_hjs6l")
+
+[node name="Visual" type="Sprite2D" parent="." unique_id=502353836]

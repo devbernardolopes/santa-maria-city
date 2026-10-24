@@ -173,21 +173,25 @@ func _physics_process(_delta: float) -> void:
 
 func _ready() -> void:
 	_update_interactable()
+	
 	# ensure we have a valid collision setup
 	if _collision == null:
 		var col := ObjectCollision.new()
 		add_child(col)
 		_collision = col
 	_collision.set_data(data)
-# ensure we have a valid visual setup
+	
+	# ensure we have a valid visual setup
 	if _visual == null:
 		var vis := ObjectVisual.new()
 		add_child(vis)
 		_visual = vis
 	_visual.set_data(data)
-# ensure we have a valid interactable setup
+
+	# ensure we have a valid interactable setup
 	if _interactable == null:
 		var inter := Interactable.new()
 		add_child(inter)
 		_interactable = inter
+			
 	_update_interactable()

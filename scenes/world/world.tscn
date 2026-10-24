@@ -5,12 +5,13 @@
 [ext_resource type="Script" uid="uid://b78jeffoiffbn" path="res://scripts/world/debug_camera.gd" id="3_camera"]
 [ext_resource type="Resource" uid="uid://yk6r1f5gcvvx" path="res://resources/style_002.tres" id="3_t5ptc"]
 [ext_resource type="Script" uid="uid://l1t1fxwtwqt1" path="res://scripts/ui/hud.gd" id="4_hud"]
-[ext_resource type="Script" path="res://scripts/ui/mini_map.gd" id="15_mini_map"]
-[ext_resource type="PackedScene" uid="uid://coxlrn2f1psbt" path="res://scenes/objects/world_object.tscn" id="5_71ii3"]
 [ext_resource type="Script" uid="uid://bpmjjc3el8ayn" path="res://scripts/world/map_picker.gd" id="5_picker"]
-[ext_resource type="Resource" uid="uid://cip0sua3aknxm" path="res://resources/objects/oriental_rug.tres" id="6_71ii3"]
+[ext_resource type="Texture2D" uid="uid://bmbo2gy3yaykj" path="res://assets/images/textures/2010-09-04_11-47-57.jpg" id="5_tytul"]
 [ext_resource type="Script" uid="uid://dj58ki6r2sw3x" path="res://scripts/world/follow_camera.gd" id="6_follow"]
+[ext_resource type="Texture2D" uid="uid://c857cetcata78" path="res://assets/images/textures/decals/park1v_g.png" id="6_wbwoo"]
 [ext_resource type="Script" uid="uid://bebsb5h3e7jm2" path="res://scripts/world/debug_spawner.gd" id="7_spawner"]
+[ext_resource type="Texture2D" uid="uid://oxqfbj2p6bq7" path="res://assets/images/textures/decals/2lnh_cw_g.png" id="7_tytul"]
+[ext_resource type="Texture2D" uid="uid://d0tfnfa6hp17k" path="res://assets/images/textures/2010-09-04_11-57-29.jpg" id="8_t634p"]
 [ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="8_touch"]
 [ext_resource type="Script" uid="uid://bpo70s0h2w5uq" path="res://scripts/world/day_night.gd" id="9_daynight"]
 [ext_resource type="Script" uid="uid://c3sn3bs74i6x3" path="res://scripts/world/entrance_spawner.gd" id="10_entrance_spawner"]
@@ -18,6 +19,7 @@
 [ext_resource type="Script" uid="uid://clgnsatsjxo3a" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
 [ext_resource type="Script" uid="uid://b7khg7p18e3w1" path="res://scripts/vegetation/vegetation_manager.gd" id="13_vegetation"]
 [ext_resource type="Script" uid="uid://cxws2svhp3mpo" path="res://scripts/vehicles/vehicle_spawner.gd" id="14_vehicles"]
+[ext_resource type="Script" uid="uid://bpcqv14h11h02" path="res://scripts/ui/mini_map.gd" id="15_mini_map"]
 [ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
 
 [node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
@@ -33,14 +35,80 @@ style = ExtResource("3_t5ptc")
 
 [node name="Decals" type="Node2D" parent="." unique_id=1844170185]
 
+[node name="Terrain001" type="Sprite2D" parent="Decals" unique_id=1532167684]
+position = Vector2(38980.004, 58809.004)
+rotation = 1.5373852
+scale = Vector2(0.048806995, 0.048806995)
+texture = ExtResource("5_tytul")
+
+[node name="Terrain002" type="Sprite2D" parent="Decals" unique_id=1991592068]
+position = Vector2(38983.004, 58913.004)
+rotation = 1.5373852
+scale = Vector2(0.048806995, 0.048806995)
+texture = ExtResource("5_tytul")
+
+[node name="Crosswalk" type="Sprite2D" parent="Decals" unique_id=1011358214]
+position = Vector2(36645, 59408.996)
+rotation = -0.048490185
+scale = Vector2(0.060388505, 0.060388505)
+texture = ExtResource("7_tytul")
+
+[node name="Parking" type="Sprite2D" parent="Decals" unique_id=631155831]
+position = Vector2(38980.535, 58771.785)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking2" type="Sprite2D" parent="Decals" unique_id=2108645581]
+position = Vector2(38980.54, 58800.79)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking3" type="Sprite2D" parent="Decals" unique_id=1883351431]
+position = Vector2(38980.54, 58829.79)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking4" type="Sprite2D" parent="Decals" unique_id=1389403672]
+position = Vector2(38980.535, 58858.785)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking5" type="Sprite2D" parent="Decals" unique_id=1234295035]
+position = Vector2(38980.535, 58888.79)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking6" type="Sprite2D" parent="Decals" unique_id=1583056138]
+position = Vector2(38980.54, 58918.79)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Parking7" type="Sprite2D" parent="Decals" unique_id=1453446678]
+position = Vector2(38980.54, 58947.78)
+rotation = -1.620928
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("6_wbwoo")
+
+[node name="Polygon2D" type="Polygon2D" parent="Decals" unique_id=2019972794]
+texture_repeat = 2
+position = Vector2(39500, 59003)
+color = Color(0.39882696, 0.3291983, 0.12844315, 1)
+offset = Vector2(-343.46094, -104.33984)
+texture = ExtResource("8_t634p")
+texture_scale = Vector2(32, 32)
+polygon = PackedVector2Array(-46.539063, 306.33984, 554.46094, 306.33984, 551.46094, 909.33984, 622.46094, 908.33984, 716.46094, 661.33984, 714.46094, 276.33984, -35.539063, -293.66016)
+uv = PackedVector2Array(-46.539063, 306.33984, 554.46094, 306.33984, 551.46094, 909.33984, 622.46094, 908.33984, 716.46094, 661.33984, 714.46094, 276.33984, -35.539063, -293.66016)
+
 [node name="TerrainState" type="Node2D" parent="." unique_id=1064762405]
 
 [node name="Objects" type="Node2D" parent="." unique_id=1436374420]
 y_sort_enabled = true
-
-[node name="OrientalRug" parent="Objects" unique_id=1345946710 instance=ExtResource("5_71ii3")]
-position = Vector2(38194, 63956)
-data = ExtResource("6_71ii3")
 
 [node name="Interiors" type="Node2D" parent="." unique_id=1689666819]
 
@@ -87,8 +155,9 @@ script = ExtResource("12_screen_fader")
 [node name="Hud" type="CanvasLayer" parent="." unique_id=2054326508]
 script = ExtResource("4_hud")
 
-[node name="MiniMap" type="Control" parent="Hud"]
-layout_mode = 0
+[node name="MiniMap" type="Control" parent="Hud" unique_id=1127746323]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("15_mini_map")
 
 [node name="TextStack" type="VBoxContainer" parent="Hud" unique_id=737701394]
@@ -175,4 +244,11 @@ layout_mode = 3
 
 [node name="PlayerEntity" parent="." unique_id=90653120 instance=ExtResource("18_bt7bg")]
 
-[editable path="Objects/OrientalRug"]
+[node name="PlayerStartPosition" type="Marker2D" parent="." unique_id=616533610]
+position = Vector2(36758.59, 59407.805)
+
+[node name="Marker2D2" type="Marker2D" parent="." unique_id=1464742469]
+position = Vector2(36897, 59435)
+
+[node name="Marker2DParking00001" type="Marker2D" parent="." unique_id=682866575]
+position = Vector2(38980, 58858)

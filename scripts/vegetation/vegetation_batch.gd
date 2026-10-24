@@ -120,9 +120,7 @@ func _draw_rock(position: Vector2, radius: float, rotation: float, color: Color)
 	draw_polyline(outline, color.darkened(0.25), 1.0)
 
 
-func _draw_textured(
-	texture: Texture2D, position: Vector2, diameter: float, rotation: float, tint: Color
-) -> void:
+func _draw_textured(texture: Texture2D, position: Vector2, diameter: float, rotation: float, tint: Color) -> void:
 	if texture == null:
 		return
 	var half: float = maxf(diameter * 0.5, 0.5)

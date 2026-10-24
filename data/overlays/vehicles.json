@@ -3,14 +3,14 @@
 	"vehicles": [
 		{
 		  "data": "res://resources/vehicles/car.tres",
-		  "position": [2375.18, 4071.47],
+		  "position": [2298.37, 3719.56],
 		  "heading_deg": 0.0,
 		  "lights": false
 		},
 		{
-		  "data": "res://resources/vehicles/ambulance.tres",
-		  "position": [2335.18, 4071.47],
-		  "heading_deg": 0.0,
+		  "data": "res://resources/vehicles/black_viper.tres",
+		  "position": [2435.06, 3679.68],
+		  "heading_deg": 180.0,
 		  "lights": true
 		},
 	]
