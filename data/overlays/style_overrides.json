@@ -1,8 +1,6 @@
 {
-  "version": 1,
-  "overrides": [
-	{
-		"relation/5830347": "residential_terra_nova_0001",
-	},
-]
+	"version": 1,
+	"overrides": {
+		"relation/5830347": "residential_terra_nova_0001"
+	}
 }
