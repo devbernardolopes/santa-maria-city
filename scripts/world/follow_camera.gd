@@ -63,10 +63,10 @@ func set_mode(value: Mode) -> void:
 func set_limits_m(rect_m: Rect2) -> void:
 	var top_left: Vector2 = Units.to_px(rect_m.position)
 	var bottom_right: Vector2 = Units.to_px(rect_m.position + rect_m.size)
-	limit_left = int(top_left.x)
-	limit_top = int(top_left.y)
-	limit_right = int(bottom_right.x)
-	limit_bottom = int(bottom_right.y)
+	limit_left = roundi(top_left.x)
+	limit_top = roundi(top_left.y)
+	limit_right = roundi(bottom_right.x)
+	limit_bottom = roundi(bottom_right.y)
 
 
 func clear_limits() -> void:

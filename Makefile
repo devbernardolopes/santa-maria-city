@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 MAP_SOURCE ?= data/export_0002.geojson
 
-.PHONY: help check smoke minimap-smoke vehicle-smoke animation-smoke bench lint format map
+.PHONY: help check smoke minimap-smoke vehicle-smoke animation-smoke entrance-smoke interior-smoke bench lint format map
 
 help:
 	@echo "make check      Syntax, import scan, and autoload-aware compile check"
@@ -11,6 +11,8 @@ help:
 	@echo "make minimap-smoke  Headless mini-map rendering and interaction test (runs check first)"
 	@echo "make vehicle-smoke  Headless vehicle handling and enter/exit test (runs check first)"
 	@echo "make animation-smoke  Headless entity animation state test (runs check first)"
+	@echo "make entrance-smoke  Headless entrance schedule, lock, and art test (runs check first)"
+	@echo "make interior-smoke  Headless interior enter/exit and camera test (runs check first)"
 	@echo "make bench      Measure runtime map load time, counts, and memory"
 	@echo "make lint       Run gdlint via uv (does not modify files)"
 	@echo "make format     Rewrite GDScript with gdformat via uv"
@@ -30,6 +32,12 @@ vehicle-smoke: check
 
 animation-smoke: check
 	@tools/animation_smoke.sh
+
+entrance-smoke: check
+	@tools/entrance_smoke.sh
+
+interior-smoke: check
+	@tools/interior_smoke.sh
 
 bench: check
 	@tools/bench.sh

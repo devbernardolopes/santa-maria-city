@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="EntityAnimationSet" format=3]
+[gd_resource type="Resource" script_class="EntityAnimationSet" format=3 uid="uid://doyvr40r3purs"]
 
-[ext_resource type="Script" path="res://resources/entities/entity_animation_set.gd" id="1_d1j3d"]
-[ext_resource type="SpriteFrames" path="res://resources/entities/entity_00001_frames.tres" id="2_isc44"]
-[ext_resource type="Script" path="res://resources/entities/entity_animation_state.gd" id="3_tf4ot"]
+[ext_resource type="Script" uid="uid://byhdrh1rfog33" path="res://resources/entities/entity_animation_set.gd" id="1_d1j3d"]
+[ext_resource type="SpriteFrames" uid="uid://byxx0edo1m40g" path="res://resources/entities/entity_00001_frames.tres" id="2_isc44"]
+[ext_resource type="Script" uid="uid://dev4tuiqic68i" path="res://resources/entities/entity_animation_state.gd" id="3_tf4ot"]
 
 [sub_resource type="Resource" id="Resource_3vg43"]
 script = ExtResource("3_tf4ot")

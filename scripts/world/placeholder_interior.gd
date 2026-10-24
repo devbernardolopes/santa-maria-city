@@ -1,6 +1,10 @@
 class_name PlaceholderInterior
 extends Interior
-## Procedural fallback room used when an entrance's interior id has no authored scene.
+## Procedural fallback room used when an entrance has no authored interior scene.
+##
+## The manager sets room_size_m and room_label from the building footprint before the
+## node enters the tree. Walls are solid for PhysicsLayers.WORLD and the exit is a normal
+## Interactable, so the room works with the same input and collision paths as the world.
 
 const FLOOR_COLOR: Color = Color(0.42, 0.4, 0.36)
 const WALL_COLOR: Color = Color(0.2, 0.19, 0.18)
@@ -9,18 +13,18 @@ const ENTRY_OFFSET_M: float = 1.2
 const LABEL_MARGIN_PX: float = 8.0
 const LABEL_COLOR: Color = Color(0.9, 0.88, 0.8)
 
-## Room size in meters; the manager sets it from the building footprint before the node enters the tree.
+## Room size in meters; the manager sets it from the building footprint.
 @export var room_size_m: Vector2 = Vector2(8.0, 6.0)
 ## Floor label: the entrance label or the building OSM id.
 @export var room_label: String = ""
 
 
 func _ready() -> void:
-	# bounds_m is set by the InteriorManager from the building footprint
-	# before we enter the tree; if empty, derive from room_size_m
+	room_size_m = Vector2(maxf(room_size_m.x, 1.0), maxf(room_size_m.y, 1.0))
 	if bounds_m.size.x <= 0.0 or bounds_m.size.y <= 0.0:
 		bounds_m = Rect2(
-			Vector2.ONE * -WALL_THICKNESS_M, room_size_m + Vector2.ONE * (WALL_THICKNESS_M * 2.0)
+			Vector2.ONE * -WALL_THICKNESS_M,
+			room_size_m + Vector2.ONE * (WALL_THICKNESS_M * 2.0)
 		)
 	var size_px: Vector2 = Units.to_px(room_size_m)
 	_build_floor(size_px)
@@ -31,9 +35,6 @@ func _ready() -> void:
 	add_child(objects_node)
 	_build_entry_and_exit(size_px, objects_node)
 	_build_label()
-	# ensure entry point and objects are found
-	_entry_point = get_node_or_null("EntryPoint") as Marker2D
-	_objects = get_node_or_null("Objects") as Node2D
 	super._ready()
 
 
@@ -49,6 +50,7 @@ func _build_floor(size_px: Vector2) -> void:
 		]
 	)
 	floor_polygon.color = FLOOR_COLOR
+	floor_polygon.z_index = -1
 	add_child(floor_polygon)
 
 
@@ -73,6 +75,7 @@ func _build_wall(rect_px: Rect2) -> void:
 	var visual := Polygon2D.new()
 	visual.polygon = points
 	visual.color = WALL_COLOR
+	visual.z_index = 1
 	body.add_child(visual)
 	add_child(body)
 
@@ -82,11 +85,11 @@ func _build_entry_and_exit(size_px: Vector2, objects_node: Node2D) -> void:
 	var center_x: float = size_px.x * 0.5
 	var exit := InteriorExit.new()
 	exit.name = "Exit"
-	exit.position = Vector2(center_x, size_px.y - wall_px * 0.5)
+	exit.position = Vector2(center_x, size_px.y - wall_px)
 	objects_node.add_child(exit)
 	var entry := Marker2D.new()
 	entry.name = "EntryPoint"
-	entry.position = Vector2(center_x, size_px.y - Units.m_to_px(ENTRY_OFFSET_M))
+	entry.position = Vector2(center_x, size_px.y - wall_px - Units.m_to_px(ENTRY_OFFSET_M))
 	add_child(entry)
 
 
@@ -97,6 +100,7 @@ func _build_label() -> void:
 	label.name = "RoomLabel"
 	label.text = room_label
 	label.position = Vector2.ONE * LABEL_MARGIN_PX
+	label.z_index = 2
 	label.add_theme_color_override("font_color", LABEL_COLOR)
 	add_child(label)
 
