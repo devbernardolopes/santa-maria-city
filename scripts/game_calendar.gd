@@ -55,9 +55,7 @@ static func civil_from_days(days: int) -> Vector3i:
 	var shifted_days: int = days + EPOCH_SHIFT_DAYS
 	var era: int = _floor_div(shifted_days, DAYS_PER_ERA)
 	var day_of_era: int = shifted_days - era * DAYS_PER_ERA
-	var year_of_era: int = (
-		(day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365
-	)
+	var year_of_era: int = ((day_of_era - day_of_era / 1460 + day_of_era / 36524 - day_of_era / 146096) / 365)
 	var year: int = year_of_era + era * 400
 	@warning_ignore("integer_division")
 	var day_of_year: int = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100)

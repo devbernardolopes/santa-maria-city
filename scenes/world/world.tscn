@@ -21,6 +21,7 @@
 [ext_resource type="Script" uid="uid://cxws2svhp3mpo" path="res://scripts/vehicles/vehicle_spawner.gd" id="14_vehicles"]
 [ext_resource type="Script" uid="uid://bpcqv14h11h02" path="res://scripts/ui/mini_map.gd" id="15_mini_map"]
 [ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
+[ext_resource type="Script" uid="uid://iikk3d7bfl1k" path="res://scripts/audio/audio_listener_setup.gd" id="22_6hctx"]
 
 [node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
 script = ExtResource("1_world")
@@ -243,10 +244,12 @@ one_shot = true
 layout_mode = 3
 
 [node name="PlayerEntity" parent="." unique_id=90653120 instance=ExtResource("18_bt7bg")]
+position = Vector2(36819.387, 59406.535)
 speed_multiplier = 1.0
 
 [node name="AudioListener2D" type="AudioListener2D" parent="PlayerEntity" unique_id=671390876]
 current = true
+script = ExtResource("22_6hctx")
 
 [node name="PlayerStartPosition" type="Marker2D" parent="." unique_id=616533610]
 position = Vector2(36758.59, 59407.805)

@@ -1,11 +1,19 @@
 [gd_resource type="Resource" script_class="VehicleSoundSet" format=3 uid="uid://clunggnjhhwwx"]
 
+[ext_resource type="AudioStream" uid="uid://c2tnis7mv5tiv" path="res://assets/sounds/vehicles/door_closing.wav" id="1_o8xxr"]
 [ext_resource type="Script" uid="uid://d3od5cteybprd" path="res://resources/vehicles/vehicle_sounds.gd" id="1_ql07s"]
-[ext_resource type="AudioStream" uid="uid://o128xij0snr0" path="res://assets/sounds/vehicles/skid-loop.wav" id="1_uj4aq"]
 [ext_resource type="AudioStream" uid="uid://dcope2br7ue43" path="res://assets/sounds/vehicles/generic_car_startengine.wav" id="2_rx02g"]
+[ext_resource type="AudioStream" uid="uid://ct6cnql3qam2b" path="res://assets/sounds/vehicles/door_opening.wav" id="2_xon1y"]
+[ext_resource type="AudioStream" uid="uid://dvnnifobc58sk" path="res://assets/sounds/vehicles/engine-loop-1-normalized.wav" id="3_ggrhl"]
+[ext_resource type="AudioStream" uid="uid://c4emn0puki00y" path="res://assets/sounds/vehicles/motor_looping.mp3" id="4_oldfs"]
+[ext_resource type="AudioStream" uid="uid://l5ql4t8fd41a" path="res://assets/sounds/vehicles/fan_interval.wav" id="5_0xrlt"]
 
 [resource]
 script = ExtResource("1_ql07s")
+door_open_stream = ExtResource("2_xon1y")
+door_close_stream = ExtResource("1_o8xxr")
 engine_start_stream = ExtResource("2_rx02g")
-drive_slow_stream = ExtResource("1_uj4aq")
+drive_idle_stream = ExtResource("4_oldfs")
+drive_slow_stream = ExtResource("5_0xrlt")
+drive_fast_stream = ExtResource("3_ggrhl")
 metadata/_custom_type_script = "uid://d3od5cteybprd"

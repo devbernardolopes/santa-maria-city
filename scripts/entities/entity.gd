@@ -289,6 +289,8 @@ func _update_footstep(delta: float) -> void:
 			_footstep_accumulated_m -= _footstep_interval_m
 			if data != null and data.sound_set != null and data.sound_set.footstep_stream != null:
 				AudioManager.play_at(global_position / Units.PX_PER_METER, data.sound_set.footstep_stream)
+
+
 func _configure_collision_shape() -> void:
 	if _collision_shape == null:
 		return

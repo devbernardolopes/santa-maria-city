@@ -123,6 +123,7 @@ func _physics_process(delta: float) -> void:
 		handbrake = controller.wants_handbrake()
 	_drive(delta, throttle, steer, handbrake)
 	_apply_impact_damage()
+	_sync_occupant_positions()
 
 
 ## Public entry point used by Interactable and (future) NPC controllers.
@@ -562,10 +563,16 @@ func _update_drive_sound() -> void:
 	if stream != null:
 		if _drive_player.stream != stream:
 			_drive_player.stream = stream
+			_drive_player.stream.set("loop", true)
 			_drive_player.play()
 	else:
 		_drive_player.stop()
-	_drive_player.stream = null
+		_drive_player.stream = null
+
+func _sync_occupant_positions() -> void:
+	for actor: Entity in occupants:
+		if is_instance_valid(actor):
+			actor.global_position = global_position
 
 func _integrate_forward_speed(forward_speed: float, throttle: float, delta: float) -> float:
 	var drive_factor: float = get_wheel_drive_factor()

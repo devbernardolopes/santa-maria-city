@@ -27,6 +27,10 @@ func play_at(world_m: Vector2, stream: AudioStream, loop: bool = false) -> Audio
 	if stream == null:
 		return null
 	if _listener_target == null:
+		var listener_nodes := get_tree().get_nodes_in_group("audio_listener")
+		if not listener_nodes.is_empty():
+			_listener_target = listener_nodes[0] as Node2D
+	if _listener_target == null:
 		return null
 	var listener_m := Vector2.ZERO
 	if _listener_target != null:
@@ -42,7 +46,7 @@ func play_at(world_m: Vector2, stream: AudioStream, loop: bool = false) -> Audio
 		return null
 	p.global_position = Vector2(world_m.x * Units.PX_PER_METER, world_m.y * Units.PX_PER_METER)
 	p.stream = stream
-	p.loop = loop
+	#(p as AudioStreamPlayer2D).stream.set set_l loop = loop
 	p.play()
 	return p
 

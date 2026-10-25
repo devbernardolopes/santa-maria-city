@@ -138,7 +138,7 @@ Folders relative to the project root. Sub-folders are indicated by the tab level
 - `EntityAnimationState.meters_per_cycle` ties clip playback to ground speed (`AnimatedSprite2D.speed_scale`, clamped 0.5–2.0) so feet do not slide on slow terrain or with a speed multiplier; zero keeps the authored fps.
 - `EntityAnimator` (`scripts/entities/entity_animator.gd`) is a pure `RefCounted` state machine: standing below 0.1 m/s → IDLE, moving with a run intent → RUN, otherwise WALK; a seated (riding) body stays IDLE. `EntityVisual` samples `Entity.get_speed_mps()`, `Entity.wants_run()`, and `Entity.riding` each frame and only touches the sprite when the state changes. Animation is presentation only and never gates movement.
 - `Entity` keeps `facing` as gameplay truth and hands it to `EntityVisual.set_facing()` / `look_toward()`, so art rotation (free 360° today, direction-specific clips later) stays out of the body.
-- The eye is the player: `entity.tscn` NPCs get a look through `DebugSpawner.npc_animation_set`, and one-offs through `EntityData.animation_set`.
+- The eye is the player: `entity.tscn` NPCs get a look through `DebugSpawner.npc_animation_set`, and one-offs through `EntityData.animation_set`. Debug NPCs spawn on road centerlines within `DebugSpawner.spawn_radius_m` (120 m) of the player, so `npc_count` measures what the player can see; a radius of 0 or less restores whole-map spawning.
 
 ### Vehicles
 
@@ -166,6 +166,7 @@ Canonical actions, persisted in `project.godot`, one keyboard key + one pad butt
 
 - Target 60 fps on the laptop and a stable frame rate on the low-end phone (see Testing). Keep node counts low: prefer one node per feature at most, and plan for chunked streaming of the map when the imported area grows. Do not build per-frame work that scales with the total number of map features.
 - The full-city import currently loads monolithically: roughly 5.5–6 s and ~125k nodes at runtime on the desktop, with collision and terrain indexing included. Street-tree indexing adds ~31 ms; the ~50k trees are now generated lazily per visible chunk. Full-map editor preview follows the same node cost. Visible-feature streaming and deferred collision streaming are the next performance work before the phone release; measure with `make bench`.
+- Measured on the full city (`make entities-bench`, headless desktop, GL-independent): the empty harness costs 0.30 ms/frame of CPU, and each full `Entity` node (physics body, controller, visual, terrain sampling) costs about 15 µs/frame — 100 NPCs ≈ 1.8 ms/frame and ~12 KB each, still paced at 60 fps. Node-per-entity therefore caps out in the low hundreds; thousands of entities need the data-only simulation LOD (sim records outside a materialization radius) rather than more nodes. The benchmark reports process CPU (`/proc/self/stat`), not `Performance.TIME_PHYSICS_PROCESS`, which excludes GDScript callbacks.
 
 ### Interaction and interiors
 
@@ -193,6 +194,7 @@ Agents must validate scripts without running gameplay. Use the headless harness:
 - `make entrance-smoke` — runs `make check`, then the headless entrance test in `res://tests/entrance_smoke.tscn` (plain and past-midnight schedules, next opening time, lock matching, transform helpers, prompts, and sprite/placeholder fallback).
 - `make interior-smoke` — runs `make check`, then the headless interior test in `res://tests/interior_smoke.tscn` (placeholder room sizing, enter/exit through the `Interactable`, camera limits, day/night restore, and the outside return point).
 - `make bench` — runs `make check`, then the headless runtime map benchmark in `res://tests/map_benchmark.tscn` (build timings, node count, static memory).
+- `make entities-bench` — runs `make check`, then the headless entity scaling benchmark in `res://tests/entities_benchmark.tscn` (per-`npc_count` CPU, frame pacing, node count, memory; `ENTITIES_BENCH_MAP` and `ENTITIES_BENCH_SWEEP` override the map and the sweep). It fails on any runtime script error, so an error storm can never be mistaken for entity cost.
 - `make lint` / `make format` — run `gdlint` / `gdformat` through `uv`; `.gdlintrc` sets a 120-column project baseline and disables legacy structural rules. `make format` rewrites files, so use it deliberately.
 - `make map` — regenerate `res://data/map.json` from `data/export_0002.geojson` (or `MAP_SOURCE=... make map`) with the pinned Python dependencies.
 

@@ -93,7 +93,7 @@ func _on_map_loaded(counts: Dictionary) -> void:
 	if _vehicle_spawner != null:
 		_vehicle_spawner.spawn_vehicles(_spawn_point_m)
 	if _debug_spawner != null:
-		_debug_spawner.spawn_npcs(debug_seed + 1)
+		_debug_spawner.spawn_npcs(debug_seed + 1, _spawn_point_m)
 
 
 func _spawn_player() -> void:
