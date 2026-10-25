@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dfqauclb7xqb3"]
+
+[sub_resource type="Curve2D" id="Curve2D_j56wk"]
+bake_interval = 8.0
+
+[node name="LineDecal" type="Path2D" unique_id=1405218900]
+curve = SubResource("Curve2D_j56wk")

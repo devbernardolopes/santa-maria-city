@@ -8,13 +8,14 @@
 [ext_resource type="Script" uid="uid://bpmjjc3el8ayn" path="res://scripts/world/map_picker.gd" id="5_picker"]
 [ext_resource type="Texture2D" uid="uid://bmbo2gy3yaykj" path="res://assets/images/textures/2010-09-04_11-47-57.jpg" id="5_tytul"]
 [ext_resource type="Script" uid="uid://dj58ki6r2sw3x" path="res://scripts/world/follow_camera.gd" id="6_follow"]
-[ext_resource type="Texture2D" uid="uid://c857cetcata78" path="res://assets/images/textures/decals/park1v_g.png" id="6_wbwoo"]
 [ext_resource type="Script" uid="uid://bebsb5h3e7jm2" path="res://scripts/world/debug_spawner.gd" id="7_spawner"]
 [ext_resource type="Texture2D" uid="uid://oxqfbj2p6bq7" path="res://assets/images/textures/decals/2lnh_cw_g.png" id="7_tytul"]
 [ext_resource type="Texture2D" uid="uid://d0tfnfa6hp17k" path="res://assets/images/textures/2010-09-04_11-57-29.jpg" id="8_t634p"]
 [ext_resource type="PackedScene" path="res://scenes/ui/touch_controls.tscn" id="8_touch"]
 [ext_resource type="Script" uid="uid://bpo70s0h2w5uq" path="res://scripts/world/day_night.gd" id="9_daynight"]
+[ext_resource type="Script" uid="uid://bdy6nukjcqkvo" path="res://scripts/decals/line_decal.gd" id="9_ues17"]
 [ext_resource type="Script" uid="uid://c3sn3bs74i6x3" path="res://scripts/world/entrance_spawner.gd" id="10_entrance_spawner"]
+[ext_resource type="Texture2D" uid="uid://b4plc3ogsj2kn" path="res://assets/images/textures/decals/continuous_yellow_line.png" id="10_xq18t"]
 [ext_resource type="Script" uid="uid://bjwfcgswah318" path="res://scripts/world/interior_manager.gd" id="11_interior_manager"]
 [ext_resource type="Script" uid="uid://clgnsatsjxo3a" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
 [ext_resource type="Script" uid="uid://b7khg7p18e3w1" path="res://scripts/vegetation/vegetation_manager.gd" id="13_vegetation"]
@@ -22,6 +23,41 @@
 [ext_resource type="Script" uid="uid://bpcqv14h11h02" path="res://scripts/ui/mini_map.gd" id="15_mini_map"]
 [ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
 [ext_resource type="Script" uid="uid://iikk3d7bfl1k" path="res://scripts/audio/audio_listener_setup.gd" id="22_6hctx"]
+
+[sub_resource type="Curve2D" id="Curve2D_xq18t"]
+bake_interval = 8.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -2405, 79, 0, 0, 0, 0, 1954, -75, 0, 0, 0, 0, 1967, -74, 0, 0, 0, 0, 1979, -70, 0, 0, 0, 0, 1990, -64, 0, 0, 0, 0, 2004, -55, 0, 0, 0, 0, 2019, -43, 0, 0, 0, 0, 2041, -26, 0, 0, 0, 0, 2050, -14, 0, 0, 0, 0, 2057, 3, 0, 0, 0, 0, 2062, 27, 0, 0, 0, 0, 2076, 71, 0, 0, 0, 0, 2089, 724)
+}
+point_count = 13
+
+[sub_resource type="Curve2D" id="Curve2D_ues17"]
+bake_interval = 8.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -3629.1836, 136.82031, 0, 0, 0, 0, 1534.8164, -47.179688)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_x0nq1"]
+bake_interval = 8.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -52, -34, 0, 0, 0, 0, 17, -36)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_rwifv"]
+bake_interval = 8.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -19, 24, 0, 0, 0, 0, 50.003906, 20.621094)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_ckok1"]
+bake_interval = 8.0
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -21.511719, 3.6875, 0, 0, 0, 0, 47.48828, 0.6875)
+}
+point_count = 2
 
 [node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
 script = ExtResource("1_world")
@@ -36,65 +72,61 @@ style = ExtResource("3_t5ptc")
 
 [node name="Decals" type="Node2D" parent="." unique_id=1844170185]
 
-[node name="Terrain001" type="Sprite2D" parent="Decals" unique_id=1532167684]
-position = Vector2(38980.004, 58809.004)
-rotation = 1.5373852
-scale = Vector2(0.048806995, 0.048806995)
-texture = ExtResource("5_tytul")
+[node name="Parking" type="Node2D" parent="Decals" unique_id=1478770139]
 
-[node name="Terrain002" type="Sprite2D" parent="Decals" unique_id=1991592068]
-position = Vector2(38983.004, 58913.004)
-rotation = 1.5373852
-scale = Vector2(0.048806995, 0.048806995)
+[node name="Polygon2D" type="Polygon2D" parent="Decals/Parking" unique_id=946402284]
+texture_repeat = 2
+position = Vector2(38977.184, 58775.2)
+antialiased = true
 texture = ExtResource("5_tytul")
+texture_scale = Vector2(50, 50)
+polygon = PackedVector2Array(-26.183594, -11.199219, 48.816406, -15.199219, 58.816406, 396.80078, -13.183594, 397.80078)
+uv = PackedVector2Array(-26.183594, -11.199219, 48.816406, -15.199219, 58.816406, 396.80078, -13.183594, 397.80078)
+
+[node name="Lines" type="Node2D" parent="Decals" unique_id=259509510]
+
+[node name="LineDecal" type="Path2D" parent="Decals/Lines" unique_id=1833721020]
+modulate = Color(1, 0.81960785, 0.11372549, 0.5411765)
+position = Vector2(36834, 58569)
+curve = SubResource("Curve2D_xq18t")
+script = ExtResource("9_ues17")
+texture = ExtResource("10_xq18t")
+metadata/_custom_type_script = "uid://bdy6nukjcqkvo"
+
+[node name="LineDecal2" type="Path2D" parent="Decals/Lines" unique_id=1284459538]
+modulate = Color(1, 0.81960785, 0.11372549, 0.5411765)
+position = Vector2(38091.184, 59351.18)
+curve = SubResource("Curve2D_ues17")
+script = ExtResource("9_ues17")
+texture = ExtResource("10_xq18t")
+metadata/_custom_type_script = "uid://bdy6nukjcqkvo"
+
+[node name="LineDecal3" type="Path2D" parent="Decals/Lines" unique_id=285645512]
+position = Vector2(39006, 58824)
+curve = SubResource("Curve2D_x0nq1")
+script = ExtResource("9_ues17")
+texture = ExtResource("10_xq18t")
+metadata/_custom_type_script = "uid://bdy6nukjcqkvo"
+
+[node name="LineDecal4" type="Path2D" parent="Decals/Lines" unique_id=994585670]
+position = Vector2(38974, 58797)
+curve = SubResource("Curve2D_rwifv")
+script = ExtResource("9_ues17")
+texture = ExtResource("10_xq18t")
+metadata/_custom_type_script = "uid://bdy6nukjcqkvo"
+
+[node name="LineDecal5" type="Path2D" parent="Decals/Lines" unique_id=716855203]
+position = Vector2(38977.51, 58848.313)
+curve = SubResource("Curve2D_ckok1")
+script = ExtResource("9_ues17")
+texture = ExtResource("10_xq18t")
+metadata/_custom_type_script = "uid://bdy6nukjcqkvo"
 
 [node name="Crosswalk" type="Sprite2D" parent="Decals" unique_id=1011358214]
 position = Vector2(36645, 59408.996)
 rotation = -0.048490185
 scale = Vector2(0.060388505, 0.060388505)
 texture = ExtResource("7_tytul")
-
-[node name="Parking" type="Sprite2D" parent="Decals" unique_id=631155831]
-position = Vector2(38980.535, 58771.785)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking2" type="Sprite2D" parent="Decals" unique_id=2108645581]
-position = Vector2(38980.54, 58800.79)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking3" type="Sprite2D" parent="Decals" unique_id=1883351431]
-position = Vector2(38980.54, 58829.79)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking4" type="Sprite2D" parent="Decals" unique_id=1389403672]
-position = Vector2(38980.535, 58858.785)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking5" type="Sprite2D" parent="Decals" unique_id=1234295035]
-position = Vector2(38980.535, 58888.79)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking6" type="Sprite2D" parent="Decals" unique_id=1583056138]
-position = Vector2(38980.54, 58918.79)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
-
-[node name="Parking7" type="Sprite2D" parent="Decals" unique_id=1453446678]
-position = Vector2(38980.54, 58947.78)
-rotation = -1.620928
-scale = Vector2(0.12, 0.12)
-texture = ExtResource("6_wbwoo")
 
 [node name="Polygon2D" type="Polygon2D" parent="Decals" unique_id=2019972794]
 texture_repeat = 2
@@ -134,7 +166,8 @@ auto_speed_zoom = 0.75
 
 [node name="DebugSpawner" type="Node" parent="." unique_id=79334371]
 script = ExtResource("7_spawner")
-npc_count = 1
+npc_count = 1000
+spawn_radius_m = 0.0
 
 [node name="VehicleSpawner" type="Node" parent="." unique_id=1322025233]
 script = ExtResource("14_vehicles")
