@@ -19,13 +19,17 @@ const OVERLAY_VERSION: int = 1
 var _vehicles: Array[Vehicle] = []
 var _map: MapLoader = null
 var _objects: Node2D = null
+var _unique_vehicles: Node = null
 
 
 func _ready() -> void:
 	_map = get_parent().get_node_or_null("Map") as MapLoader
 	_objects = get_parent().get_node_or_null("Objects") as Node2D
+	_unique_vehicles = get_parent().get_node_or_null("Uniques/Vehicles") as Node
 	if _objects == null:
 		push_error("VehicleSpawner: Objects node not found; vehicles are disabled.")
+	if _unique_vehicles == null:
+		push_warning("VehicleSpawner: Uniques/Vehicles node not found; no unique vehicles.")
 
 
 func spawn_vehicles(spawn_point_m: Vector2) -> void:
@@ -36,6 +40,11 @@ func spawn_vehicles(spawn_point_m: Vector2) -> void:
 	if entries.is_empty() and OS.is_debug_build() and debug_fallback_count > 0:
 		entries = _debug_entries(spawn_point_m)
 	for entry: Dictionary in entries:
+		_spawn_entry(entry)
+	var unique_entries: Array[Dictionary] = _read_unique_vehicles()
+	if unique_entries.is_empty():
+		return
+	for entry: Dictionary in unique_entries:
 		_spawn_entry(entry)
 
 
@@ -142,6 +151,48 @@ func _read_overlay() -> Array[Dictionary]:
 		)
 	if skipped > 0:
 		push_warning("VehicleSpawner: skipped %d invalid entries in %s." % [skipped, overlay_path])
+	return result
+
+func _read_unique_vehicles() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	if not _unique_vehicles:
+		return result
+	var unique_vehicles = _unique_vehicles.get_children()
+	if not unique_vehicles or unique_vehicles.is_empty():
+		return result
+	for index: int in range(unique_vehicles.size()):
+		var entry: UniqueVehicle = unique_vehicles[index]
+		
+		var data_path: String = entry.vehicle_data.resource_path
+		#var position_aux: Vector2 = entry.position / 16.0
+		#var position_value: Variant = position_aux
+		#var position_m: Variant = _read_position(position_value)
+		var position_m: Variant = entry.position / 16.0
+		#var position_value: Variant = position_aux
+		
+		#push_warning("p: ", entry.position, " - p_aux: ", position_aux, " - p_m: ", position_m)
+		var heading_deg: float = 0.0
+		var heading_value: Variant = entry.get("heading_deg")
+		if _is_number(heading_value):
+			heading_deg = float(heading_value)
+		var entry_id: String = ""
+		if entry_id.is_empty():
+			entry_id = "vu_%04d" % index
+		var lights_value: Variant = entry.get("lights_enabled")
+		var lights: bool = lights_value is bool and bool(lights_value)
+		(
+			result
+			. append(
+				{
+					"id": entry_id,
+					"data": data_path,
+					"position": position_m,
+					"heading_rad": deg_to_rad(heading_deg),
+					"lights": lights,
+				}
+			)
+		)
+		entry.visible = false
 	return result
 
 

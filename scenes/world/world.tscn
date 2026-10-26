@@ -15,6 +15,7 @@
 [ext_resource type="Script" uid="uid://bpo70s0h2w5uq" path="res://scripts/world/day_night.gd" id="9_daynight"]
 [ext_resource type="Script" uid="uid://bdy6nukjcqkvo" path="res://scripts/decals/line_decal.gd" id="9_ues17"]
 [ext_resource type="Script" uid="uid://c3sn3bs74i6x3" path="res://scripts/world/entrance_spawner.gd" id="10_entrance_spawner"]
+[ext_resource type="Texture2D" uid="uid://poy08m6mhffs" path="res://assets/images/textures/stone/Photoreal_Stone_07-512x512.png" id="10_x0nq1"]
 [ext_resource type="Texture2D" uid="uid://b4plc3ogsj2kn" path="res://assets/images/textures/decals/continuous_yellow_line.png" id="10_xq18t"]
 [ext_resource type="Script" uid="uid://bjwfcgswah318" path="res://scripts/world/interior_manager.gd" id="11_interior_manager"]
 [ext_resource type="Script" uid="uid://clgnsatsjxo3a" path="res://scripts/ui/screen_fader.gd" id="12_screen_fader"]
@@ -23,6 +24,11 @@
 [ext_resource type="Script" uid="uid://bpcqv14h11h02" path="res://scripts/ui/mini_map.gd" id="15_mini_map"]
 [ext_resource type="PackedScene" uid="uid://chmlq44l61w64" path="res://scenes/entities/player_entity.tscn" id="18_bt7bg"]
 [ext_resource type="Script" uid="uid://iikk3d7bfl1k" path="res://scripts/audio/audio_listener_setup.gd" id="22_6hctx"]
+[ext_resource type="Texture2D" uid="uid://ci3qlxs37e31y" path="res://assets/images/sprites/vehicles/cars/police/1.png" id="25_wnndm"]
+[ext_resource type="Texture2D" uid="uid://c51e8irq0p5w5" path="res://assets/images/sprites/vehicles/cars/police/2.png" id="26_26xou"]
+[ext_resource type="Resource" uid="uid://g6nk78bq6hb6" path="res://resources/vehicles/police.tres" id="26_ckok1"]
+[ext_resource type="Texture2D" uid="uid://dw2ppbikt0v3f" path="res://assets/images/sprites/vehicles/cars/police/3.png" id="27_jyr8v"]
+[ext_resource type="Script" uid="uid://du5447hqpx2hh" path="res://scripts/vehicles/unique_vehicle.gd" id="28_5o5dd"]
 
 [sub_resource type="Curve2D" id="Curve2D_xq18t"]
 bake_interval = 8.0
@@ -59,6 +65,36 @@ _data = {
 }
 point_count = 2
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_wnndm"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("25_wnndm")
+}],
+"loop": 0,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("25_wnndm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_26xou")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_jyr8v")
+}],
+"loop": 1,
+"name": &"lights",
+"speed": 10.0
+}]
+
 [node name="World" type="Node2D" unique_id=1946698986 node_paths=PackedStringArray("player")]
 script = ExtResource("1_world")
 player = NodePath("PlayerEntity")
@@ -74,7 +110,7 @@ style = ExtResource("3_t5ptc")
 
 [node name="Parking" type="Node2D" parent="Decals" unique_id=1478770139]
 
-[node name="Polygon2D" type="Polygon2D" parent="Decals/Parking" unique_id=946402284]
+[node name="ParkingArea" type="Polygon2D" parent="Decals/Parking" unique_id=946402284]
 texture_repeat = 2
 position = Vector2(38977.184, 58775.2)
 antialiased = true
@@ -138,6 +174,15 @@ texture_scale = Vector2(32, 32)
 polygon = PackedVector2Array(-46.539063, 306.33984, 554.46094, 306.33984, 551.46094, 909.33984, 622.46094, 908.33984, 716.46094, 661.33984, 714.46094, 276.33984, -35.539063, -293.66016)
 uv = PackedVector2Array(-46.539063, 306.33984, 554.46094, 306.33984, 551.46094, 909.33984, 622.46094, 908.33984, 716.46094, 661.33984, 714.46094, 276.33984, -35.539063, -293.66016)
 
+[node name="Node2D" type="Node2D" parent="Decals" unique_id=701516427]
+
+[node name="Sidewalk" type="Polygon2D" parent="Decals/Node2D" unique_id=2141609721]
+texture_repeat = 2
+position = Vector2(38803.76, 58796.906)
+texture = ExtResource("10_x0nq1")
+texture_scale = Vector2(12, 12)
+polygon = PackedVector2Array(-2154.7617, 644.09375, 824.2383, 539.09375, 824.2383, 552.09375, -4283.7617, 732.09375, -4283.7617, 718.09375)
+
 [node name="TerrainState" type="Node2D" parent="." unique_id=1064762405]
 
 [node name="Objects" type="Node2D" parent="." unique_id=1436374420]
@@ -166,7 +211,7 @@ auto_speed_zoom = 0.75
 
 [node name="DebugSpawner" type="Node" parent="." unique_id=79334371]
 script = ExtResource("7_spawner")
-npc_count = 1000
+npc_count = 1
 spawn_radius_m = 0.0
 
 [node name="VehicleSpawner" type="Node" parent="." unique_id=1322025233]
@@ -292,3 +337,21 @@ position = Vector2(36897, 59435)
 
 [node name="Marker2DParking00001" type="Marker2D" parent="." unique_id=682866575]
 position = Vector2(38980, 58858)
+
+[node name="Uniques" type="Node" parent="." unique_id=1654328409]
+
+[node name="Vehicles" type="Node" parent="Uniques" unique_id=846462704]
+
+[node name="UniqueVehicle" type="AnimatedSprite2D" parent="Uniques/Vehicles" unique_id=488036546]
+position = Vector2(36406, 59346)
+rotation = 2.3561945
+scale = Vector2(0.2811215, 0.2811215)
+sprite_frames = SubResource("SpriteFrames_wnndm")
+animation = &"lights"
+frame_progress = 0.059112713
+script = ExtResource("28_5o5dd")
+vehicle_data = ExtResource("26_ckok1")
+lights_enabled = true
+vehicle_scale = 0.8
+heading_deg = 135.0
+metadata/_custom_type_script = "uid://du5447hqpx2hh"

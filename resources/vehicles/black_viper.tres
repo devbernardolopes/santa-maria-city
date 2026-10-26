@@ -32,6 +32,6 @@ rolling_resistance_mps2 = 0.55
 max_steer_deg = 30.0
 steer_rate_deg_s = 150.0
 high_speed_steer_factor = 0.3
-lateral_grip = 10.0
+lateral_grip = 16.0
 wheelbase_m = 2.8
 seat_count = 2

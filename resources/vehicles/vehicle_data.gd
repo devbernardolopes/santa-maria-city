@@ -10,6 +10,8 @@ extends Resource
 @export_enum("car", "van", "truck", "bus", "motorcycle", "emergency") var kind: String = "car"
 ## Shared physical description (mass, flammability, breaking, lifespan).
 @export var properties: ObjectProperties = null
+@export var owner_entity: StringName = &""
+@export_enum("Unknown", "Nissan", "Fiat", "Ford", "Volkswagen", "Toyota", "Renault", "Peugeot", "Dodge", "Mitsibushi", "Audi", "BMW", "Mercedez-Benz") var maker: String = "Unknown"
 
 @export_group("Body")
 @export var length_m: float = 4.5

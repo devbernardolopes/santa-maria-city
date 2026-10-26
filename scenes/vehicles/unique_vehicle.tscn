@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://bbb41d5ywp25y"]
+
+[node name="UniqueVehicle" type="AnimatedSprite2D" unique_id=674776292]
